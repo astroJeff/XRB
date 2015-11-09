@@ -1,0 +1,88 @@
+\documentclass[12pt, preprint]{aastex}
+\usepackage{bm}
+
+\newcommand{\setof}[1]{\left\{{#1}\right\}}
+\newcommand{\given}{\,|\,}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\catalog}{\bm{Q}}
+\newcommand{\pars}{\bm{\theta}}
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+
+\begin{document}
+
+\title{Modeling the X-Ray Populations of NGC 55}
+\author{some combination of JJA, AZ, TF, and others}
+\date{NOT READY}
+
+\begin{abstract}
+
+\end{abstract}
+
+\section{Introduction}
+
+{\it Chandra} has revolutionized our understanding of the x-ray emitting objects. It's unprecedented angular precision and collecting area allows it to identify dozens of resolved sources in nearby galaxies. Studies of individual objects have yielded a deeper insight into the physical processes forming the bulk of individually identified sources, low and high mass X-ray binaries (XRBs), as well as a rare, but important subset, the ultra-luminous X-ray sources (ULXs). High mass binaries, in particular, are formed from the accretion of an early-type star onto either a neutron star or black hole. Their relatively short lifetimes requires that these systems cannot travel far away from their birth site, and indeed observations show the majority of luminous X-ray sources are near star forming regions. 
+
+NGC 55 is a relatively transparent, edge-on, nearby galaxy. Using the {\it Hubble Space Telescope}, and other optical telescopes, we have been able to identify a near-complete sample of star forming regions. For each region, multi-band photometry provides an estimate of the star formation history. 
+
+In this work, we simulate the expected number, position, and characteristics of the X-ray binary population, given our sample of star forming regions, as well as the star formation history of the overall galaxy. We then apply a Bayesian method to generate a likelihood function comparing the resulting distribution with the observed X-ray sample.
+
+\section{Method}
+
+We begin with Bayes' Rule:
+\begin{equation}
+P( M \given D ) = \frac{P( D \given M ) P(M)}{P(D)},
+\end{equation}
+where $M$ is the model and $D$ is the data. In this case, $D$ includes the set of observed X-ray luminosities, companion masses (where available), and sky positions:
+\begin{equation}
+P ( D \given M ) = P( \bs{L_x}, \bs{M_2}, \bs{\alpha}, \bs{\delta} \given M),
+\end{equation}
+here we use bold quantities to identify sets of variables. The posterior probability over the entire set of observables is the product over the posterior probability over the observed quantities for each X-ray binary:
+\begin{equation}
+P( \bs{L_x}, \bs{M_2}, \bs{\alpha}, \bs{\delta} \given M) = \prod_i P( L_x, M_2, \alpha, \delta \given M).
+\end{equation}
+We now marginalize over the birth time ($t_b$), the birth kick velocity ($v_k$), and from which star forming region each system was formed ($C$):
+\begin{equation}
+P( L_x, M_2, \alpha, \delta \given M) = \sum_{{\rm all}\ C} \int \int P( L_x, M_2, \alpha, \delta, t_b, C, v_k \given M)\ \dd v_k\ \dd t_b\ \dd C.
+\end{equation}
+There are an integer number of star forming regions, so we expressed the integral over $C$ as a sum over the known set of star forming regions. This assumes a complete census of the star forming regions in NGC 55. ({\bf Is this reasonable? If not, we should add a complication to the model to account for our non-perfect knowledge.}). Based on independence, we can separate out several terms:
+\begin{equation}
+\sum_{{\rm all}\ C} \int \int P(\alpha, \delta \given v_k, C, t_b) P(L_x, M_2, v_k \given t_b, M)\ \dd v_k\ P(t_b \given C)\ \dd t_b.
+\end{equation}
+We discuss each of these terms in turn. 
+
+The first term provides the probability that, given a birth time, kick velocity, and particular star forming region, what is the probability that the X-ray binary would be observed at its current position. For the vast majority of parameter space, this probability is zero. For example, given a short birth time, and a small kick velocity, none but the nearest star forming regions could have formed that particular system. We can only observe the projected distance between the X-ray binary and its candidate host star forming region. The actual distance is $v_k t_b$. We care only about the distance the cluster is from each particular star forming region, so the probability is equal to the probability of the X-ray binary being ejected from that particular star forming region along the angle implied by the distance traveled $v_k t_b$ and the projected separation $s$. This probability is equal to the probability of randomly drawing a polar angle (multiplied by two since the X-ray binary could be either in front of or behind the star forming region:
+\begin{equation}
+P(\alpha, \delta \given v_k, C, t_b) = \frac{s}{v_k t_b}.
+\end{equation}
+
+Given a birth time and a particular binary population synthesis model, the second term provides the probability that a binary with a particular $L_x$, $M_2$, and $v_k$ will be formed. We discuss this term in detail below.
+
+The final term gives the probability of a birth time for a particular cluster. The birth time probability is directly related to the star formation rate at that time:
+\begin{equation}
+P(t_b \given C) \propto \dot{M}(t_b).
+\end{equation} 
+Determining this term therefore requires a knowledge of the star formation history of each star forming cluster. Multi wavelength observations have allowed approximate knowledge of the star formation histories for most of the star forming regions in NGC 55, at least within the recent past.
+
+ 
+
+
+\section{Experiments}
+
+... Make a test model to check our code and see if it actually works.
+
+\section{Results}
+
+... Apply our model to the data from NGC 55. 
+
+\section{Discussion}
+
+... First stab at a difficult problem. This is the basics, but generalization to X-ray populations in all galaxies should be possible.
+
+... What does this imply about our understanding of NGC 55? What about binary population synthesis? Kick velocities? High mass binary evolution?
+
+\acknowledgements
+It is a pleasure to thank...
+Funding...
+Code...
+
+\end{document}
