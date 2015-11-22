@@ -160,7 +160,25 @@ $M_{1,c}$ can be estimated by:
 \begin{equation}
 M_{1,c} = M_0 M_1^{1/\xi},
 \end{equation}
-where $M_0 = 0.073\ \Msun$ and $\xi = 0.704\ \Msun$. Determining the Jacobian matrix of this transformation (which we provide in the appendix) allows us transform the initial binary distribution into the post mass transfer distribution:
+where $M_0 = 0.073\ \Msun$ and $\xi = 0.704\ \Msun$. 
+
+
+The inverse transformation, $G_{\rm MT}$ can be determined from these equations:
+\begin{equation}
+M_1 = \left( \frac{M_1'}{M_0} \right)^{\xi},
+\end{equation}
+and
+\begin{equation}
+M_2 = M_2' - \left( \frac{M_1'}{M_0} \right)^{\xi} + M_1'.
+\end{equation}
+Using these, we can determine $A$ from $A'$:
+\begin{equation}
+A = \left[ \frac{M_1' M_2'}{M_1 M_2} \right]^2 A'
+\end{equation}
+
+
+
+Determining the Jacobian matrix of this transformation (which we provide in the appendix) allows us transform the initial binary distribution into the post mass transfer distribution:
 \begin{equation}
 P(M'_1, M'_2, A') = P(M_1, M_2, A) J_{MT}. \label{eq:P_MT}
 \end{equation}
@@ -179,7 +197,11 @@ v_{\rm sys} &=& \left( \frac{M_1''}{M_1'' + M_2''} \right) \sqrt{ |v_1^2| }, \la
 \end{eqnarray}
 where $v_1$ is the post-kick velocity of the primary:
 \begin{equation}
-v_1^2 = 2v_k \cos \theta \sqrt{\frac{G (M_1' + M_2')}{A'}} + v_k^2 + \frac{G (M_1' + M_2')}{A'}. 
+v_1^2 = 2v_k v_r \cos \theta + v_k^2 + v_r^2\, 
+\end{equation}
+where:
+\begin{equation}
+v_r = \sqrt{\frac{G (M_1' + M_2')}{A'}} \label{eq:v_r}
 \end{equation}
 
 For now, we will ignore eccentricity. However, if the post-SN orbital eccentricity becomes relevant for the evolution of the binary later on, we can include it in the analysis. We include the eccentricity equation below for reference:
@@ -187,6 +209,24 @@ For now, we will ignore eccentricity. However, if the post-SN orbital eccentrici
 1-e^2 = \frac{A'^2}{A'' \mu} \left[ v_k^2 \cos^2\theta + v_k^2 \sin^2 \theta \sin^2 \phi + v_k \left( \frac{\mu}{h} \right) \cos \theta + \left( \frac{\mu}{h} \right)^2  \right], \label{eq:SN_e}
 \end{equation}
 where $\mu = G(M_1' + M_2')$, $\mu/h = \sqrt{G(M_1'+M_2') / A'}$.
+
+The reverse mapping of this transformation, $H_{\rm SN}$ is analytic. $A'$ is straightforward:
+\begin{equation}
+A' = \left[ \frac{1}{A''} - \frac{M_1'' + M_2''}{G M_1''^2} v_{\rm sys} \right]^{-1}.
+\end{equation}
+We can now determine $v_r$:
+\begin{equation}
+v_r = -v_k \cos \theta + \sqrt{v_{\rm sys}^2 \left( \frac{M_1'' + M_2''}{M_1''} \right)^2 - v_k^2\ \sin^2 \theta}. \label{eq:v_r_2}
+\end{equation}
+This equation places two constraints:
+\begin{eqnarray}
+v_{\rm sys}^2 \left( \frac{M_1'' + M_2''}{M_1''} \right)^2 &>& v_k^2\ \sin^2 \theta \\ 
+\sqrt{v_{\rm sys}^2 \left( \frac{M_1'' + M_2''}{M_1''} \right)^2 - v_k^2\ \sin^2 \theta} &>& v_k \cos \theta.
+\end{eqnarray}
+If either of those conditions are false, then the observed binary cannot be formed with the particular choice of kick velocity and angle. Using Equation \ref{eq:v_r}, we can solve for $M_1'$ in terms of $A'$, $M_2'$ and $v_r$ (which can be determined from equation \ref{eq:v_r_2}):
+\begin{equation}
+M_1' = \frac{v_r^2 A'}{G} - M_2'
+\end{equation}
 
 
 Derivatives of equations \ref{eq:SN_A} and \ref{eq:SN_v_sys} determine the Jacobian $J_{\rm SN}$. We provide the analytic form for $J_{\rm SN}$ in the Appendix. The probability of the post-SN parameters from the pre-SN parameters and the three kick parameters is:
