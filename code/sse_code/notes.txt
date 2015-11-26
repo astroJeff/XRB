@@ -1,0 +1,13 @@
+We want to call subroutine star in star.f:
+
+SUBROUTINE star(kw,mass,mt,tm,tn,tscls,lums,GB,zpars)
+
+kw = stellar type
+mass = Initial stellar mass
+mt = current stellar mass (Msun)
+tm = Main sequence lifetime
+tn = Nuclear burning lifetime (assuming no further mass loss)
+tscls = Evolution timescales for different stages
+lums = Landmark luminosities
+GB = Giant branch parameters
+zpars = Parameters for distinguishing various mass intervals

@@ -1,0 +1,1 @@
+for i in $(seq -w 1.0 0.01 10.0); do echo $i; ./sse_Mdot $i > temp.dat; sed s/'  '/' '/g temp.dat > temp2.dat; sed s/'  '/' '/g temp2.dat > temp.dat; sed s/'  '/' '/g temp.dat > mdot_${i}.dat; done
