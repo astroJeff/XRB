@@ -64,15 +64,15 @@ c-------------------------------------------------------------c
 *
 * neta is the Reimers mass-loss coefficent (neta*4x10^-13; 0.5 normally).
 * bwind is the binary enhanced mass loss parameter (inactive for single).
-* hewind is a helium star mass loss factor (1.0 normally). 
-* sigma is the dispersion in the Maxwellian for the SN kick speed (190 km/s). 
+* hewind is a helium star mass loss factor (1.0 normally).
+* sigma is the dispersion in the Maxwellian for the SN kick speed (190 km/s).
 *
-* ifflag > 0 uses WD IFMR of HPE, 1995, MNRAS, 272, 800 (0). 
-* wdflag > 0 uses modified-Mestel cooling for WDs (0). 
-* bhflag > 0 allows velocity kick at BH formation (0). 
-* nsflag > 0 takes NS/BH mass from Belczynski et al. 2002, ApJ, 572, 407 (1). 
-* mxns is the maximum NS mass (1.8, nsflag=0; 3.0, nsflag=1). 
-* idum is the random number seed used in the kick routine. 
+* ifflag > 0 uses WD IFMR of HPE, 1995, MNRAS, 272, 800 (0).
+* wdflag > 0 uses modified-Mestel cooling for WDs (0).
+* bhflag > 0 allows velocity kick at BH formation (0).
+* nsflag > 0 takes NS/BH mass from Belczynski et al. 2002, ApJ, 572, 407 (1).
+* mxns is the maximum NS mass (1.8, nsflag=0; 3.0, nsflag=1).
+* idum is the random number seed used in the kick routine.
 *
 * Next come the parameters that determine the timesteps chosen in each
 * evolution phase:
@@ -125,7 +125,7 @@ c-------------------------------------------------------------c
 *
 ************************************************************************
 *
-* Set parameters which depend on the metallicity 
+* Set parameters which depend on the metallicity
 *
       CALL zcnsts(z,zpars)
       if(idum.gt.0) idum = -idum
@@ -136,22 +136,22 @@ c-------------------------------------------------------------c
       epoch = 0.d0
 *
 *
-* Set the initial spin of the star. If ospin is less than or equal to 
-* zero at time zero then evolv1 will set an appropriate ZAMS spin. If 
+* Set the initial spin of the star. If ospin is less than or equal to
+* zero at time zero then evolv1 will set an appropriate ZAMS spin. If
 * ospin is greater than zero then it will start with that spin regardless
-* of the time. If you want to start at time zero with negligible spin 
+* of the time. If you want to start at time zero with negligible spin
 * then I suggest using a negligible value (but greater than 0.001).
 *
       ospin = 0.d0
 *
-* Set the data-save parameter. If dtp is zero then the parameters of the 
-* star will be stored in the scm array at each timestep otherwise they 
-* will be stored at intervals of dtp. Setting dtp equal to tphysf will 
-* store data only at the start and end while a value of dtp greater than 
+* Set the data-save parameter. If dtp is zero then the parameters of the
+* star will be stored in the scm array at each timestep otherwise they
+* will be stored at intervals of dtp. Setting dtp equal to tphysf will
+* store data only at the start and end while a value of dtp greater than
 * tphysf will mean that no data is stored.
 *
       dtp = 0.0
-* 
+*
       CALL evolv1(kw,mass,mt,r,lum,mc,rc,menv,renv,ospin,
      &            epoch,tms,tphys,tphysf,dtp,z,zpars)
 *
@@ -161,21 +161,21 @@ c-------------------------------------------------------------c
       j = 0
       if(scm(1,1).lt.0.0) goto 50
 *
-* The scm array stores the stellar parameters at the specified output 
+* The scm array stores the stellar parameters at the specified output
 * times. The parameters are (in order of storage):
-*    
+*
 *    Time, stellar type, initial mass, current mass, log10(L), log10(r),
 *    log10(Teff), core mass, epoch and spin.
 *
       text1 = ' Tev(Myr)    type      Mo        Mt      log10(L) '
-      text2 = ' log10(R) log10(Teff)  Mc        Mdot     ' 
-      text3 = ' epoch      spin' 
+      text2 = ' log10(R) log10(Teff)  Mc        Mdot     '
+      text3 = ' epoch      spin'
 *      WRITE(*,'(a,a,a)')text1,text2,text3
-*TEMP*      write(*,*) "Time(Myr)    Type    Mass(Msun)    Mdot(Msun/yr)"
+      write(*,*) "Time(Myr)    Type    Mass(Msun)    Mdot(Msun/yr)"
  30   j = j + 1
 *
 * To set the initial wind mass loss rate to zero
-      scm(1,10) = 0.d0  
+      scm(1,10) = 0.d0
 *
       if(scm(j,1).lt.0.0)then
          scm(j-1,1) = scm(j,1)
@@ -183,10 +183,14 @@ c-------------------------------------------------------------c
       endif
       kw = INT(scm(j,2))
       kw_last = INT(scm(j-1,2))
-*TEMP*      write(*,*) scm(j,1), kw, scm(j,4), scm(j,10)
-      if((kw.gt.2).and.(kw_last.le.2)) then
-         write(*,*) mass_in,scm(j,8),scm(j,1)
-      endif
+      write(*,*) scm(j,1), kw, scm(j,4), scm(j,10)
+
+*********** For He core mass at He ignition *************
+*      if((kw.gt.2).and.(kw_last.le.2)) then
+*         write(*,*) mass_in,scm(j,8),scm(j,1)
+*      endif
+*********** For He core mass at He ignition *************
+
 *      WRITE(*,99)(scm(j,k),k=1,8),scm(j,10),scm(j,12),scm(j,13)
       if((scm(j,1).ge.0.0).and.(scm(j-2,2).lt.10)) goto 30
  99   FORMAT(8f10.4,1p,e12.4,0p,f12.4,1p,e12.4)
