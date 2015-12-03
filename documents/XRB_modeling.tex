@@ -195,43 +195,59 @@ We assume that the binary does not change between the end of the mass transfer p
 \subsection{The Primary's Core Collapse} \label{sec:trans_SN}
 
 We next calculate the post-SN orbital separation ($A''$), systemic velocity ($v_{\rm sys}$), and eccentricity ($e$) based on the equations in Kalogera (1996):
-\begin{eqnarray}
-A'' &=& \left[ \frac{2 }{A'}  - \frac{v_1^2}{G(M_{\rm NS} + M_2')} \right]^{-1}. \label{eq:SN_A} \\
+\begin{equation}
+A'' = \left[ \frac{2 }{A'}  - \frac{v_1^2}{G(M_{\rm NS} + M_2')} \right]^{-1}. \label{eq:SN_A} \\
 %A'' &=& GM_1M_2 \left[ -\left( \frac{M_1''M_2''}{M_1'' + M_2''} \right) v_1^2 + \frac{2GM_1''M_2''}{A'} \right] ^{-1} \label{eq:SN_A} \\
-v_{\rm sys} &=& \left( \frac{M_{\rm NS}}{M_{\rm NS} + M_2'} \right) \sqrt{ |v_1^2| }, \label{eq:SN_v_sys}
-\end{eqnarray}
-where $v_1$ is the post-kick velocity of the primary:
+\end{equation}
+where $v_1$ is the post-kick velocity of the primary (in the reference frame of an initially stationary secondary):
 \begin{equation}
 v_1^2 = 2v_k v_r \cos \theta + v_k^2 + v_r^2\, 
 \end{equation}
 where:
 \begin{equation}
-v_r = \sqrt{\frac{G (M_1' + M_2')}{A'}} \label{eq:v_r}
+v_r = \sqrt{\frac{G (M_1' + M_2')}{A'}}. \label{eq:v_r}
 \end{equation}
+The systemic velocity is:
+\begin{equation}
+v_{\rm sys}^2 = \beta^2 v_k^2
+   + v_r^2 \left( \alpha - \beta \right)^2
+   + 2 \beta v_r v_k \cos \theta \left( \alpha - \beta \right)
+    \label{eq:SN_v_sys}
+\end{equation}
+where we have included two substitutions:
+\begin{eqnarray}
+\alpha &=& \frac{M_1'}{M_1' + M_2'} \\
+\beta &=& \frac{M_{\rm NS}}{M_{\rm NS} + M_2'}
+\end{eqnarray}
+
 
 For now, we will ignore eccentricity. However, if the post-SN orbital eccentricity becomes relevant for the evolution of the binary later on, we can include it in the analysis. We include the eccentricity equation below for reference:
 \begin{equation}
-1-e^2 = \frac{A'^2}{A'' \mu} \left[ v_k^2 \cos^2\theta + v_k^2 \sin^2 \theta \sin^2 \phi + v_k \left( \frac{\mu}{h} \right) \cos \theta + \left( \frac{\mu}{h} \right)^2  \right], \label{eq:SN_e}
+1-e^2 = \frac{A'^2}{A'' G (M_{\rm NS} + M_2')} \left[ v_k^2 \cos^2\theta + v_k^2 \sin^2 \theta \sin^2 \phi + v_k v_r \cos \theta + v_r^2  \right]. \label{eq:SN_e}
 \end{equation}
-where $\mu = G(M_1' + M_2')$, $\mu/h = \sqrt{G(M_1'+M_2') / A'}$.
 
 The reverse mapping of this transformation, $H_{\rm SN}$ is analytic. $A'$ is straightforward:
 \begin{equation}
 A' = \left[ \frac{1}{A''} - \frac{M_{\rm NS} + M_2'}{G M_{\rm NS}^2} v_{\rm sys}^2 \right]^{-1}.
 \end{equation}
-We can now determine $v_r$:
+To obtain $M_1'$ from the other quantities, we need to use Equation \ref{eq:SN_v_sys}. Here we make the substitution:
 \begin{equation}
-v_r = -v_k \cos \theta + \sqrt{v_{\rm sys}^2 \left( \frac{M_{\rm NS} + M_2'}{M_{\rm NS}} \right)^2 - v_k^2\ \sin^2 \theta}. \label{eq:v_r_2}
+x = v_r (\alpha - \beta), \label{eq:x_substitution}
 \end{equation}
-This equation places two constraints:
+so that all the variables containing $M_1'$ are now consolidated into $x$. Solving for $x$, we find:
+\begin{equation}
+x = -\beta v_k \cos\ \theta \pm \sqrt{v_{\rm sys}^2 - \beta^2 v_k^2 \sin^2 \theta}.
+\end{equation}
+This equation has two constraints:
 \begin{eqnarray}
-v_{\rm sys}^2 \left( \frac{M_{\rm NS} + M_2'}{M_{\rm NS}} \right)^2 &>& v_k^2\ \sin^2 \theta \\ 
-\sqrt{v_{\rm sys}^2 \left( \frac{M_{\rm NS} + M_2'}{M_{\rm NS}} \right)^2 - v_k^2\ \sin^2 \theta} &>& v_k \cos \theta.
+v_{\rm sys}^2 &>& \beta^2 v_k^2 \sin^2\ \theta \\
+\beta v_k \cos\ \theta &<& \pm \sqrt{v_{\rm sys}^2 - \beta^2 v_k^2 \sin^2 \theta}.
 \end{eqnarray}
-If either of those conditions are false, then the observed binary cannot be formed with the particular choice of kick velocity and angle. Using Equation \ref{eq:v_r}, we can solve for $M_1'$ in terms of $A'$, $M_2'$ and $v_r$ (which can be determined from equation \ref{eq:v_r_2}):
+The second constraint requires that $x$ is positive which can be seen from Equation \ref{eq:x_substitution}. Since $\cos\ \theta$ may be negative, both positive and negative square root solutions must be considered. Now we can solve Equation \ref{eq:x_substitution}, substituting for $\alpha$ and $v_r$ to obtain an equation for $M_1'$:
 \begin{equation}
-M_1' = \frac{v_r^2 A'}{G} - M_2'
+M_1' = \frac{ \frac{A' x^2}{G} \pm \sqrt{ \frac{A'^2 x^4}{G^2} + 4 (1-\beta) \left( \frac{A' x^2}{G} - \beta^2 \right) M_2' }}{2 (1-\beta)}.
 \end{equation}
+
 
 
 Derivatives of equations \ref{eq:SN_A} and \ref{eq:SN_v_sys} determine the Jacobian $J_{\rm SN}$. We provide the analytic form for $J_{\rm SN}$ in the Appendix. The probability of the post-SN parameters from the pre-SN parameters and the three kick parameters is:
