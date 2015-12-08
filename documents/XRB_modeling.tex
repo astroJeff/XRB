@@ -23,7 +23,7 @@ Really exciting abstract that will make everyone want to read this paper.
 
 \section{Introduction}
 
-{\it Chandra} has revolutionized our understanding of the x-ray emitting objects. It's unprecedented angular precision and collecting area allows it to identify dozens of resolved sources in nearby galaxies. Studies of individual objects have yielded a deeper insight into the physical processes forming the bulk of individually identified sources, low and high mass X-ray binaries (XRBs), as well as a rare, but important subset, the ultra-luminous X-ray sources (ULXs). High mass binaries, in particular, are formed from the accretion of an early-type star onto either a neutron star or black hole. Their relatively short lifetimes requires that these systems cannot travel far away from their birth site, and indeed observations show the majority of luminous X-ray sources are near star forming regions. 
+{\it Chandra} has revolutionized our understanding of the X-ray emitting objects. It's unprecedented angular precision and collecting area allows it to identify dozens of resolved sources in nearby galaxies. Studies of individual objects have yielded a deeper insight into the physical processes forming the bulk of individually identified sources, low and high mass X-ray binaries (XRBs), as well as a rare, but important subset, the ultra-luminous X-ray sources (ULXs). High mass binaries, in particular, are formed from the accretion of an early-type star onto either a neutron star or black hole. Their relatively short lifetimes requires that these systems cannot travel far away from their birth site, and indeed observations show the majority of luminous X-ray sources are near star forming regions. 
 
 NGC 55 is a relatively transparent, edge-on, nearby galaxy. Using the {\it Hubble Space Telescope}, and other optical telescopes, we have been able to identify a near-complete sample of star forming regions. For each region, multi-band photometry provides an estimate of the star formation history. 
 
@@ -201,7 +201,7 @@ A'' = \left[ \frac{2 }{A'}  - \frac{v_1^2}{G(M_{\rm NS} + M_2')} \right]^{-1}. \
 \end{equation}
 where $v_1$ is the post-kick velocity of the primary (in the reference frame of an initially stationary secondary):
 \begin{equation}
-v_1^2 = 2v_k v_r \cos \theta + v_k^2 + v_r^2\, 
+v_1^2 = 2v_k v_r \cos \theta + v_k^2 + v_r^2, \label{eq:v_1}
 \end{equation}
 where:
 \begin{equation}
@@ -226,27 +226,26 @@ For now, we will ignore eccentricity. However, if the post-SN orbital eccentrici
 1-e^2 = \frac{A'^2}{A'' G (M_{\rm NS} + M_2')} \left[ v_k^2 \cos^2\theta + v_k^2 \sin^2 \theta \sin^2 \phi + v_k v_r \cos \theta + v_r^2  \right]. \label{eq:SN_e}
 \end{equation}
 
-The reverse mapping of this transformation, $H_{\rm SN}$ is analytic. $A'$ is straightforward:
-\begin{equation}
-A' = \left[ \frac{1}{A''} - \frac{M_{\rm NS} + M_2'}{G M_{\rm NS}^2} v_{\rm sys}^2 \right]^{-1}.
-\end{equation}
-To obtain $M_1'$ from the other quantities, we need to use Equation \ref{eq:SN_v_sys}. Here we make the substitution:
-\begin{equation}
-x = v_r (\alpha - \beta), \label{eq:x_substitution}
-\end{equation}
-so that all the variables containing $M_1'$ are now consolidated into $x$. Solving for $x$, we find:
-\begin{equation}
-x = -\beta v_k \cos\ \theta \pm \sqrt{v_{\rm sys}^2 - \beta^2 v_k^2 \sin^2 \theta}.
-\end{equation}
-This equation has two constraints:
+The reverse mapping of this transformation, $H_{\rm SN}$ is analytic. We first make a substitution:
 \begin{eqnarray}
-v_{\rm sys}^2 &>& \beta^2 v_k^2 \sin^2\ \theta \\
-\beta v_k \cos\ \theta &<& \pm \sqrt{v_{\rm sys}^2 - \beta^2 v_k^2 \sin^2 \theta}.
+X &=& \frac{\beta - \alpha}{\beta} v_r \nonumber \\
+&=& -v_k \cos\theta \pm \sqrt{\frac{v_{\rm sys}^2}{\beta^2} - v_k^2 \sin^2\theta}, \label{eq:SN_X}
 \end{eqnarray}
-The second constraint requires that $x$ is positive which can be seen from Equation \ref{eq:x_substitution}. Since $\cos\ \theta$ may be negative, both positive and negative square root solutions must be considered. Now we can solve Equation \ref{eq:x_substitution}, substituting for $\alpha$ and $v_r$ to obtain an equation for $M_1'$:
+which we obtain by solving Equation \ref{eq:SN_v_sys} for $v_r$. Combining Equations \ref{eq:SN_A}, \ref{eq:v_1}, \ref{eq:v_r}, and \ref{eq:SN_X}, we obtain a quadratic equation for $M_1'$:
 \begin{equation}
-M_1' = \frac{ \frac{A' x^2}{G} \pm \sqrt{ \frac{A'^2 x^4}{G^2} + 4 (1-\beta) \left( \frac{A' x^2}{G} - \beta^2 \right) M_2' }}{2 (1-\beta)}.
+0 = C_1 M_1'^{2} + C_2 M'_1 + C_3, \label{eq:SN_M_1}
 \end{equation}
+where the constants, $C_i$, are equal to:
+\begin{eqnarray}
+C_1 &=& \frac{G(M_{\rm NS} + M'_2)}{A''} + v_k^2 + \frac{M_{\rm NS}^2}{M_2^{'2}}X^2 - 2 v_k \cos \theta \frac{M_{\rm NS}}{M'_2}X \\
+C_2 &=& -2M_{\rm NS} \left[ \frac{G(M_{\rm NS} + M'_2)}{A''} + v_k^2 + \frac{M_{\rm NS}^2}{M_2^{'2}}X^2 + \left( 1 - \frac{M_{\rm NS}}{M'_2} \right) v_k \cos \theta X \right] \\
+C_3 &=& \frac{G(M_{\rm NS} + M'_2)}{A''} M_{\rm NS}^2 + M_{\rm NS}^2 (v_k^2 + X^2) + 2v_k \cos \theta M_{\rm NS}^2 X - \frac{2(M_{\rm NS} + M'_2)}{M'_2} M_{\rm NS}^2X^2
+\end{eqnarray}
+Solving Equation \ref{eq:SN_M_1} now provides four separate values for $M_1'$, each of which has a corresponding $A'$ value:
+\begin{equation}
+A' = G (M_1' + M_2') \left(\frac{M_{\rm NS} - M_1'}{M_1' + M_2'} \right)^2 \left( \frac{M_2'}{M_{\rm NS}} \right)^2 \frac{1}{X^2}. \label{eq:SN_A1}
+\end{equation}
+Although there are four separate solutions for $M_1'$ and $A'$, three can be removed since we require that $v_r > 0$ and $M'_1 > M_{\rm NS}$. All four must be solved for since it is unknown which of the four solutions is the correct one {\it a priori}.
 
 
 
