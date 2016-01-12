@@ -1,0 +1,114 @@
+-------------XRB-cluster separation (observation)-------------
+
+Kaaret et al. (2004)
+	- X-ray populations in M82, NGC 1569, and NGC 5253
+	-* X-ray sources are located near star clusters
+	-* Brighter x-ray sources are closer than fainter x-ray sources
+	- Displacements typically 10-1000 pc
+
+Rangelov et al. (2011)
+	- XRBs and star clusters in NGC 4449
+	- XRBs from Chandra, clusters from HST
+	- 50% of XRBs have young, BH accretors
+	-* Compile a list of distances, ages to nearest clusters
+
+Rangelov et al. (2012)
+	- Matches X-ray and optical data of Antennae galaxies
+	- A quarter of XRBs are (near) coincident with star clusters
+	-* XRBs with black holes tend to remain within star cluster
+
+Poutanen et al. (2013)
+	- ULXs are (slightly) separated from clusters in the Antennae
+	- Formed from BHs (M_i > 40 M_sun)
+	- Ejections must be due to N-body scattering (are you sure?)
+
+-------------XRB-cluster separation (theory)-------------
+
+Sepinsky et al. (2005)
+	- Use StarTrack to generate a population
+	- Place generated population within a cluster potential
+	- Distributions of XRB displacements from their host cluster
+
+Kalogera et al. (2007) - conference proceedings
+	- Use StarTrack to generate a population
+	- Place objects in a Plummer potential
+	- Compare avg separation for different times, cluster masses
+	- Massive clusters affect separation, slowing down binary
+
+Shtykovskiy & Gilfanov (2007)
+	- Generate a spatially resolved SFH over past 100 Myr
+	- Correlate HMXB position with spatially resolved SFH 
+
+Zuo & Li (2010)
+	- Model X-ray binaries to match separation/luminosity trend
+	- Use their own version of BSE/Hurley 2002
+	- Constrain model parameters
+	- Use a birth cluster potential
+	- alpha_CE causes significant differences
+
+Mapelli et al. (2011)
+	- ~44% of black hole binaries are ejected within 10 Myr
+	- 3-body interactions change the binary's separation, eccentricity
+	- Focus specifically on ULXs
+
+Zuo (2015)
+	- Follow Zuo & Li (2010) to test different kick velocities
+	- BH kicks are likely lower velocity
+	- NS kicks must be a few 100 km/s
+
+-------------Black holes in clusters (theory)-------------
+
+Mapelli & Zampieri (2014)
+	- Simulate BH binaries using stellar evolution and N-body
+	- Use STARLAB which combines N-body with SEBA
+	- Focus on BH binaries with RLOF, different metallicities
+	- Specifically compare to ULXs
+
+Goswami, Kiel, & Rasio (2014)
+	- Combine stellar evolution with N-body - CMC code
+	- Use more (factor of 100) stars than Mapelli & Zampieri (2014)
+	- Rate of BH ejection from clusters depends on cluster density
+	- Stellar dynamics unimportant in low density environments
+
+Garofali et al. (2012)
+	- N-body simulations of NGC 4449 - from Rangelov et al. 2011
+	- Only extremely compact clusters can form BHBs dynamically
+	- N-body - SAPPORO (GPU), stellar evolution - STARLAB
+	-* XRBs in NGC 4449 are likely formed primordially
+
+
+XRB-cluster separation papers:
+-observations-
+Van Paradijs & White 1995
+White & Van Paradijs 1996
+Zezas et al. 2002
+Berghea 2009
+Rangelov et al. 2012
+Poutanen et al. 2013
+Berghea et al. 2013
+Swartz et al. 2009
+Swartz 2010
+-theory-
+Zuo & Li 2010
+Mapelli et al. 2011b, 2013
+Shtykovskiy & Gilfanov 2007
+
+XRB pop synth papers:
+Portegies Zwart et al. 1997
+Hurley et al. 2002
+Podisadlowski et al. 2002, 2003
+Belczynski et al. 2004a, 2004b, 2008
+Rappaport et al. 2005
+Dray 2006
+Madhusudhan et al. 2006, 2008
+Zuo, Li, & Liu 2008
+Linden et al. 2010
+
+Pop synth + dynamics:
+Blecha et al. 2006
+
+HMXB
+-observations-
+Grimm et al. 2003
+McBride et al. 2008 - Be in SMC/LMC(?)
+
