@@ -38,12 +38,13 @@ c-------------------------------------------------------------c
       integer i,kw,j,k,kw_last
 *
       real*8 mass,mt,z,zpars(20)
+      real*8 radius
       real*8 epoch,tms,tphys,tphysf,dtp
       real*8 r,lum,ospin
       real*8 mc,rc,menv,renv
       character*10 arg_in
       real*8 mass_in, time_in
-      character*50 text1,text2,text3
+      character*50 text1,text2,text3,text4,text5
       character*30 label(16)
       data label /' Low Mass MS Star ',' Main sequence Star ',
      &            ' Hertzsprung Gap ',' Giant Branch ',
@@ -171,7 +172,10 @@ c-------------------------------------------------------------c
       text2 = ' log10(R) log10(Teff)  Mc        Mdot     '
       text3 = ' epoch      spin'
 *      WRITE(*,'(a,a,a)')text1,text2,text3
-      write(*,*) "Time(Myr)    Type    Mass(Msun)    Mdot(Msun/yr)"
+      text4 = 'Time(Myr)    Type   Mass(Msun)    Mdot(Msun/yr)'
+      text5 = 'R(Rsun)'
+      write(*,'(a,a)') text4, text5
+*      write(*,*) "Time(Myr)    Type    Mass(Msun)    Mdot(Msun/yr)"
  30   j = j + 1
 *
 * To set the initial wind mass loss rate to zero
@@ -183,7 +187,8 @@ c-------------------------------------------------------------c
       endif
       kw = INT(scm(j,2))
       kw_last = INT(scm(j-1,2))
-      write(*,*) scm(j,1), kw, scm(j,4), scm(j,10)
+      radius = 10.0**(scm(j,6))
+      write(*,*) scm(j,1), kw, scm(j,4), scm(j,10), radius
 
 *********** For He core mass at He ignition *************
 *      if((kw.gt.2).and.(kw_last.le.2)) then
