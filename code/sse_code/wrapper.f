@@ -38,7 +38,7 @@ c-------------------------------------------------------------c
       integer i,kw,j,k,kw_last
 *
       real*8 mass,mt,z,zpars(20)
-      real*8 radius
+      real*8 radius, Teff
       real*8 epoch,tms,tphys,tphysf,dtp
       real*8 r,lum,ospin
       real*8 mc,rc,menv,renv
@@ -173,7 +173,7 @@ c-------------------------------------------------------------c
       text3 = ' epoch      spin'
 *      WRITE(*,'(a,a,a)')text1,text2,text3
       text4 = 'Time(Myr)    Type   Mass(Msun)    Mdot(Msun/yr)'
-      text5 = 'R(Rsun)'
+      text5 = 'R(Rsun)   Teff(K)'
       write(*,'(a,a)') text4, text5
 *      write(*,*) "Time(Myr)    Type    Mass(Msun)    Mdot(Msun/yr)"
  30   j = j + 1
@@ -188,7 +188,8 @@ c-------------------------------------------------------------c
       kw = INT(scm(j,2))
       kw_last = INT(scm(j-1,2))
       radius = 10.0**(scm(j,6))
-      write(*,*) scm(j,1), kw, scm(j,4), scm(j,10), radius
+      Teff = 10.0**(scm(j,7))
+      write(*,*) scm(j,1), kw, scm(j,4), scm(j,10), radius, Teff
 
 *********** For He core mass at He ignition *************
 *      if((kw.gt.2).and.(kw_last.le.2)) then
