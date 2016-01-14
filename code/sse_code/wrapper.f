@@ -173,7 +173,7 @@ c-------------------------------------------------------------c
       text3 = ' epoch      spin'
 *      WRITE(*,'(a,a,a)')text1,text2,text3
       text4 = 'Time(Myr)    Type   Mass(Msun)    Mdot(Msun/yr)'
-      text5 = 'R(Rsun)   Teff(K)'
+      text5 = 'R(Rsun)   Teff(K) Luminosity(erg/s)'
       write(*,'(a,a)') text4, text5
 *      write(*,*) "Time(Myr)    Type    Mass(Msun)    Mdot(Msun/yr)"
  30   j = j + 1
@@ -187,9 +187,10 @@ c-------------------------------------------------------------c
       endif
       kw = INT(scm(j,2))
       kw_last = INT(scm(j-1,2))
+      lum = 10.0**(scm(j,5))
       radius = 10.0**(scm(j,6))
       Teff = 10.0**(scm(j,7))
-      write(*,*) scm(j,1), kw, scm(j,4), scm(j,10), radius, Teff
+      write(*,*) scm(j,1), kw, scm(j,4), scm(j,10), radius, Teff, lum
 
 *********** For He core mass at He ignition *************
 *      if((kw.gt.2).and.(kw_last.le.2)) then
