@@ -1,5 +1,6 @@
 \documentclass[12pt, preprint]{aastex}
 \usepackage{bm}
+\usepackage{amsmath}
 
 
 \newcommand{\setof}[1]{\left\{{#1}\right\}}
@@ -29,53 +30,97 @@ NGC 55 is a relatively transparent, edge-on, nearby galaxy. Using the {\it Hubbl
 
 In this work, we simulate the expected number, position, and characteristics of the X-ray binary population, given our sample of star forming regions, as well as the star formation history of the overall galaxy. We then apply a Bayesian method to generate a likelihood function comparing the resulting distribution with the observed X-ray sample.
 
-\section{Method}
+
+
+\section{Statistical Method}
+
+Our goal is to identify quantitatively how the individual HMXBs formed in our sample. 
 
 We begin with Bayes' Rule:
 \begin{equation}
 P( M \given D ) = \frac{P( D \given M ) P(M)}{P(D)},
 \end{equation}
-where $M$ is the model and $D$ is the data. In this case, $D$ includes the set of observed X-ray luminosities ($\bs{L_x}$), companion optical magnitudes ($\bs{\vec{m}}$), and sky positions ($\bs{\alpha}$, $\bs{\delta}$):
+where $M$ is the model and $D$ is the data. For any individual HMXB, the evolution can be determined uniquely (at least to first order) by its initial masses, $M_1$ and $M_2$, its initial binary separation, $a$, and the kick velocity it received after the primary collapsed to form a NS or BH, $\vec{v_k}$. Hereafter, $M$ includes both these six explicit model parameters ($M_1$, $M_2$, $a$, and $\vec{v_k}$), and our implicit model prescriptions and assumptions to follow the formation of HMXBs. For our model here, we ignore higher order effects such as differences in metallicity and the exact chemical abundance.
 \begin{equation}
-P ( D \given M ) = P( \bs{L_x}, \bs{\vec{m}}, \bs{\alpha}, \bs{\delta} \given M),
+P ( D \given M ) = P(L_x, \vec{m}, \alpha, \delta \given M).
+%P ( D \given M ) = P(L_x, \vec{m}, \alpha, \delta \given M_1, M_2, a, \vec{v_k}).
 \end{equation}
-here we use bold quantities to identify the set of individual objects. We use vector notation for the magnitudes, because an individual object may have been observed using multiple filters. The posterior probability over the entire set of observables is the product over the posterior probability over the observed quantities for each X-ray binary:
-\begin{equation}
-P( \bs{L_x}, \bs{\vec{m}}, \bs{\alpha}, \bs{\delta} \given M) = \prod_i P( L_x, \vec{m}, \alpha, \delta \given M).
-\end{equation}
+We use vector notation for the magnitudes, because an individual object may have been observed using multiple filters. 
+%In this case, $D$ includes the set of observed X-ray luminosities ($\bs{L_x}$), companion optical magnitudes ($\bs{\vec{m}}$), and sky positions ($\bs{\alpha}$, $\bs{\delta}$):
+%\begin{equation}
+%P ( D \given M ) = P( \bs{L_x}, \bs{\vec{m}}, \bs{\alpha}, \bs{\delta} \given M),
+%\end{equation}
+%here we use bold quantities to identify the set of individual objects. We use vector notation for the magnitudes, because an individual object may have been observed using multiple filters. The posterior probability over the entire set of observables is the product over the posterior probability over the observed quantities for each X-ray binary:
+%\begin{equation}
+%P( \bs{L_x}, \bs{\vec{m}}, \bs{\alpha}, \bs{\delta} \given M) = \prod_i P( L_x, \vec{m}, \alpha, \delta \given M).
+%\end{equation}
 We now marginalize over the companion mass ($M_2$), the systemic velocity ($v_{\rm sys}$), the birth time ($t_b$), and from which star forming region each system was formed ($C$):
 \begin{equation}
 P( L_x, \vec{m}, \alpha, \delta \given M) = \sum_{{\rm all}\ C} \int \int \int P( L_x, \vec{m}, \alpha, \delta, M_2, v_{\rm sys}, t_b, C \given M)\ \dd M_2\ \dd v_{\rm sys}\ \dd t_b.
 \end{equation}
-There are an integer number of star forming regions, so we expressed the integral over $C$ as a sum over the known set of star forming regions. This assumes a complete census of the star forming regions in NGC 55. We can also include the galaxy field, as a whole, as its own element of class $C$. Based on independence, we can separate out several terms:
+There are an integer number of star forming regions, so we expressed the integral over $C$ as a sum over the known set of star forming regions. This assumes a complete census of the star forming regions in {\bf XXX}. We can also include the galaxy field, as a whole, as its own element of class $C$. Based on independence, we can separate out several terms:
 \begin{equation}
 \sum_{{\rm all}\ C} \int \int \int P(\alpha, \delta \given v_{\rm sys}, C, t_b) P(L_x, M_2, v_{\rm sys} \given t_b, M)\ \dd v_{\rm sys}\ P(\vec{m} \given M_2, t_b, M)\ \dd M_2\ P(t_b \given C)\ \dd t_b. \label{eq:marginalized}
 \end{equation}
 We discuss each of these terms in turn. 
 
-The first term provides the probability that, given a birth time, systemic velocity, and particular star forming region, what is the probability that the X-ray binary would be observed at its current position. For the vast majority of parameter space, this probability is zero. For example, given a short birth time, and a small systemic velocity, none but the nearest star forming regions could have formed that particular system. We can only observe the projected distance between the X-ray binary and its candidate host star forming region. The actual distance is $v_k t_b$. We care only about the distance the cluster is from each particular star forming region, so the probability is equal to the probability of the X-ray binary being ejected from that particular star forming region along the angle implied by the distance traveled $v_k t_b$ and the projected separation $s$. This probability is equal to the probability of randomly drawing a polar angle ($\theta_{\rm proj}$), multiplied by two since the X-ray binary could be either in front of or behind the star forming region:
+
+\subsection{$P(\alpha, \delta \given v_{\rm sys}, C, t_b)$}
+The first term provides the probability that, given a birth time, systemic velocity, and particular star forming region, what is the probability that the X-ray binary would be observed at its current position. For the vast majority of parameter space, this probability is zero. For example, given a short birth time, and a small systemic velocity, none but the nearest star forming regions could have formed that particular system. 
+
+We can only observe the projected distance between the X-ray binary and its candidate host star forming region (the orientation is random, so the probability is independent of azimuthal angle). 
 \begin{equation}
-P(\alpha, \delta \given v_k, C, t_b) = \sin (\theta_{\rm proj}) = \frac{s}{v_k t_b}.
+P(\alpha, \delta \given v_{\rm sys}, C, t_b) = P(\theta_{\rm proj, C} \given v_{\rm sys}, C, t_{\rm post-SN}).
+\end{equation}
+The projected physical separation, $s$, is:
+\begin{equation}
+s \approx D \theta_{\rm proj},
+\end{equation}
+where D is the distance to {\bf XXX}. We can express $s$ in terms of the physical distance the HMXB travelled ($v_{\rm sys} t_{\rm post-SN}$), and a polar angle, measured from the line of sight:
+\begin{equation}
+s = v_{\rm sys} t_{\rm post-SN} \sin \phi.
+\end{equation}
+Since $\phi$ is a randomly chosen polar angle, it has a prior probability of:
+\begin{equation}
+P(\phi) = \frac{\sin \phi} {2}.
+\end{equation}
+Determining this probability requires marginalizing over $\phi$:
+\begin{eqnarray}
+P(\theta_{\rm proj, C} \given v_{\rm sys}, C, t_{\rm post-SN}) &=& \int_0^{\pi} P(\theta_{\rm proj, C}, \phi \given v_{\rm sys}, C, t_{\rm post-SN}) \dd \phi \\
+&=& \int_0^{\pi} P(\theta_{\rm proj, C} \given \phi, v_{\rm sys}, C, t_{\rm post-SN}) P(\phi) \dd \phi. \label{eq:theta_proj_int}
+\end{eqnarray}
+The first probability in the integrand is a delta function:
+\begin{equation}
+P(\theta_{\rm proj, C} \given \phi, v_{\rm sys}, C, t_{\rm post-SN}) = \delta \left( \theta_{\rm proj, C} - \frac{v_{\rm sys} t_{\rm post-SN} \sin \phi}{D} \right).
+\end{equation}
+The integral in Equation \ref{eq:theta_proj_int} has the form:
+\begin{equation}
+\int F(x)\ \delta \left[ G(x) \right]\ \dd x\ =\ \sum_i\ \frac{F(x_i^{\star})}{| G' (x_i^{\star}) |},
+\end{equation}
+where the sum is over the $i$ roots of $G(x)$. After evaluating the integral in Equation \ref{eq:theta_proj_int}, our desired probability becomes:
+\begin{equation}
+  P(\theta_{\rm proj, C} \given v_{\rm sys}, C, t_{\rm post-SN}) =
+\begin{cases} 
+      0, & \theta_{\rm proj} > \frac{v_{\rm sys}t_{\rm pre-SN}}{D} \\
+      \frac{D}{v_{\rm sys} t_{\rm post-SN}}\ \tan \phi^{\star}, & \theta_{\rm proj} \leq \frac{v_{\rm sys}t_{\rm pre-SN}}{D} 
+   \end{cases}
+\end{equation}
+where:
+\begin{equation}
+\phi^{\star} = \sin^{-1} \left[ \frac{D}{v_{\rm sys} t_{\rm post-SN}} \theta_{\rm proj} \right].
 \end{equation}
 
-Given a birth time and a particular binary population synthesis model, the second term provides the probability that a binary with a particular $L_x$, $M_2$, and $v_k$ will be formed. We discuss this term in detail in Section \ref{sec:P_L_x}.
 
-The final term gives the probability of a birth time for a particular cluster. The birth time probability is directly related to the star formation rate at that time:
-\begin{equation}
-P(t_b \given C) \propto {\rm SFR}(t_b).
-\end{equation} 
-Determining this term therefore requires a knowledge of the star formation history of each star forming cluster. Multi wavelength observations have allowed approximate knowledge of the star formation histories for most of the star forming regions in NGC 55, at least within the recent past.
 
-Finally, we need to determine the probability of observing the set of optical observations for each object $\vec{m}$ given a companion mass $M_2$. Since the distance to NGC 55 is known, and we have {\it HST} photometry for most of the X-ray binaries, this probability should be known quite accurately:
-\begin{equation}
-P(\vec{m} \given M_2, M) \approx \delta\left[ \vec{m} - f(M_2) \right],
-\end{equation}
-where $f(M_2)$ is some function of the companion mass determined from stellar evolution models. We use both the models from the Geneva group and the Padova group here. However, for certain masses, magnitudes do not vary strongly as a function of mass, and we must perform the integral over $M_2$ in Equation \ref{eq:marginalized}.
+%the probability is equal to the probability of the X-ray binary being ejected from that particular star forming region along the angle implied by the distance traveled $v_k t_b$ and the projected separation $s$. This probability is equal to the probability of randomly drawing a polar angle ($\theta_{\rm proj}$), multiplied by two since the X-ray binary could be either in front of or behind the star forming region:
 
- 
-\section{Calculating $P(L_x, M_2, v_{\rm sys} \given t_b, M)$} \label{sec:P_L_x}
 
-To determine $P(L_x, M_2, v_{\rm sys} \given t_b, M)$, we must first marginalize over three latent parameters, the kick velocity ($v_k$), the polar kick angle ($\theta$), and the azimuthal kick angle ($\phi$). We will show be low that if the binary's eccentricity is irrelevant, we can ignore $\phi$, and we need only marginalize over $v_k$ and $\theta$:
+
+
+
+\subsection{$P(L_x, M_2, v_{\rm sys} \given t_b, M)$}
+
+Given a birth time and a particular binary population synthesis model, the second term provides the probability that a binary with a particular $L_x$, $M_2$, and $v_k$ will be formed. To determine $P(L_x, M_2, v_{\rm sys} \given t_b, M)$, we must first marginalize over three latent parameters, the kick velocity ($v_k$), the polar kick angle ($\theta$), and the azimuthal kick angle ($\phi$). We will show below that if the binary's eccentricity is irrelevant, we can ignore $\phi$, and we need only marginalize over $v_k$ and $\theta$:
 \begin{equation}
 P(L_x, M_2, v_{\rm sys} \given t_b, M) = \int \int P(L_x, M_2, v_{\rm sys} \given v_k, \theta, t_b, M)\ P(v_k, \theta \given t_b, M)\ \dd v_k\ \dd \theta.
 \end{equation}
@@ -111,6 +156,10 @@ f_3 = I_{\rm XRB} \circ H_{\rm SN} \circ G_{\rm MT} ( f_0).
 \end{equation}
 
 
+If we are interesting on an individual system or a small set of binaries, we can opt for a different approach, however.
+
+
+\begin{comment}
 If, however, a reverse mapping exists (or it can be determined numerically), a different approach can be used. This mapping allows one to determine the initial binary state from the observed system:
 \begin{equation}
 f_0 = G_{\rm MT}^{-1} \circ H_{\rm SN}^{-1} \circ I_{\rm XRB}^{-1} (f_3) .
@@ -121,6 +170,7 @@ P(f_3) &=& P(f_2)  J_{\rm XRB}  \\
   &=& P(f_1)  J_{\rm SN}  J_{\rm XRB}  \\
   &=& P(f_0)  J_{\rm MT}  J_{\rm SN}  J_{\rm XRB} .
 \end{eqnarray}
+\end{comment}
 
 
 We choose to adapt and improve upon the Jacobian formalism discussed by Kalogera (1996), Bhadkeamkar \& Ghosh (2012) and others(?). The underlying premise relies upon our ability to map the initial state of a binary through its various stages, until it forms an X-ray luminous object. If this can be done analytically or semi-analytically, such that the first partial derivatives of these mappings can be calculated, then the Jacobians of these mappings can be used to determine how the distribution of binaries evolves without having to randomly generate a population.
@@ -144,7 +194,7 @@ Below, we discuss each of the three transformations, their reverse mappings, and
 
 
 
-\subsection{The First Mass Transfer Phase} \label{sec:trans_MT}
+\subsubsection{The First Mass Transfer Phase} \label{sec:trans_MT}
 
 We start with the initial conditions of the binary, which includes three parameters, the primary mass ($M_1$), the secondary mass ($M_2$), and the orbital separation ($A$):
 \begin{equation}
@@ -155,9 +205,9 @@ We start with the initial conditions of the binary, which includes three paramet
 Once the first star evolves past its main sequence onto the giant branch, it begins overfilling its Roche lobe. We select only those systems that will undergo stable mass accretion, which can be determined by comparing the thermal time of the secondary with the mass accretion time. This comparison determines whether the transferring matter can lose its entropy fast enough to become incorporated with the companion star, or whether it forms a common envelope. The mapping from the initial binary conditions to the post-mass transfer binary is straightforward. The post mass transfer primary becomes the primary core mass ($M_{1,c}$), while the secondary incorporates the primary's lost envelope. From Ghosh et al.: 
 \begin{eqnarray} 
 M_1' &=& M_{1,c} \\
-M_2' &=& M_1 + M_2 - M_{1,c},
+M_2' &=& M_2 + f_a (M_1 - M_{1,c}),
 \end{eqnarray}
-and
+where $f_a$ is a unitless parameter designating the fraction of mass lost by the primary that is accreted by the secondary. The post-mass transfer orbital separation is:
 \begin{equation}
 A' = A \left[ \frac{M_1 M_2}{M_1' M_2'} \right]^2.
 \end{equation}
@@ -192,7 +242,7 @@ We assume that the binary does not change between the end of the mass transfer p
 
 
 
-\subsection{The Primary's Core Collapse} \label{sec:trans_SN}
+\subsubsection{The Primary's Core Collapse} \label{sec:trans_SN}
 
 We next calculate the post-SN orbital separation ($A''$), systemic velocity ($v_{\rm sys}$), and eccentricity ($e$) based on the equations in Kalogera (1996):
 \begin{equation}
@@ -258,7 +308,7 @@ P(M_{\rm NS}, M_2', A'') = P(M_1', M_2', A') J_{\rm SN}. \label{eq:P_SN}
 
 
 
-\subsection{The X-ray Luminous Phase} \label{sec:trans_XRB}
+\subsubsection{The X-ray Luminous Phase} \label{sec:trans_XRB}
 
 Once the secondary evolves onto the core helium burning branch, its luminosity increases, and the star emits a wind accreted by the primary NS. Determining the X-ray luminosity ($L_x$) from the accretion rate ($\dot{M}$) is straightforward: 
 \begin{equation}
@@ -313,7 +363,27 @@ P(M_{\rm NS}, M''_2, L) = P(M_{\rm NS}, M'_2, A'') J_{\rm XRB}. \label{eq:P_XRB}
 
 
 
-\subsection{Model Parameters}
+\subsection{P($t_b \given C)$}
+
+The final term gives the probability of a birth time for a particular cluster. The birth time probability is directly related to the star formation rate at that time:
+\begin{equation}
+P(t_b \given C) \propto {\rm SFR}(t_b).
+\end{equation} 
+Determining this term therefore requires a knowledge of the star formation history of each star forming cluster. Multi wavelength observations have allowed approximate knowledge of the star formation histories for most of the star forming regions in NGC 55, at least within the recent past.
+
+\subsection{P($P(\vec{m} \given M_2, M)$)}
+
+Finally, we need to determine the probability of observing the set of optical observations for each object $\vec{m}$ given a companion mass $M_2$. Since the distance to NGC 55 is known, and we have {\it HST} photometry for most of the X-ray binaries, this probability should be known quite accurately:
+\begin{equation}
+P(\vec{m} \given M_2, M) \approx \delta\left[ \vec{m} - f(M_2) \right],
+\end{equation}
+where $f(M_2)$ is some function of the companion mass determined from stellar evolution models. We use both the models from the Geneva group and the Padova group here. However, for certain masses, magnitudes do not vary strongly as a function of mass, and we must perform the integral over $M_2$ in Equation \ref{eq:marginalized}.
+
+ 
+
+
+
+\subsection{Prior Probabilities}
 
 As part of our model, we standard distributions for the initial parameters of the binary, that the initial primary mass follows a power law, the mass ratio follows a uniform distribution, and the binary separation follow a log uniform distribution:
 \begin{eqnarray}
@@ -339,7 +409,13 @@ The combined probability we are looking for, $P(L_x, M_2, v_{\rm sys} \given t_b
 
 
 
-\section{Experiments}
+\subsection{Numerical Method}
+
+We use DFM's {\tt emcee}.
+
+
+
+\section{Test Cases}
 
 ... Make a test model to check our code and see if it actually works.
 
