@@ -1,0 +1,13 @@
+code
+documents/XRB_modeling.aux
+documents/XRB_modeling.dvi
+documents/XRB_modeling.log
+plots
+literature
+documents/XRB_modeling.pdf
+data/Geneva/
+data/sse_data
+data/lmc_data/lmc_coolav.fits.txt
+data/lmc_data/lmc_hotav.fits
+data/lmc_data/lmc_sfh.dat
+notebooks/.ipynb_checkpoints/
