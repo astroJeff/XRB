@@ -8,13 +8,15 @@
 \newcommand{\dd}{\mathrm{d}}
 \newcommand{\catalog}{\bm{Q}}
 \newcommand{\pars}{\bm{\theta}}
+\newcommand{\amin}{\ifmmode {^{\prime}\ }\else$^{\prime}$\fi}
+\newcommand{\asec}{\ifmmode {^{\prime\prime}}\else$^{\prime\prime}$\fi}
 \newcommand{\bs}[1]{\boldsymbol{#1}}
 
 \newcommand{\Msun}{\ifmmode {M_{\odot}}\else${M_{\odot}}$\fi}
 
 \begin{document}
 
-\title{Modeling the X-Ray Populations of NGC 55}
+\title{Modeling the X-Ray Populations of the LMC}
 \author{some combination of JJA, AZ, TF, and others}
 \date{NOT READY}
 
@@ -26,9 +28,29 @@ Really exciting abstract that will make everyone want to read this paper.
 
 {\it Chandra} has revolutionized our understanding of the X-ray emitting objects. It's unprecedented angular precision and collecting area allows it to identify dozens of resolved sources in nearby galaxies. Studies of individual objects have yielded a deeper insight into the physical processes forming the bulk of individually identified sources, low and high mass X-ray binaries (XRBs), as well as a rare, but important subset, the ultra-luminous X-ray sources (ULXs). High mass binaries, in particular, are formed from the accretion of an early-type star onto either a neutron star or black hole. Their relatively short lifetimes requires that these systems cannot travel far away from their birth site, and indeed observations show the majority of luminous X-ray sources are near star forming regions. 
 
-NGC 55 is a relatively transparent, edge-on, nearby galaxy. Using the {\it Hubble Space Telescope}, and other optical telescopes, we have been able to identify a near-complete sample of star forming regions. For each region, multi-band photometry provides an estimate of the star formation history. 
+The nearby Small and Large Magellanic Clouds have the best studied extragalactic X-ray populations. Long term X-ray campaigns with {\it Chandra} have identified every X-ray emitting object with $L_x < 10^{32}$ erg s$^{-1}$ in the SMC, and ongoing observations of the somewhat larger LMC are approaching this degree of sensitivity (Zezas, Laycock et al.). 
 
-In this work, we simulate the expected number, position, and characteristics of the X-ray binary population, given our sample of star forming regions, as well as the star formation history of the overall galaxy. We then apply a Bayesian method to generate a likelihood function comparing the resulting distribution with the observed X-ray sample.
+At the same time, infrared, optical, and ultraviolet imaging with {\it HST} provide detailed spatially resolved star formation histories of the SMC and LMC with angular resolutions as small as 12\amin by 12\amin regions (Harris \& Zaritsky). Reference to Konstantina's paper linking XRB's with star formation history.
+
+Previous analysis of High mass XRBs (HMXB) have primary relied on population synthesis, in which one randomly generates, according to some predetermined initial distribution of parameters and our best understanding of binary evolution, a large number (often in excess of 10$^6$) of stellar binaries. One then takes a ''snapshot'' of accreting binaries at to characterize the population of HMXBs at a given time. By comparing the observed population of HMXBs in the SMC to the simulation ''snapshot'' after 60 Myr (the most recent ''starburst'' in the SMC), one can estimate the accuracy of our understanding of binary evolution. In essence population synthesis is a Monte Carlo numerical solution to the integral for the observed HMXBs:
+\begin{equation}
+P(obs) = \int \dd \vec{x}_i P(obs \given \vec{x}_i)\ P(\vec{x}_i). \label{eq:pop_synth}
+\end{equation}
+$P(\vec{x}_i)$ contains the {\it ab initio} binary distributions and the binary evolutionary processes are contained within $P(obs \given \vec{x}_i)$. Since the integration is over 6-dimensions (the two masses, initial binary separation, and three parameter SN kick velocity), standard numerical techniques cannot be applied, and population synthesis provides a straightforward solution to the problem. 
+
+Yet, population synthesis is not the only method to evaluate Equation \ref{eq:pop_synth}, and for rare or short-lived evolutionary states, it is exceedingly poor; significant computational time is spent on regions of parameter space of no interest to the observed systems. 
+
+Bhadkamkar\ & Ghosh (2012) presented an analytic solution to a reduced form of Equation \ref{eq:pop_synth}. Instead of treating the kick velocity as a three dimensional distribution, they applied the maximum likelihood value to a binary, reducing the 6-dimensional problem to a 3-dimensional integral. Using Jacobian transformations, these authors analytically represented the current state of HMXBs as transformations of the initial conditions of a binary. In this way, they were able to determine exactly which initial conditions produced HMXBs with specific $L_x$. Subsequent integration over the remaining two parameters provided an X-ray luminosity function. However, this method was wanting in two separate aspects. First, their treatment of the SN kick velocity is an approximation at best, since they do not apply a distribution of kick velocities. Second, their analysis did not include the evolution over time (although it could likely be adapted to include this). 
+
+%NGC 55 is a relatively transparent, edge-on, nearby galaxy. Using the {\it Hubble Space Telescope}, and other optical telescopes, we have been able to identify a near-complete sample of star forming regions. For each region, multi-band photometry provides an estimate of the star formation history. 
+
+In this work, we solve then Equation \ref{eq:pop_synth} in a novel way, using a Markov Chain Monte Carlo technique. This relies on the same binary evolution models as previous population synthesis studies, however, by design, computational power is focused on the region of parameter space relevant to the problem at hand. This method is versatile and substantially more efficient than comparable population synthesis methods, however extra care must be taken to implement. In particular the distribution priors must be correctly normalized.
+
+We augment the problem to nine dimensions, adding the position and birth time as components of $\vec{x}_i$. Because of both its well characterized HMXB population and its precise star formation history, the LMC is an excellent testbed for this method. We apply our 9-parameter model to each HMXBs in the sample. Our results provide important constraints on both the binaries forming of each of these systems and the HMXB population of the LMC as a whole.
+
+%simulate the expected number, position, and characteristics of the X-ray binary population, given our sample of star forming regions, as well as the star formation history of the overall galaxy. We then apply a Bayesian method to generate a likelihood function comparing the resulting distribution with the observed X-ray sample.
+
+In section 2, we develop and justify our statistical approach and include our binary evolution implementation. In section 3, we provide several tests of our model. We apply the model to the population of HMXBs in the LMC in section 4 and discuss the results in section 5. We provide some conclusions and future applications of this model in section 6.
 
 
 
