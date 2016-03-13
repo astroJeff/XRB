@@ -60,48 +60,60 @@ Our goal is to identify quantitatively how the individual HMXBs formed in our sa
 \begin{equation}
 P( \vec{x}_i \given D, M ) = \frac{P( D \given M, \vec{x}_i ) P(\vec{x}_i \given M)}{P(D \given M)},
 \end{equation}
-where $\vec{x}_i$ are the binary parameters described above, $M$ is the binary evolution model and $D$ contains the observed data. For any individual HMXB, the evolution can be determined uniquely (at least to first order) by its initial masses, $M_1$ and $M_2$, its initial binary separation, $a$, and the kick velocity it received after the primary collapsed to form a NS or BH, $\vec{v}_k$. For the problem at hand, we also include the binary's birth position, $\alpha_b and \delta_b$, and its birth time, $t_b$:
+where $\vec{x}_i$ are the binary parameters described above, $M$ is the binary evolution model and $D$ contains the observed data. For any individual HMXB, the evolution can be determined uniquely (at least to first order) by its initial masses, $M_{1,i}$ and $M_{2,i}$, its initial binary separation, $a_i$, and eccentricity $e_i$, and the kick velocity it received after the primary collapsed to form a NS or BH, $\vec{v}_k$. For the problem at hand, we also include the binary's birth position, $\alpha_i$ and $\delta_i$, and its birth time, $t_i$:
 \begin{equation}
-\vec{x}_i \in (M_{1,i}, M_{2,i,} a_i, \vec{v}_k, \alpha_b, \delta_b, t_b). \label{eq:x_i}
+\vec{x}_i \in (M_{1,i}, M_{2,i,} a_i, e_i, \vec{v}_k, \alpha_i, \delta_i, t_i). \label{eq:x_i}
 \end{equation}
 For the HMXB population in the LMC, observations include the position of the binary, $\alpha$ and $\delta$, its observed X-ray luminosity, $L'_x$, and its optical counterpart's observed current mass $M'_2$:
 \begin{equation}
 D \in (\alpha, \delta, L'_x, M'_2). \label{eq:D}
 %D \in (\alpha, \delta, L_x, \vec{m}). \label{eq:D}
 \end{equation}
-We use primed quantities to denote that the true $L_x$ and $M_2$ may be somewhat different from the observed values. 
+We use primed quantities to denote observed values that are, in general, different from the true, physical values $L_x$ and $M_2$. We ignore uncertainties on the position.
 %We use vector notation for the magnitudes, because an individual object may have been observed using multiple filters. 
 
 
 We now marginalize the likelihood over three parameters, the true (current) companion mass $M_2$, the true $L_x$, and the systemic velocity ($v_{\rm sys}$):
 \begin{equation}
-P(D \given M, \vec{x}_i) =  \int \dd M_2\ \dd L_x\ \dd v_{\rm sys}\ P( M_2, L_x, v_{\rm sys}, \alpha, \delta, M'_2, L'_x \given M_{1,i}, M_{2,i}, a_i, \vec{v}_k, \alpha_b, \delta_b, t_b, M).
+P(D \given M, \vec{x}_i) =  \int \dd M_2\ \dd L_x\ \dd v_{\rm sys}\ P( M_2, L_x, v_{\rm sys}, \alpha, \delta, M'_2, L'_x \given M_{1,i}, M_{2,i}, a_i, e_i, \vec{v}_k, \alpha_i, \delta_i, t_i, M).
 \end{equation}
-Based on independence, we express this integral in tractable parts:
+Based on independence, we express this integral into separate, tractable parts:
 \begin{eqnarray}
 P(D \given M, \vec{x}_i) &=&  \int \dd M_2\ \dd L_x\ \dd v_{\rm sys}\ P(L'_x \given L_x) \nonumber \\
 	& & \qquad \times P(M'_2 \given M_2) \nonumber \\
-	& & \qquad \times P(\alpha, \delta \given \alpha_b, \delta_b, t_b, M_{1,i}, v_{\rm sys}) \nonumber \\
-	& & \qquad \times P(L_x, M_2, v_{\rm sys} \given M_{1,i}, M_{2,i}, a_i, \vec{v}_k, t_b). \label{eq:marginalized}
+	& & \qquad \times P(\alpha, \delta \given \alpha_i, \delta_i, t_i, M_{1,i}, v_{\rm sys}) \nonumber \\
+	& & \qquad \times P(L_x, M_2, v_{\rm sys} \given M_{1,i}, M_{2,i}, a_i, e_i, \vec{v}_k, t_i). \label{eq:marginalized}
 \end{eqnarray}
-The first term in the integrand, $P(L'_x \given L_x)$, includes the observational uncertainty in the X-ray luminosity of the binary. Typically, this is a Gaussian uncertainty (in logspace?), but in principle, can account for any observational distribution. Similarly, $P(M'_2 \given M_2)$ accounts for the observational uncertainty on $M_2$. This term again can be approximated as a Gaussian distribution, but a more careful determination will include a comparison between the observed magnitudes in various filters and stellar models on a color-magnitude diagram. The third term in the integrand accounts for the fact that the system's birth place may, in general, be different from its observed position since the center of mass of a system received a kick during the primary's core collapse. The spatially resolved star formation history of the LMC is included in this term as well. We derive this term in Section \ref{sec:ra_dec} below. The last term of the integrand, which we discuss in Section \ref{eq:binary_evolve}, includes the binary evolution from its {\it ab initio} state to the $M_2$, $L_x$, and $v_{\rm sys}$ of the system today. In section \ref{sec:priors} we derive the prior distributions for each of our nine model parameters.
+The first term in the integrand, $P(L'_x \given L_x)$, includes the observational uncertainty in the X-ray luminosity of the binary. Typically, this is a Gaussian uncertainty (in logspace?), but in principle, can account for any observational distribution. Similarly, $P(M'_2 \given M_2)$ accounts for the observational uncertainty on $M_2$. This term again can be approximated as a Gaussian distribution, but a more careful determination will include a comparison between the observed magnitudes in various filters and stellar models on a color-magnitude diagram. 
+
+The third term in the integrand accounts for the fact that the system's birth place may, in general, be different from its observed position since the center of mass of a system received a kick during the primary's core collapse. We explicitly include dependencies on $v_{\rm sys}$, $t_i$, and $M_{1,i}$ since the distance travelled depends on both the system's velocity and time since the primary's supernova. We derive this term in Section \ref{sec:ra_dec} below. The last term of the integrand, which we discuss in Section \ref{sec:binary_evolve}, includes the binary evolution from its {\it ab initio} state to the $M_2$, $L_x$, and $v_{\rm sys}$ of the system today. In section \ref{sec:priors} we derive the prior distributions for each of our nine model parameters.
 
 
 
-\subsection{Position Probability: $P( \alpha, \delta \given \alpha_b, \delta_b, t_b, M_{1,i}, v_{\rm sys} )$} \label{sec:ra_dec}
+\subsection{Position Probability: $P( \alpha, \delta \given \alpha_i, \delta_i, t_i, M_{1,i}, v_{\rm sys} )$} \label{sec:ra_dec}
 
-The first term provides the probability that, given a system's birth time, position, systemic velocity, and initial primary mass, the system would be observed at its current position. Since HMXBs are generally short lived, this probability is non-zero for only a small region around any given HMXB's observed position. To solve the positional component of Equation \ref{eq:marginalized}, we first marginalize over $\omega$:
+The first term provides the probability that, given a system's birth time, position, systemic velocity, and initial primary mass, the system would be observed at its current position. Since HMXBs are generally short lived, this probability is non-zero for only a small region around any given HMXB's observed position. To solve the positional component of Equation \ref{eq:marginalized}, we first marginalize over $\omega$ the angle between the line of sight vector to the birth location and the systemic velocity vector:
 \begin{equation}
-P(\alpha, \delta \given \alpha_b, \delta_b, t_b, M_{1,i}, v_{\rm sys} ) = \int \dd \omega\ P(\alpha, \delta, \omega \given \alpha_b, \delta_b, t_b, M_{1,i}, v_{\rm sys} ). \label{eq:P_pos_1}
+P(\alpha, \delta \given \alpha_i, \delta_i, t_i, M_{1,i}, v_{\rm sys} ) = \int \dd \omega\ P(\alpha, \delta, \omega \given \alpha_i, \delta_i, t_i, M_{1,i}, v_{\rm sys} ). \label{eq:P_pos_1}
 \end{equation}
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.95\columnwidth]{../figures/position_projected.pdf}
+\caption{Our representation of the current position $(\alpha, \delta)$ in relation to its birth position $(\alpha_i, \delta_i)$. The distance the system traveled is $d$, which has a projected separation $s$. We express this transportation as a function of $\theta_{\rm proj}$ and position angle, $\phi$. For typical systems, the diagram is grossly out of scale, since $d << D_{\rm LMC}$.}
+\label{fig:position_projection}
+\end{center}
+\end{figure}
+
+
 We next perform a coordinate transform from the absolute positional coordinates $\alpha$ and $\delta$, to the angular separation, $\theta_{\rm proj}$, and the position angle, $\phi$, measured from the system's birth location. The determinant of the Jacobian matrix for this transformation is:
 \begin{equation}
 J_{\rm coor} = \left| \frac{\dd \alpha}{\dd \theta_{\rm proj}} \frac{\dd \delta}{\dd \phi} - \frac{\dd \alpha}{\dd \phi} \frac{\dd \delta}{\dd \theta_{\rm proj}} \right|.
 \end{equation}
 Equation \ref{eq:P_pos_1} now becomes:
 \begin{eqnarray}
-P(\alpha, \delta \given \alpha_b, \delta_b, t_b, M_{1,i}, v_{\rm sys} ) &=& \int \dd \omega\ P(\theta_{\rm proj}, \phi, \omega \given t_b, M_{1,i}, v_{\rm sys} ) J_{\rm coor}. \nonumber \\
-&=& \int \dd \omega\ P(\phi) P(\omega) P(\theta_{\rm proj} \given \omega,  t_b, M_{1,i}, v_{\rm sys} ) J_{\rm coor}, \label{eq:P_pos_2}
+P(\alpha, \delta \given \alpha_i, \delta_i, t_i, M_{1,i}, v_{\rm sys} ) &=& \int \dd \omega\ P(\theta_{\rm proj}, \phi, \omega \given t_i, M_{1,i}, v_{\rm sys} ) J_{\rm coor}. \nonumber \\
+&=& \int \dd \omega\ P(\phi) P(\omega) P(\theta_{\rm proj} \given \omega,  t_i, M_{1,i}, v_{\rm sys} ) J_{\rm coor}, \label{eq:P_pos_2}
 \end{eqnarray}
 where we have separated terms based on independence.
 
@@ -114,43 +126,43 @@ P(\phi) &=& \frac{1}{2 \pi}, \in [0, 2\pi].
 
 The physical distance an HMXB travels is the product of $v_{\rm sys}$ and the time since the primary's core collapse:
 \begin{equation}
-d = v_{\rm sys} \left[t_b - t(M_1) \right].  
+d = v_{\rm sys} \left[t_i - t(M_{1,i}) \right],
 \end{equation}
-We can only observe the projection of $d$ onto the sky, $s = d \sin \omega$, where $\omega$ is a (randomly chosen) polar angle, measured from the line connecting the HMXB's birth location to the observer. $s$ is equivalently approximated as the product of the distance to the LMC, $D_{\rm LMC}$ and $\theta_{\rm proj}$.
+where $t(M_{1,i})$ is the lifetime of a star with a mass of $M_{1,i}$. We can only observe the projection of $d$ onto the sky, $s = d \sin \omega$. $s$ is approximated as the product of the distance to the LMC, $D_{\rm LMC}$ and $\theta_{\rm proj}$, which allows us to express $\theta_{\rm proj}$ in terms of model parameters:
 \begin{equation}
-\theta_{\rm proj} = \frac{v_{\rm sys} \left[ t_b - t(M_1) \right] \sin \omega}{D_{\rm LMC}}. \label{eq:theta_proj}
+\theta_{\rm proj} = \frac{v_{\rm sys} \left[ t_i - t(M_{1,i}) \right] \sin \omega}{D_{\rm LMC}}. \label{eq:theta_proj}
 \end{equation}
-The first probability in the integrand in Equation \ref{eq:P_pos_2} is a delta function:
+The third term in the integrand in Equation \ref{eq:P_pos_2} is a delta function:
 \begin{equation}
-P(\theta_{\rm proj} \given \omega, t_b, M_{1,i}, v_{\rm sys}) = \delta \left[ \theta_{\rm proj} - \frac{v_{\rm sys} \left[t_b - t(M_1) \right] \sin \omega}{D_{\rm LMC}} \right]. \label{eq:P_theta_proj}
+P(\theta_{\rm proj} \given \omega, t_i, M_{1,i}, v_{\rm sys}) = \delta \left[ \theta_{\rm proj} - \frac{v_{\rm sys} \left[t_i - t(M_{1,i}) \right] \sin \omega}{D_{\rm LMC}} \right]. \label{eq:P_theta_proj}
 \end{equation}
 
 
 With the delta function from Equation \ref{eq:P_theta_proj}, the integral in Equation \ref{eq:P_pos_2} can be reduced to a sum:
 \begin{equation}
-\int \dd \omega\ P(\phi) P(\omega) \delta \left[ G(\omega) \right]\  =\ \sum_i\ \frac{P(\omega_i^{\star}) P(\phi)}{ \left| \frac{ \dd G (\omega) }{\dd \omega} \right|_{\omega_i^*}},
+\int \dd \omega\ P(\phi) P(\omega) \delta \left[ G(\omega) \right]  J_{\rm coor}\  =\ \sum_i\ \frac{P(\omega_i^{\star}) P(\phi)  J_{\rm coor}}{ \left| \frac{ \dd G (\omega) }{\dd \omega} \right|_{\omega_i^*}},
 \end{equation}
 where $G(\omega)$ is the function inside the delta function in Equation \ref{eq:P_theta_proj} and the sum is over $\omega_i^*$, the $i$ roots of $G(\omega)$. This integral can now be evaluated analytically:
 \begin{equation}
-P(\alpha, \delta \given \alpha_b, \delta_b, t_b, M_{1,i}, v_{\rm sys} ) =
+P(\alpha, \delta \given \alpha_i, \delta_i, t_i, M_{1,i}, v_{\rm sys} ) =
 \begin{cases} 
       0, & \theta_{\rm proj} \geq \theta_C\\
-     \frac{\tan \phi^*}{\theta_C} , & \theta_{\rm proj} < \theta_C 
+     \frac{\tan \omega^*}{2 \pi \theta_C}  J_{\rm coor}, & \theta_{\rm proj} < \theta_C 
    \end{cases}
 \end{equation}
 where:
 \begin{equation}
-\phi^{\star} = \sin^{-1} \left[ \frac{\theta_{\rm proj}}{\theta_C} \right].
+\omega^{\star} = \sin^{-1} \left[ \frac{\theta_{\rm proj}}{\theta_C} \right].
 \end{equation}
 and
 \begin{equation}
-\theta_C = \frac{v_{\rm sys} \left[ t_b - t(M_1) \right]}{D_{\rm LMC}} \label{eq:theta_c}
+\theta_C = \frac{v_{\rm sys} \left[ t_i - t(M_{1,i}) \right]}{D_{\rm LMC}} \label{eq:theta_c}
 \end{equation}
 
 
 
 
-\subsection{Binary Probability: $P(L_x, M_2, v_{\rm sys} \given M_{1,i}, M_{2,i}, a_i, \vec{v}_k, t_b)$}
+\subsection{Binary Probability: $P(L_x, M_2, v_{\rm sys} \given M_{1,i}, M_{2,i}, a_i, \vec{v}_k, t_i)$} \label{sec:binary_evolve}
 
 Given a birth time and a particular initial binary parameters, this term provides the probability that a binary with a particular $L_x$, $M_2$, and $v_k$ will be formed. For HMXBs, determining this term relies on the evolution through three separate evolutionary transitions. First, the more massive primary evolves first off the main sequence, leading to stable, thermal-timescale mass transfer onto the secondary. After the primary has completed its evolution it core-collapses, forming a NS. The system suffers effectively instantaneous mass loss and a natal kick, both of which act to profoundly affect the binary's orbit. Finally, the system begins to emit in X-rays once the NS accretes from the secondary's stellar wind. Since the companion's mass and mass loss rate change as the system evolves, these are both, in general, a function of time. We discuss each of these stages below.
 
@@ -164,14 +176,14 @@ Given a birth time and a particular initial binary parameters, this term provide
 
 \subsubsection{The First Mass Transfer Phase} \label{sec:trans_MT}
 
-Once the first star evolves past its main sequence onto the giant branch, it begins overfilling its Roche lobe. We select only those systems that will undergo stable mass accretion, which can be determined by comparing the thermal time of the secondary with the mass accretion time. We discuss this further in Section \ref{se:priors} This comparison determines whether the transferring matter can lose its entropy fast enough to become incorporated with the companion star, or whether it forms a common envelope. The mapping from the initial binary conditions to the post-mass transfer binary is straightforward. The post mass transfer primary becomes the primary core mass ($M_{1,c}$), while the secondary incorporates the primary's lost envelope. From Ghosh et al.: 
+Once the first star evolves past its main sequence onto the giant branch, it begins overfilling its Roche lobe. We select only those systems that will undergo stable mass accretion, which can be determined by comparing the thermal time of the secondary with the mass accretion time. We discuss this further in Section \ref{sec:priors}. This comparison determines whether the transferring matter can lose its entropy fast enough to become incorporated with the companion star, or whether it forms a common envelope. We assume that the system instantaneously circularizes at the pericenter separation: $a_i (1-e_i)$.The mapping from the initial binary conditions to the post-mass transfer binary is straightforward. The post mass transfer primary becomes the primary core mass ($M_{1,c}$), while the secondary incorporates the primary's lost envelope. From Ghosh et al.: 
 \begin{eqnarray} 
 M_1' &=& M_{1,c} \\
 M_2' &=& M_2 + f_a (M_1 - M_{1,c}),
 \end{eqnarray}
 where $f_a$ is a unitless parameter designating the fraction of mass lost by the primary that is accreted by the secondary. For now, we set $f_a$ to unity, denoting conservative mass transfer. The post-mass transfer orbital separation is:
 \begin{equation}
-a_{\rm MT} = a_i \left[ \frac{M_1 M_2}{M_1' M_2'} \right]^2.
+a_{\rm MT} = a_i (1-e_i) \left[ \frac{M_1 M_2}{M_1' M_2'} \right]^2.
 \end{equation}
 $M_{1,c}$ can be estimated by:
 \begin{equation}
@@ -207,7 +219,7 @@ We assume that the binary does not change between the end of the mass transfer p
 
 \subsubsection{The Primary's Core Collapse} \label{sec:trans_SN}
 
-We next calculate the post-SN orbital separation ($a_{\rm SN}$), systemic velocity ($v_{\rm sys}$), and eccentricity ($e$) based on the equations in Hills (1983) and Kalogera (1996):
+We next calculate the post-SN orbital separation, $a_{\rm SN}$, systemic velocity, $v_{\rm sys}$, and eccentricity, $e_{\rm SN}$ based on the equations in Hills (1983) and Kalogera (1996):
 \begin{equation}
 a_{\rm SN} = \left[ \frac{2 }{a_{\rm MT}}  - \frac{v_1^2}{G(M_{\rm NS} + M_2')} \right]^{-1}. \label{eq:SN_A} \\
 %A'' &=& GM_1M_2 \left[ -\left( \frac{M_1''M_2''}{M_1'' + M_2''} \right) v_1^2 + \frac{2GM_1''M_2''}{A'} \right] ^{-1} \label{eq:SN_A} \\
@@ -234,10 +246,12 @@ where we have included two substitutions:
 \end{eqnarray}
 
 
-If the post-SN orbital eccentricity becomes relevant for the evolution of the binary later on, we can include it in the analysis, however for now, we use it to determine which systems remain bound during a SN: $0 < e < 1$. The eccentricity equation is below:
+The post-SN eccentricity is determined by:
 \begin{equation}
-1-e^2 = \frac{a_{\rm MT}^2}{a_{\rm SN}\ G (M_{\rm NS} + M_2')} \left[ v_k^2 \cos^2\theta + v_k^2 \sin^2 \theta \sin^2 \phi + 2 v_k v_r \cos \theta + v_r^2  \right]. \label{eq:SN_e}
+1-e_{\rm SN}^2 = \frac{a_{\rm MT}^2}{a_{\rm SN}\ G (M_{\rm NS} + M_2')} \left[ v_k^2 \cos^2\theta + v_k^2 \sin^2 \theta \sin^2 \phi + 2 v_k v_r \cos \theta + v_r^2  \right]. \label{eq:SN_e}
 \end{equation}
+Systems with $0 \leq e < 1$ remain bound. We do not include tidal dissipation or circularization, but keep track of $e_{\rm SN}$ since it affects the X-ray luminosity calculation below.
+
 
 
 
@@ -280,11 +294,19 @@ Once the secondary evolves onto the core helium burning branch, its luminosity i
 \begin{equation}
 L = \frac{G M_{\rm NS} \dot{M}}{R_{\rm NS}}.
 \end{equation}
-We assume a circular binary, the NS accretes from its companion's wind, that the wind is faster than the orbital velocity of the companion, and that the orbital separation, $a_{\rm XRB}$, is significantly greater than the Bondi radius of the NS. Under these assumptions, the fraction of the companion's wind that is accreted by the NS can be determined in a straightforward way:
+The NS accretes from its companion's wind, that the wind is faster than the orbital velocity of the companion, and that the orbital separation, $a_{\rm XRB}$, is significantly greater than the Bondi radius of the NS. Under these assumptions, the fraction of the companion's wind that is accreted by the NS can be determined in a straightforward way:
 \begin{equation}
 \dot{M} = \left( \frac{G M_{\rm NS}}{V_w^2\ a_{\rm XRB}} \right)^2 \times \dot{M}_{\rm wind}. \label{eq:mdot}
 \end{equation}
-Determining this transformation is difficult; $\dot{M}_{\rm wind}$ is not a simple function of the stellar mass. To solve this problem, we interpolate between models from the stellar evolution code SSE (Hurley, Pols \& Tout). Specifically, we run a grid of models every 0.01 \Msun, interpolating the mass, radius, and $\dot{M}$ of each model as a function of time. The numerous model outputs provide a smooth transition over time for the star. In our procedure, we round $M_{2,MT}$ to the nearest hundredth and determine $\dot{M}$ from the corresponding model interpolation.
+Unfortunately, $\dot{M}_{\rm wind}$ is not a simple function of the stellar mass. To solve this problem, we interpolate between models from the stellar evolution code SSE (Hurley, Pols \& Tout). Specifically, we run a grid of models every 0.01 \Msun, between 1 and 40 \Msun, interpolating the mass, radius, and $\dot{M}$ of each model as a function of time. The numerous model outputs provide a smooth transition over time for the star. In our procedure, we round $M_{2,MT}$ to the nearest hundredth and determine $\dot{M}$ from the corresponding model interpolation.
+
+
+Equation \ref{eq:mdot} is dependent upon the fourth power of $V_w$, and must therefore be treated carefully. Based on studies of O and B star winds, Vink et al.\ determine that the terminal stellar wind velocity scales with the escape velocity by a factor, $\beta$, of order unity. Specifically, we use:
+\begin{equation}
+V_w = \sqrt{\frac{2 \beta G M}{R^2}},
+\end{equation}
+where $\beta$ is linearly interpolated between 1.4 for 120 \Msun\ stars and 0.5 for 7 \Msun\ stars. Again, we use the SSE interpolation outputs to obtain estimates of $M$ and $R$ as a function of initial mass and time.
+
 
 
 
@@ -298,34 +320,29 @@ Determining this transformation is difficult; $\dot{M}_{\rm wind}$ is not a simp
 
 There is a subtle but important complication here. From the first mass transfer phase, the secondary gained a significant amount of hydrogen, which, depending on the initial stellar parameters, could more than double its mass. Clearly the stellar lifetimes will be affected. The first mass transfer phase will occur at roughly the helium ignition time for a star of mass $M_1$, $t_{\rm He} (M_1)$. If we assume that stars burn hydrogen at a constant rate throughout their main sequence, the hydrogen mass of the secondary at this point will be:
 \begin{equation}
-M_{\rm He,2} = \frac{t_{\rm He}(M_1)}{t_{\rm He}(M_2)} M_{\rm He,core}(M_2), \label{eq:M_He}
+M_{\rm He,2} = \frac{t_{\rm He}(M_{1,i})}{t_{\rm He}(M_{2,i})} M_{\rm He,core}(M_{2,i}), \label{eq:M_He}
 \end{equation}
-where $M_{\rm He,core}(M_2)$ is the helium core mass (at helium ignition) of a star with an initial mass of $M_2$. At this point, the secondary will accrete roughly pure hydrogen from the primary. Since this mass transfer occurs on a thermal timescale, it is effectively instantaneous compared to the stellar lifetime. The rejuvenated secondary star, may have a substantially different mass ($M_2'$), but it is not beginning with a cosmic helium abundance. We can estimate its effective age ($t_{\rm eff}$) by comparing its helium mass from Equation \ref{eq:M_He} with $M_{\rm He,core}(M_2')$, multiplied by the helium ignition time:
+where $M_{\rm He,core}(M_{2,i})$ is the helium core mass (at helium ignition) of a star with an initial mass of $M_{2,i}$. At this point, the secondary will accrete roughly pure hydrogen from the primary. Since this mass transfer occurs on a thermal timescale, it is effectively instantaneous compared to the stellar lifetime. The rejuvenated secondary star, may have a substantially different mass ($M'_2$), but it is not beginning with a cosmic helium abundance. We can estimate its effective age ($t_{\rm eff}$) by comparing its helium mass from Equation \ref{eq:M_He} with $M_{\rm He,core}(M_2')$, multiplied by the helium ignition time:
 \begin{equation}
 t_{\rm eff} = \frac{M_{\rm He,2}}{M_{\rm He,core} (M_2') } t_{\rm He} (M_2'). \label{eq:t_eff_1}
 \end{equation}
-Finally, the total age of the system ($t_b$) is a conditional on our posterior probability. The secondary's effective age at the time of observation, $t_b$, is $t_{\rm eff,obs} = t_{\rm eff} + t_b - t_{\rm He}(M_1)$, which can be expressed using Equations \ref{eq:M_He} and \ref{eq:t_eff_1}:
+Finally, the total age of the system ($t_i$) is a conditional on our posterior probability. The secondary's effective age at the time of observation, $t_i$, is $t_{\rm eff,obs} = t_{\rm eff} + t_i - t_{\rm He}(M_{1,i})$, which can be expressed using Equations \ref{eq:M_He} and \ref{eq:t_eff_1}:
 \begin{equation}
-t_{\rm eff,obs} = \frac{M_{\rm He,core}(M_2)}{M_{\rm He,core}(M_2')} \frac{t_{\rm He}(M_1)}{t_{\rm He}(M_2)} t_{\rm He}(M_2')
-  + t_b - t_{\rm He}(M_1) \label{eq:t_eff_obs_full}
+t_{\rm eff,obs} = \frac{M_{\rm He,core}(M_{2,i})}{M_{\rm He,core}(M_2')} \frac{t_{\rm He}(M_{1,i})}{t_{\rm He}(M_{2,i})} t_{\rm He}(M_2')
+  + t_i - t_{\rm He}(M_{1,i}) \label{eq:t_eff_obs_full}
 \end{equation}
 Using this effective time, we can determine the mass and wind mass loss rate of the secondary using single stellar evolution models.
 
-Equation \ref{eq:mdot} is dependent upon the fourth power of $V_w$, and must therefore be treated carefully. Based on studies of O and B star winds, Vink et al.\ determine that the terminal stellar wind velocity scales with the escape velocity by a factor of order unity. Specifically, we use:
-\begin{equation}
-V_w = \sqrt{\frac{2 \beta G M}{R^2}},
-\end{equation}
-where $\beta$ is linearly interpolated between 1.4 for 120 \Msun\ stars and 0.5 for 7 \Msun\ stars.
 
 
 \begin{comment}
 Unfortunately, accurately calculating $t_{\rm eff,obs}$ requires both $M_1$ and $M_2$ which can only be determined by evaluating the previous two transformations, discussed in Sections \ref{sec:trans_MT} and \ref{sec:trans_SN}. To get an estimate of how important the transformation is, we first evaluate $t_{\rm eff,obs}$ in the limit of a large initial mass ratio: $M_1 >> M_2$. In this limit, the first term in Equation \ref{eq:t_eff_obs_full} can be ignored:
 \begin{equation}
-\lim_{M_1 >> M_2}:  t_{\rm eff,obs} \approx t_b - t_{\rm He}(M_2'). \label{eq:t_eff_obs_lim_1}
+\lim_{M_1 >> M_2}:  t_{\rm eff,obs} \approx t_i - t_{\rm He}(M_2'). \label{eq:t_eff_obs_lim_1}
 \end{equation}
 We now take the opposite limit, such that $M_1 \approx M_2$. In this limit, $M_1, M_2 \approx M_2'/2$. We can find a similar approximation for $t_{\rm eff,obs}$:
 \begin{equation}
-\lim_{M_1 \approx M_2}: t_{\rm eff,obs} \approx (2)^{-1/\xi}  t_{\rm He} (M_2') + t_b - t_{\rm He} (M_2'/2).
+\lim_{M_1 \approx M_2}: t_{\rm eff,obs} \approx (2)^{-1/\xi}  t_{\rm He} (M_2') + t_i - t_{\rm He} (M_2'/2).
 \end{equation}
 While these two approximations will in general differ, the difference between them will provide an estimate of the overall dependence of the stellar merger on the secondary's effective lifetime. Specifically, if the difference between the two limiting $t_{\rm eff,obs}$ is smaller than the uncertainty on the star formation history of the particular region in question, then we can approximate $t_{\rm eff,obs}$ using Equation \ref{eq:t_eff_obs_lim_1}.
 
@@ -345,12 +362,12 @@ P(M_{\rm NS}, M''_2, L) = P(M_{\rm NS}, M'_2, A'') J_{\rm XRB}. \label{eq:P_XRB}
 
 
 
-\subsection{Prior Probabilities: $P(M_{1,i}, M_{2,i,} a_i, \vec{v}_k, \alpha_b, \delta_b, t_b)$} \label{sec:priors}
+\subsection{Prior Probabilities: $P(M_{1,i}, M_{2,i,} a_i, \vec{v}_k, \alpha_i, \delta_i, t_i)$} \label{sec:priors}
 
 
 Our model includes nine parameters. These are not necessarily independent of each other, however the prior probability can be split into several parts:
 \begin{equation}
-P(M_{1,i}, M_{2,i,} a_i, \vec{v}_k, \alpha_b, \delta_b, t_b) = P(M_{1,i}) P(M_{2,i} \given M_{1,i}) P(a_i) P(\vec{v}_k \given M_{1,i}) P(\alpha_b, \delta_b, t_b \given M_{1,i})
+P(M_{1,i}, M_{2,i,} a_i, \vec{v}_k, \alpha_i, \delta_i, t_i) = P(M_{1,i}) P(M_{2,i} \given M_{1,i}) P(a_i) P(\vec{v}_k \given M_{1,i}) P(\alpha_i, \delta_i, t_i \given M_{1,i})
 \end{equation}
 We discuss each of these terms and the justification for their dependencies (where they exist) in turn below.
 
@@ -394,25 +411,55 @@ where:
 
 Since the kick distribution is isotropic, normalized probabilities for the kick polar, $\theta_k$, and azimuthal, $\phi_k$, angles are straightforward:
 \begin{eqnarray}
-P(\theta_k) &=& \sin \theta_k \label{eq:P_theta_k} \\
-P(\phi_k) &=& \frac{1}{2 \pi}. \label{eq:P_phi_k}
+P(\theta_k) &=& \sin \theta_k \in [0, \pi] \label{eq:P_theta_k} \\
+P(\phi_k) &=& \frac{1}{2 \pi} \in [0, 2\pi] . \label{eq:P_phi_k}
 \end{eqnarray}
 
 
 \subsubsection{Position and time parameters}
 
-{\bf This section has problems and needs to be fixed. Disregard for now.}
 
-The priors on $\alpha_b$ and $\delta_b$ ensure these parameters are bounded to the position of the LMC. Further, we would like for the priors on $\alpha_b$ and $\delta_b$ to scale inversely with the size of the solid angle available for any particular HMXB to have been formed. The positional priors are therefore dependent upon $\theta_C$, defined in Equation \ref{eq:theta_c}, which is itself a function of $t_b$, $M_{1,i}$, and $v_{\rm sys}$. It can be shown that the appropriate prior is:
+The priors on $\alpha_i$, $\delta_i$, and $t_i$ depends on the local star formation history at that position and time. We use the star formation history maps from Harris \& Zaritsky. We only take into account their star formation at a metallicity of $Z=0.008$, the dominant metallicity at which stars have been formed in the LMC over the past 1Gyr. Their data cover the LMC with some 1300 separate regions with angular resolutions of either 12\amin or 24 \amin on a side. Further, their star formation histories have a resolution of 0.2 dex from log $t$ ranging from 6.8 to 10.2 yr. We ignore the uncertainties on their star formation histories, generating an interpolation function for each region. The prior on location and time is therefore:
 \begin{equation}
-P(\alpha_b, \delta_b \given M_{1,i}, M_{2,i}, a, \vec{v}_k, t_b) = \frac{\cos \delta}{\pi \theta_C^2}.
+P(\alpha_i, \delta_i \given M_{1,i}, M_{2,i}, a, \vec{v}_k, t_i) = C_{\rm SFH}\ {\rm SFR}(\alpha_i, \delta_, t_i),
 \end{equation}
+where is $C_{\rm SFH}$ is a normalization constant. 
 
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.55\columnwidth]{../figures/prior_SFH.pdf}
+\caption{The prior on both position of the binary's birth location and time depends on the star formation history. Only the star formation history within the cone, the size and shape of which is set by the binary parameters, are taken into account. We show contours indicating regions of high (red) and low (blue) star formation for three different ages. Determining the prior on the star formation history involves integrating the star formation history throughout the cone.}
+\label{fig:prior_SFH}
+\end{center}
+\end{figure}
 
-Finally, we add a prior for $t_b$, which is based on the star formation history at $\alpha_b$ and $\delta_b$. Harris \& Zaritsky provide spatially resolved star formation histories with logarithmically-spaced bins. We linearly interpolate these bins in log time to determine the star formation rate at the position $\alpha_b$ and $\delta_b$ and time $t_b$. The prior on $t_b$ is therefore:
+Figure \ref{fig:prior_SFH} demonstrates how we determine the normalization constant. An object at a location $(\alpha, \delta)$ could have been formed only within a region (shown by the circle) that progressively increases for older birth times. Only stars formed within this cone contribute to the normalization constant; stars formed outside the cone could not have led to the observed system. The shape and size of the cone changes depending on the binary parameters (hence the conditional dependence on this term), therefore the prior needs to be recalculated for each set of model parameters. Because of the function calls, calculating this normalization constant is the most computationally expensive portion of this method. 
+
+The normalization constant is determined by integrating over the specific star formation rate throughout the cone and setting the quantity to unity:
 \begin{equation}
-P(t_b) \propto {\rm SFR}(\alpha_b, \delta_b, t_b).
+1 = C_{\rm SFH}\ \int_{t_{min}}^{t_{max}} \int_0^{2 \pi} \int_0^{\theta_c} \dd t_i\ \dd \phi\ \dd \theta\ {\rm SFR}(\theta, \phi, t_i). 
 \end{equation}
+We choose to calculate the integral using a Monte Carlo sampling technique. We draw $N$ random samples throughout the cone. The integral is the product of the average of the samples and the cone's volume:
+\begin{equation}
+\frac{1}{C_{\rm SFH}} \approx \frac{\pi \theta_C^2 (t_{max} - t_{min})}{3N} \sum_j {\rm SFR}(\theta_j, \phi_j, t_{i,j}),
+\end{equation}
+where $(\theta_j, \phi_j, t_{i,j})$ are random samples, evenly distributed around the cone's volume. Formally, an infinite number of samples is required for the approximation above to become an equality, however, we find that for typical systems, 512 samples is sufficient to accurately calculate $C_{\rm SFH}$.
+
+
+
+ To obtain random samples of $\theta$ and $t$, we use inversion sampling, which involves obtaining random samples of the cumulative distribution function. The random values of $\theta$ and $t$ are the inversions of those samples:
+ \begin{eqnarray}
+\phi &\sim& U(0, 2\pi) \\
+\theta &=& \sqrt{\frac{y}{C_{\theta}(t) \pi}}: y \sim U(0,1) \\
+t &=& \left[ \frac{3y}{C_t \pi \left( \frac{v_{sys}}{D_{\rm LMC}} \right)^2} \right]^{1/3} + t(M_{1,i}): y \sim U(0,1)], 
+\end{eqnarray}
+where:
+\begin{eqnarray}
+C_{\theta} &=& \frac{1}{\pi \theta_c^2(t)} \\
+C_t &=& \frac{ 3 \left( \frac{D_{\rm LMC}}{v_{sys}} \right)^2 }{ \pi \left( t_{max} - t_{min} \right)^3 }.
+\end{eqnarray}
+Since $C_{\theta}$ depends on the $t$, we must generate random samples in $t$ first. 
+
 
 
 
@@ -420,11 +467,11 @@ P(t_b) \propto {\rm SFR}(\alpha_b, \delta_b, t_b).
 
 
 \begin{comment}
-\subsection{P($t_b \given C)$}
+\subsection{P($t_i \given C)$}
 
 The final term gives the probability of a birth time for a particular cluster. The birth time probability is directly related to the star formation rate at that time:
 \begin{equation}
-P(t_b \given C) \propto {\rm SFR}(t_b).
+P(t_i \given C) \propto {\rm SFR}(t_i).
 \end{equation} 
 Determining this term therefore requires a knowledge of the star formation history of each star forming cluster. Multi wavelength observations have allowed approximate knowledge of the star formation histories for most of the star forming regions in NGC 55, at least within the recent past.
 
@@ -456,18 +503,18 @@ After initializing, we run {\tt emcee} for 10,000 steps for the ``burn-in", to d
 
 To test the ability of our model to recover the initial parameters, we devise a series of tests. First, we create a mock system with a set of initial conditions. We then apply our forward evolution equations to evolve the system through stable mass transfer, SN, and the X-ray luminous phase. Finally, we ``observe" the system and record the output $\alpha$, $\delta$, $M'_2$, and $L'_x$. We apply our model to these values to determine how accurately our model can recover the initial parameters that generated this mock system. 
 
-Our posterior probability distributions and their covariances are shown in Figure \ref{fig:test_corner}. The observation of $M'_2$ provides the most stringent constraints on $M_{1,i}$, $M_{2,i}$, and $t_b$.
+Our posterior probability distributions and their covariances are shown in Figure \ref{fig:test_corner}. The observation of $M'_2$ provides the most stringent constraints on $M_{1,i}$, $M_{2,i}$, and $t_i$.
 
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=0.95\columnwidth]{../figures/test_corner.pdf}
-\caption{Posterior probability distributions and their covariances when applied to the test model. The true input values are indicated by the blue lines in each plot. Our model successfully reproduces the majority of these parameters. The strongest covariances are between $M_{1,i}$, $M_{2,i}$, and $t_b$, since these all need to be well constrained to generate a system with $M'_2$. }
+\caption{Posterior probability distributions and their covariances when applied to the test model. The true input values are indicated by the blue lines in each plot. Our model successfully reproduces the majority of these parameters. The strongest covariances are between $M_{1,i}$, $M_{2,i}$, and $t_i$, since these all need to be well constrained to generate a system with $M'_2$. }
 \label{fig:test_corner}
 \end{center}
 \end{figure}
 
 
-In Figure \ref{fig:test_SFR}, we compare the position posterior distribution to the star formation history around $\alpha_b$ and $\delta_b$ at two separate ages. The posterior distribution well matches the region of star formation history at the true age of 40 Myr (top panel), however there is an additional region of high probability at slightly lower $\delta$. The bottom panel shows that this region corresponds to a high rate of star formation history at slightly younger ages. This indicates that the output distributions are indeed sensitive to the spatially resolved star formation histories, and our numerical method is able to well probe the multidimensional parameter space.
+In Figure \ref{fig:test_SFR}, we compare the position posterior distribution to the star formation history around $\alpha_i$ and $\delta_i$ at two separate ages. The posterior distribution well matches the region of star formation history at the true age of 40 Myr (top panel), however there is an additional region of high probability at slightly lower $\delta$. The bottom panel shows that this region corresponds to a high rate of star formation history at slightly younger ages. This indicates that the output distributions are indeed sensitive to the spatially resolved star formation histories, and our numerical method is able to well probe the multidimensional parameter space.
 
 
 \begin{figure}[h!]
@@ -504,21 +551,21 @@ Code...
 
 \section{Walker initialization}
 
-Only a small portion of the nine-dimensional parameter space has a non-zero posterior probability, and it is necessary to initialize the walkers in this small region. The most important parameters are $M_{1,i}, M_{2,i}, and t_b$, since these are necessary to match the observed companion mass, $M'_2$. To initialized these parameters, we create and run a separate three-parameter MCMC model within our larger nine-parameter model. We solve the following Bayesian posterior probability:
+Only a small portion of the nine-dimensional parameter space has a non-zero posterior probability, and it is necessary to initialize the walkers in this small region. The most important parameters are $M_{1,i}, M_{2,i}, and t_i$, since these are necessary to match the observed companion mass, $M'_2$. To initialized these parameters, we create and run a separate three-parameter MCMC model within our larger nine-parameter model. We solve the following Bayesian posterior probability:
 \begin{equation}
-P(M_{1,i}, M_{2,i}, t_b \given M'_2) = \frac{ P(M'_2 \given M_{1,i}, M_{2,i}, t_b ) P( M_{1,i}, M_{2,i}, t_b )}{P(M'_2)}.
+P(M_{1,i}, M_{2,i}, t_i \given M'_2) = \frac{ P(M'_2 \given M_{1,i}, M_{2,i}, t_i ) P( M_{1,i}, M_{2,i}, t_i )}{P(M'_2)}.
 \end{equation}
-The priors on $M_{1,i}$, $M_{2,i}$, and $t_b$ are the same as provided above in Section \ref{sec:priors}. The likelihood distribution, $P(M'_2 \given M_{1,i}, M_{2,i}, t_b )$, is adapted from our method described in Section \ref{sec:binary}. We first marginalize over $M_2$, the true (current) secondary mass:
+The priors on $M_{1,i}$, $M_{2,i}$, and $t_i$ are the same as provided above in Section \ref{sec:priors}. The likelihood distribution, $P(M'_2 \given M_{1,i}, M_{2,i}, t_i )$, is adapted from our method described in Section \ref{sec:binary}. We first marginalize over $M_2$, the true (current) secondary mass:
 \begin{eqnarray}
-P(M'_2 \given M_{1,i}, M_{2,i}, t_b ) &=& \int \dd M_2\ P(M'_2, M_2 \given M_{1,i}, M_{2,i}, t_b ) \nonumber \\
-&=& \int \dd M_2\ P(M'_2 \given M_2) P(M_2 \given M_{1,i}, M_{2,i}, t_b).
+P(M'_2 \given M_{1,i}, M_{2,i}, t_i ) &=& \int \dd M_2\ P(M'_2, M_2 \given M_{1,i}, M_{2,i}, t_i ) \nonumber \\
+&=& \int \dd M_2\ P(M'_2 \given M_2) P(M_2 \given M_{1,i}, M_{2,i}, t_i).
 \end{eqnarray}
 Here again the observed mass is a Gaussian distribution: 
 \begin{equation}
 P(M'_2 \given M_2) = \mathcal{N}(M'_2 \given M_2).
 \end{equation}
 
-To determine $P(M_2 \given M_{1,i}, M_{2,i}, t_b )$, we first determine the mass of the secondary after mass transfer using Equation \ref{eq:M2_MT}. We then determine $t_{eff,obs}$ using Equation \ref{eq:t_eff_obs}. Finally, we determine $M_2$ using Equation \ref{eq:M2}.
+To determine $P(M_2 \given M_{1,i}, M_{2,i}, t_i )$, we first determine the mass of the secondary after mass transfer using Equation \ref{eq:M2_MT}. We then determine $t_{eff,obs}$ using Equation \ref{eq:t_eff_obs}. Finally, we determine $M_2$ using Equation \ref{eq:M2}.
 
 
 
@@ -532,16 +579,16 @@ To determine $P(M_2 \given M_{1,i}, M_{2,i}, t_b )$, we first determine the mass
 
 We must first marginalize over three latent parameters, the kick velocity ($v_k$), the polar kick angle ($\theta$), and the azimuthal kick angle ($\phi$). We will show below that if the binary's eccentricity is irrelevant, we can ignore $\phi$, and we need only marginalize over $v_k$ and $\theta$:
 \begin{equation}
-P(L_x, M_2, v_{\rm sys} \given t_b, M) = \int \int P(L_x, M_2, v_{\rm sys} \given v_k, \theta, t_b, M)\ P(v_k, \theta \given t_b, M)\ \dd v_k\ \dd \theta.
+P(L_x, M_2, v_{\rm sys} \given t_i, M) = \int \int P(L_x, M_2, v_{\rm sys} \given v_k, \theta, t_i, M)\ P(v_k, \theta \given t_i, M)\ \dd v_k\ \dd \theta.
 \end{equation}
 Since we assume an isotropic kick direction and the kick velocity is an independent parameter dependent only on our model, these two parameters can be separated:
 \begin{equation}
-P(L_x, M_2, v_{\rm sys} \given t_b, M) = \int \int P(L_x, M_2, v_{\rm sys} \given v_k, \theta, t_b, M)\ P(v_k \given M)\ P(\theta)\ \dd v_k\ \dd \theta. \label{eq:P_marginalized}
+P(L_x, M_2, v_{\rm sys} \given t_i, M) = \int \int P(L_x, M_2, v_{\rm sys} \given v_k, \theta, t_i, M)\ P(v_k \given M)\ P(\theta)\ \dd v_k\ \dd \theta. \label{eq:P_marginalized}
 \end{equation}
 Our problem now amounts to determining the integrand in the equation above.
 
 
-Determining the quantity $P(L_x, M_2, v_{\rm sys} \given v_k, \theta, t_b, M)$ in the equation above amounts to calculating how often (given the Bayesian priors provided) a randomly generated stellar binary will have a luminosity $L_x$, companion mass, $M_2$, and systemic velocity, $v_{\rm sys}$. To calculate such quantities, population studies have traditionally opted for producing a Monte Carlo-generated, synthesized population and determining how many are produced with the observed properties. There is a simple reason for this: Monte Carlo methods require only an initial distribution of binaries and an understanding of how any particular system evolves from its initial state. This lends itself well to evolving systems through complex physical processes that require numerical integration. 
+Determining the quantity $P(L_x, M_2, v_{\rm sys} \given v_k, \theta, t_i, M)$ in the equation above amounts to calculating how often (given the Bayesian priors provided) a randomly generated stellar binary will have a luminosity $L_x$, companion mass, $M_2$, and systemic velocity, $v_{\rm sys}$. To calculate such quantities, population studies have traditionally opted for producing a Monte Carlo-generated, synthesized population and determining how many are produced with the observed properties. There is a simple reason for this: Monte Carlo methods require only an initial distribution of binaries and an understanding of how any particular system evolves from its initial state. This lends itself well to evolving systems through complex physical processes that require numerical integration. 
 
 
 The downside is that since it is unknown {\it a priori} about which initial binaries will evolve into those in question, Monte Carlo population synthesis often requires generating some 10$^6$ random initial binaries to accurately cover the large dimensional initial phase space. For particularly rare binaries, small number statistics are often a problem. The computation time required can be considerable. Parameter studies are therefore often limited to testing a few key parameters. Figure \ref{fig:Mapping} shows an abstract demonstration of the transformation from the initial binary through the first (stable) mass transfer phase ($G_{\rm MT}$), the primary's core collapse ($H_{\rm SN}$), and finally into the observed X-ray luminous phase once the secondary star feeds the NS from a stellar wind ($I_{\rm XRB}$).
