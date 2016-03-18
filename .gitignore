@@ -17,3 +17,12 @@ documents/data/
 data_2
 data/smc_data/
 figures/
+code/bse_code/*.o
+code/bse_code/*.in
+code/bse_code/*.out
+code/bse_code/*.txt
+code/bse_code/sse
+code/bse_code/bse
+code/bse_code/popbin
+code/bse_code/pybse.so
+code/bse_code/binary.dat
