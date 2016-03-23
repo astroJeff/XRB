@@ -1,7 +1,8 @@
 ***
       SUBROUTINE COMENV(M01,M1,MC1,AJ1,JSPIN1,KW1,
      &                  M02,M2,MC2,AJ2,JSPIN2,KW2,
-     &                  ZPARS,ECC,SEP,JORB,COEL)
+     &                  ZPARS,ECC,SEP,JORB,COEL,
+     &                  vk,theta_in,phi_in)
 *
 * Common Envelope Evolution.
 *
@@ -19,6 +20,7 @@
       INTEGER ceflag,tflag,ifflag,nsflag,wdflag
       COMMON /FLAGS/ ceflag,tflag,ifflag,nsflag,wdflag
 *
+      REAL*8 vk,theta_in,phi_in
       REAL*8 M01,M1,MC1,AJ1,JSPIN1,R1,L1,K21
       REAL*8 M02,M2,MC2,AJ2,JSPIN2,R2,L2,K22,MC22
       REAL*8 TSCLS1(20),TSCLS2(20),LUMS(10),GB(10),TM1,TM2,TN,ZPARS(20)
@@ -28,7 +30,7 @@
       REAL*8 RC1,RC2,Q1,Q2,RL1,RL2,LAMB1,LAMB2
       REAL*8 MENV,RENV,MENVD,RZAMS,VS(3)
       REAL*8 AURSUN,K3,ALPHA1,LAMBDA
-      PARAMETER (AURSUN = 214.95D0,K3 = 0.21D0) 
+      PARAMETER (AURSUN = 214.95D0,K3 = 0.21D0)
       COMMON /VALUE2/ ALPHA1,LAMBDA
       LOGICAL COEL
       REAL*8 CELAMF,RL,RZAMSF
@@ -128,7 +130,10 @@
             CALL hrdiag(M01,AJ1,M1,TM1,TN,TSCLS1,LUMS,GB,ZPARS,
      &                  R1,L1,KW1,MC1,RC1,MENV,RENV,K21)
             IF(KW1.GE.13)THEN
-               CALL kick(KW1,MF,M1,M2,ECC,SEPF,JORB,VS)
+* We assume a circular binary at the SN kick
+*               CALL kick_rev(KW1,MF,M1,M2,ECC,SEPF,JORB,VS,
+               CALL kick_rev(KW1,MF,M1,M2,SEPF,JORB,VS,
+     &                       vk,theta_in,phi_in)
                IF(ECC.GT.1.D0) GOTO 30
             ENDIF
          ENDIF
@@ -216,7 +221,10 @@
             CALL hrdiag(M01,AJ1,M1,TM1,TN,TSCLS1,LUMS,GB,ZPARS,
      &                  R1,L1,KW1,MC1,RC1,MENV,RENV,K21)
             IF(KW1.GE.13)THEN
-               CALL kick(KW1,MF,M1,M2,ECC,SEPF,JORB,VS)
+* We assume a circular binary at the SN kick
+*               CALL kick_rev(KW1,MF,M1,M2,ECC,SEPF,JORB,VS,
+               CALL kick_rev(KW1,MF,M1,M2,SEPF,JORB,VS,
+     &                       vk,theta_in,phi_in)
                IF(ECC.GT.1.D0) GOTO 30
             ENDIF
             MF = M2
@@ -226,7 +234,10 @@
             CALL hrdiag(M02,AJ2,M2,TM2,TN,TSCLS2,LUMS,GB,ZPARS,
      &                  R2,L2,KW2,MC2,RC2,MENV,RENV,K22)
             IF(KW2.GE.13.AND.KW.LT.13)THEN
-               CALL kick(KW2,MF,M2,M1,ECC,SEPF,JORB,VS)
+* We assume a circular binary at the SN kick
+*               CALL kick_rev(KW1,MF,M1,M2,ECC,SEPF,JORB,VS,
+               CALL kick_rev(KW1,MF,M1,M2,SEPF,JORB,VS,
+     &                       vk,theta_in,phi_in)
                IF(ECC.GT.1.D0) GOTO 30
             ENDIF
          ENDIF
@@ -235,7 +246,7 @@
       IF(COEL)THEN
          MC22 = MC2
          IF(KW.EQ.4.OR.KW.EQ.7)THEN
-* If making a helium burning star calculate the fractional age 
+* If making a helium burning star calculate the fractional age
 * depending on the amount of helium that has burnt.
             IF(KW1.LE.3)THEN
                FAGE1 = 0.D0
@@ -262,7 +273,7 @@
 *
       IF(COEL)THEN
 *
-* Calculate the orbital spin just before coalescence. 
+* Calculate the orbital spin just before coalescence.
 *
          TB = (SEPL/AURSUN)*SQRT(SEPL/(AURSUN*(MC1+MC2)))
          OORB = TWOPI/TB
@@ -323,9 +334,9 @@
          ECC = 0.D0
       ELSE
 *
-* Check if any eccentricity remains in the orbit by first using 
-* energy to circularise the orbit before removing angular momentum. 
-* (note this should not be done in case of CE SN ... fix).  
+* Check if any eccentricity remains in the orbit by first using
+* energy to circularise the orbit before removing angular momentum.
+* (note this should not be done in case of CE SN ... fix).
 *
          IF(EORBF.LT.ECIRC)THEN
             ECC = SQRT(1.D0 - EORBF/ECIRC)
@@ -333,7 +344,7 @@
             ECC = 0.D0
          ENDIF
 *
-* Set both cores in co-rotation with the orbit on exit of CE, 
+* Set both cores in co-rotation with the orbit on exit of CE,
 *
          TB = (SEPF/AURSUN)*SQRT(SEPF/(AURSUN*(M1+M2)))
          OORB = TWOPI/TB

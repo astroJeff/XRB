@@ -37,8 +37,8 @@ popbin: $(OBJT3) $(LFLAGS)
 	$(CMPLR) $(FFLAGS) $(OBJT3) -o popbin
 
 SRCE4 = \
-evolv_wrapper.f comenv.f corerd.f deltat.f dgcore.f evolv2.f \
-gntage.f hrdiag.f instar.f kick.f mix.f mlwind.f mrenv.f ran3.f \
+evolv_wrapper.f comenv.f corerd.f deltat.f dgcore.f evolv2_rev.f \
+gntage.f hrdiag.f instar.f kick_rev.f mix.f mlwind.f mrenv.f ran3.f \
 rl.f star.f zcnsts.f zfuncs.f
 
 OBJT4 = $(SRCE4:.f=.o)
@@ -48,9 +48,9 @@ evolv_wrapper: $(OBJT4) $(LFLAGS)
 
 
 SRCE5 = \
-evolv_wrapper.f comenv.f corerd.f deltat.f dgcore.f evolv2.f \
-gntage.f hrdiag.f instar.f kick.f mix.f mlwind.f mrenv.f ran3.f \
-rl.f star.f zcnsts.f zfuncs.f
+evolv_wrapper.f comenv.f corerd.f deltat.f dgcore.f evolv2_rev.f \
+gntage.f hrdiag.f instar.f kick_rev.f mix.f mlwind.f mrenv.f \
+ran3.f rl.f star.f zcnsts.f zfuncs.f
 
 OBJT5 = $(SRCE5:.f=.o)
 

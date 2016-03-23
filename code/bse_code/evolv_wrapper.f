@@ -27,6 +27,7 @@
       PARAMETER(aursun=214.95d0,yeardy=365.25d0,yearsc=3.1557d+07)
       PARAMETER(tol=1.d-07)
       real*8 t1,t2,mx,mx2,tbx,eccx
+      real*8 p_out
       real*8, intent(out) :: m1_out, m2_out, a_out, ecc_out
       real*8, intent(out) :: k1_out, k2_out, mdot1_out, mdot2_out
 *
@@ -66,7 +67,8 @@
       neta = 0.5
       bwind = 0.0
       hewind = 1.0
-      alpha1 = 3.0
+*      alpha1 = 3.0
+      alpha1 = 0.7
       lambda = 0.5
       ceflag = 0
       tflag = 1
@@ -77,9 +79,10 @@
       mxns = 3.0
       pts1 = 0.05
       pts2 = 0.01
-      pts3 = 0.02
+      pts3 = 0.01
       sigma = 190.0
-      beta = 0.125
+*      beta = 0.125
+      beta = 0.5
       xi = 1.0
       acc2 = 1.5
       epsnov = 0.001
@@ -141,9 +144,10 @@
 *
 * Evolve the binary.
 *
-         CALL evolv2(kstar,mass0,mass,rad,lum,massc,radc,
+         CALL evolv2_rev(kstar,mass0,mass,rad,lum,massc,radc,
      &               menv,renv,ospin,epoch,tms,
-     &               tphys,tphysf,dtp,z,zpars,tb,ecc)
+     &               tphys,tphysf,dtp,z,zpars,tb,ecc,
+     &               v_kick,theta_kick,phi_kick)
 *
 * Search the BCM array for the formation of binaries of
 * interest (data on unit 12 if detected) and also output
@@ -154,20 +158,35 @@
 
          jj = 0
          do while (bcm(jj,1).lt.tmax)
+           m1_out = bcm(jj,4)
+           m2_out = bcm(jj,18)
+           k1_out = bcm(jj,2)
+           k2_out = bcm(jj,16)
+           ecc_out = bcm(jj,32)
+           p_out = bcm(jj,30)*365.25
+           a_out = bcm(jj,31)
+           mdot1_out = bcm(jj,14)
+           mdot2_out = bcm(jj,28)
+
+           write(11,*) bcm(jj,1), m1_out,m2_out,k1_out,k2_out,
+     &                ecc_out, a_out, p_out, mdot1_out, mdot2_out
            jj = jj + 1
          enddo
 
-         last = jj-2
+         last = jj
 
          m1_out = bcm(last,4)
          m2_out = bcm(last,18)
          k1_out = bcm(last,2)
          k2_out = bcm(last,16)
          ecc_out = bcm(last,32)
+         p_out = bcm(last,30)*365.25
          a_out = bcm(last,31)
          mdot1_out = bcm(last,14)
          mdot2_out = bcm(last,28)
 
+         write(11,*) bcm(last,1), m1_out,m2_out,k1_out,k2_out,
+     &              ecc_out, a_out, p_out, mdot1_out, mdot2_out
 
 
 
