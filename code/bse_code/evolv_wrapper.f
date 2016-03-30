@@ -2,7 +2,8 @@
       SUBROUTINE evolv_wrapper(num_bin, m1, m2, tb, ecc, v_kick,
      &                         theta_kick, phi_kick, tmax, z,
      &                         m1_out, m2_out, a_out, ecc_out,
-     &                         k1_out, k2_out, mdot1_out, mdot2_out)
+     &                         k1_out, k2_out, mdot1_out, mdot2_out,
+     &                         out_flag)
 ***
 *
 * Evolves a population of binaries using input parameters
@@ -30,6 +31,8 @@
       real*8 p_out
       real*8, intent(out) :: m1_out, m2_out, a_out, ecc_out
       real*8, intent(out) :: k1_out, k2_out, mdot1_out, mdot2_out
+      logical out_flag
+      CHARACTER*8 label(14)
 *
 ************************************************************************
 * BSE parameters:
@@ -64,11 +67,11 @@
 * eddfac is Eddington limit factor for mass transfer (1.0).
 * gamma is the angular momentum factor for mass lost during Roche (-1.0).
 *
-      neta = 0.5
+      neta = 1.0
       bwind = 0.0
       hewind = 1.0
 *      alpha1 = 3.0
-      alpha1 = 0.7
+      alpha1 = 1.0
       lambda = 0.5
       ceflag = 0
       tflag = 1
@@ -81,8 +84,8 @@
       pts2 = 0.01
       pts3 = 0.01
       sigma = 190.0
-*      beta = 0.125
-      beta = 0.5
+      beta = 0.125
+*      beta = 0.5
       xi = 1.0
       acc2 = 1.5
       epsnov = 0.001
@@ -97,6 +100,22 @@
 * Set the collision matrix.
 *
       CALL instar
+*
+      label(1) = 'INITIAL '
+      label(2) = 'KW CHNGE'
+      label(3) = 'BEG RCHE'
+      label(4) = 'END RCHE'
+      label(5) = 'CONTACT '
+      label(6) = 'COELESCE'
+      label(7) = 'COMENV  '
+      label(8) = 'GNTAGE  '
+      label(9) = 'NO REMNT'
+      label(10) = 'MAX TIME'
+      label(11) = 'DISRUPT '
+      label(12) = 'BEG SYMB'
+      label(13) = 'END SYMB'
+      label(14) = 'BEG BSS'
+*
 *
 * Open the input file - list of binary initial parameters.
 *
@@ -168,8 +187,10 @@
            mdot1_out = bcm(jj,14)
            mdot2_out = bcm(jj,28)
 
-           write(11,*) bcm(jj,1), m1_out,m2_out,k1_out,k2_out,
-     &                ecc_out, a_out, p_out, mdot1_out, mdot2_out
+           if(out_flag)then
+              write(11,*) bcm(jj,1), m1_out,m2_out,k1_out,k2_out,
+     &                   ecc_out, a_out, p_out, mdot1_out, mdot2_out
+           endif
            jj = jj + 1
          enddo
 
@@ -185,9 +206,10 @@
          mdot1_out = bcm(last,14)
          mdot2_out = bcm(last,28)
 
-         write(11,*) bcm(last,1), m1_out,m2_out,k1_out,k2_out,
-     &              ecc_out, a_out, p_out, mdot1_out, mdot2_out
-
+         if(out_flag)then
+            write(11,*) bcm(last,1), m1_out,m2_out,k1_out,k2_out,
+     &                 ecc_out, a_out, p_out, mdot1_out, mdot2_out
+         endif
 
 
          jj = 0
@@ -259,6 +281,24 @@
 *      CLOSE(10)
       CLOSE(11)
       CLOSE(12)
+
+
+* The bpp array acts as a log, storing parameters at each change
+* of evolution stage.
+*
+*50    j = 0
+*      WRITE(*,*)'     TIME      M1       M2   K1 K2        SEP    ECC',
+*     &          '  R1/ROL1 R2/ROL2  TYPE'
+*52    j = j + 1
+*      if(bpp(j,1).lt.0.0) goto 60
+*      kstar(1) = INT(bpp(j,4))
+*      kstar(2) = INT(bpp(j,5))
+*      kw = INT(bpp(j,10))
+*      WRITE(*,100)(bpp(j,k),k=1,3),kstar,(bpp(j,k),k=6,9),label(kw)
+*      goto 52
+*60    continue
+*100   FORMAT(f11.4,2f9.3,2i3,f13.3,f6.2,2f8.3,2x,a8)
+*
 *
 ************************************************************************
 *
