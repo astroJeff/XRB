@@ -729,14 +729,13 @@
          if(kw.ne.kstar(k).and.kstar(k).le.12.and.
      &      (kw.eq.13.or.kw.eq.14))then
             if(sgl)then
-               write(*,*) "SGL if statement. sgl =", sgl
-               CALL kick_rev(kw,mass(k),mt,0.d0,0.d0,-1.d0,vs,
-     &                       vk,theta_in,phi_in)
+               CALL kick_rev(kw,mass(k),mt,0.0,0.d0,0.d0,-1.d0,
+     &                       vs,vk,theta_in,phi_in)
             else
 * We need to assume a zero eccentricity binary at the SN kick
 *               CALL kick_rev(kw,mass(k),mt,mass(3-k),ecc,sep,jorb,vs,
-               CALL kick_rev(kw,mass(k),mt,mass(3-k),sep,jorb,vs,
-     &                       vk,theta_in,phi_in)
+               CALL kick_rev(kw,mass(k),mt,mass(3-k),ecc,sep,jorb,
+     &                       vs,vk,theta_in,phi_in)
                if(ecc.gt.1.d0)then
                   kstar(k) = kw
                   mass(k) = mt
@@ -1937,8 +1936,8 @@
          if(kw.ne.kstar(k).and.kstar(k).le.12.and.
      &      (kw.eq.13.or.kw.eq.14))then
             dms(k) = mass(k) - mt
-            CALL kick_rev(kw,mass(k),mt,mass(3-k),sep,jorb,vs,
-     &                    vk,theta_in,phi_in)
+            CALL kick_rev(kw,mass(k),mt,mass(3-k),ecc,sep,jorb,
+     &                    vs,vk,theta_in,phi_in)
             if(ecc.gt.1.d0)then
                kstar(k) = kw
                mass(k) = mt

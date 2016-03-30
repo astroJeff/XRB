@@ -132,7 +132,7 @@
             IF(KW1.GE.13)THEN
 * We assume a circular binary at the SN kick
 *               CALL kick_rev(KW1,MF,M1,M2,ECC,SEPF,JORB,VS,
-               CALL kick_rev(KW1,MF,M1,M2,SEPF,JORB,VS,
+               CALL kick_rev(KW1,MF,M1,M2,ECC,SEPF,JORB,VS,
      &                       vk,theta_in,phi_in)
                IF(ECC.GT.1.D0) GOTO 30
             ENDIF
@@ -223,7 +223,7 @@
             IF(KW1.GE.13)THEN
 * We assume a circular binary at the SN kick
 *               CALL kick_rev(KW1,MF,M1,M2,ECC,SEPF,JORB,VS,
-               CALL kick_rev(KW1,MF,M1,M2,SEPF,JORB,VS,
+               CALL kick_rev(KW1,MF,M1,M2,ECC,SEPF,JORB,VS,
      &                       vk,theta_in,phi_in)
                IF(ECC.GT.1.D0) GOTO 30
             ENDIF
@@ -236,7 +236,7 @@
             IF(KW2.GE.13.AND.KW.LT.13)THEN
 * We assume a circular binary at the SN kick
 *               CALL kick_rev(KW1,MF,M1,M2,ECC,SEPF,JORB,VS,
-               CALL kick_rev(KW1,MF,M1,M2,SEPF,JORB,VS,
+               CALL kick_rev(KW1,MF,M1,M2,ECC,SEPF,JORB,VS,
      &                       vk,theta_in,phi_in)
                IF(ECC.GT.1.D0) GOTO 30
             ENDIF

@@ -1,5 +1,5 @@
 ***
-      SUBROUTINE kick_rev(kw,m1,m1n,m2,sep,jorb,vs,vk,
+      SUBROUTINE kick_rev(kw,m1,m1n,m2,ecc,sep,jorb,vs,vk,
      &                        theta_in,phi_in)
       implicit none
 *
@@ -22,8 +22,6 @@
       real ran3,xx
       external ran3
 *
-      write(*,*) "Made it to the kick function", m1, m2, sep
-*
       do k = 1,3
          vs(k) = 0.d0
       enddo
@@ -35,10 +33,16 @@
 * radius in solar units.
       gmrkm = 1.906125d+05
 * Assume a circular orbit
-      vr = 0.d0
-      vr2 = 0.d0
-      salpha = 0.d0
-      calpha = 0.d0
+* Find the initial relative velocity vector.
+      salpha = 1.0
+      calpha = 0.0
+      vr2 = gmrkm*(m1+m2)*(1.d0/sep)
+      vr = SQRT(vr2)
+
+*      vr = 0.d0
+*      vr2 = 0.d0
+*      salpha = 0.d0
+*      calpha = 0.d0
 *
 * Use the input vick speed and angles
 * BSE uses phi as the polar angle, and theta as the azimuthal
@@ -54,6 +58,10 @@
 *      if(sep.le.0.d0.or.ecc.lt.0.d0) goto 90
       if(sep.le.0.d0.or.ecc.lt.0.d0) return
 *
+* Other inputs
+      vk2 = vk*vk
+      r = sep
+
 * Determine the magnitude of the new relative velocity.
       vn2 = vk2+vr2-2.d0*vk*vr*(ctheta*cphi*salpha-stheta*cphi*calpha)
 * Calculate the new semi-major axis.
