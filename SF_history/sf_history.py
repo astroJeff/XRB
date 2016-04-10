@@ -6,15 +6,15 @@ from astropy import units as u
 from scipy.interpolate import interp1d
 
 
-def dec_to_rad(theta):
-    """ Convert from decimals to radians """
+def deg_to_rad(theta):
+    """ Convert from degrees to radians """
     return np.pi * theta / 180.0
 
-def rad_to_dec(theta):
-    """ Convert from radians to decimals """
+def rad_to_deg(theta):
+    """ Convert from radians to degrees """
     return 180.0 * theta / np.pi
 
-def get_theta_proj_decimal(ra, dec, ra_b, dec_b):
+def get_theta_proj_degree(ra, dec, ra_b, dec_b):
     """ Return angular distance between two points
 
     Parameters
@@ -34,12 +34,39 @@ def get_theta_proj_decimal(ra, dec, ra_b, dec_b):
         Angular distance (radians)
     """
 
-    ra1 = dec_to_rad(ra)
-    dec1 = dec_to_rad(dec)
-    ra2 = dec_to_rad(ra_b)
-    dec2 = dec_to_rad(dec_b)
+    ra1 = deg_to_rad(ra)
+    dec1 = deg_to_rad(dec)
+    ra2 = deg_to_rad(ra_b)
+    dec2 = deg_to_rad(dec_b)
 
     return np.sqrt((ra1-ra2)**2 * np.cos(dec1)*np.cos(dec2) + (dec1-dec2)**2)
+
+def get_dist_closest(ra, dec, coor):
+    """ Returns the distance to the closest star formation history region
+    Parameters
+    ----------
+    ra : float64 or ndarray
+        (Individual or ndarray of) right ascensions (degrees)
+    dec : float64 or ndarray
+        (Individual or ndarray of) declinations (degrees)
+    coor : ndarray
+        Array of already loaded LMC or SMC region coordinates
+
+    Returns
+    -------
+    dist : float
+        Distance to closest star formation history region (degrees)
+    """
+
+    ra1 = deg_to_rad(ra)
+    dec1 = deg_to_rad(dec)
+    ra2 = deg_to_rad(coor["ra"])
+    dec2 = deg_to_rad(coor["dec"])
+
+    dist = np.sqrt((ra1-ra2)**2*np.cos(dec1)*np.cos(dec2) + (dec1-dec2)**2)
+    index = np.argmin(dist)
+
+    return rad_to_deg(dist[index])
 
 
 def get_SFH(ra, dec, t_b, coor, sfh):
@@ -67,8 +94,8 @@ def get_SFH(ra, dec, t_b, coor, sfh):
 
     if isinstance(ra, np.ndarray):
 
-        ra1, ra2 = np.meshgrid(dec_to_rad(ra), dec_to_rad(coor["ra"]))
-        dec1, dec2 = np.meshgrid(dec_to_rad(dec), dec_to_rad(coor["dec"]))
+        ra1, ra2 = np.meshgrid(deg_to_rad(ra), deg_to_rad(coor["ra"]))
+        dec1, dec2 = np.meshgrid(deg_to_rad(dec), deg_to_rad(coor["dec"]))
 
         dist = np.sqrt((ra1-ra2)**2*np.cos(dec1)*np.cos(dec2) + (dec1-dec2)**2)
         indices = dist.argmin(axis=0)
@@ -80,10 +107,10 @@ def get_SFH(ra, dec, t_b, coor, sfh):
         return SFR
 
     else:
-        ra1 = dec_to_rad(ra)
-        dec1 = dec_to_rad(dec)
-        ra2 = dec_to_rad(coor["ra"])
-        dec2 = dec_to_rad(coor["dec"])
+        ra1 = deg_to_rad(ra)
+        dec1 = deg_to_rad(dec)
+        ra2 = deg_to_rad(coor["ra"])
+        dec2 = deg_to_rad(coor["dec"])
 
         dist = np.sqrt((ra1-ra2)**2*np.cos(dec1)*np.cos(dec2) + (dec1-dec2)**2)
         index = np.argmin(dist)
