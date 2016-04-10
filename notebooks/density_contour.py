@@ -36,9 +36,9 @@ def density_contour(xdata, ydata, nbins_x, nbins_y, ax=None, **contour_kwargs):
     Z = pdf.T
 
     if ax == None:
-        contour = plt.contour(X, Y, Z, levels=levels, origin="lower", **contour_kwargs)
+        contour = plt.contour(X, Y, Z, levels=levels[::-1], origin="lower", **contour_kwargs)
     else:
-        contour = ax.contour(X, Y, Z, levels=levels, origin="lower", **contour_kwargs)
+        contour = ax.contour(X, Y, Z, levels=levels[::-1], origin="lower", **contour_kwargs)
 
     return contour
 
