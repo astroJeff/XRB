@@ -432,9 +432,14 @@
          omecc2 = 1.d0 - ecc2
          sqome2 = SQRT(omecc2)
 *
+* TESTING
          djorb = ((dmr(1)+q(1)*dmt(1))*mass(2)*mass(2) +
      &            (dmr(2)+q(2)*dmt(2))*mass(1)*mass(1))*
      &           sep*sep*sqome2*oorb/(mass(1)+mass(2))**2
+*         djorb = ((dmr(1)-dmt(2))*mass(2)*mass(2) +
+*     &            (dmr(2)-dmt(1))*mass(1)*mass(1))*
+*     &           sep*sep*sqome2*oorb/(mass(1)+mass(2))**2
+* TESTING
          delet = ecc*(dmt(1)*(0.5d0/mass(1) + 1.d0/(mass(1)+mass(2))) +
      &                dmt(2)*(0.5d0/mass(2) + 1.d0/(mass(1)+mass(2))))
 *
@@ -1651,10 +1656,19 @@
 *
 * Calculate orbital angular momentum change due to system mass loss.
 *
+* TESTING
          djorb = ((dmr(1)+q(1)*dmt(1))*mass(2)*mass(2) +
      &            (dmr(2)+q(2)*dmt(2))*mass(1)*mass(1))/
      &           (mass(1)+mass(2))**2
          djorb = djorb*dt
+*         djorb = ((dmr(1)-dmt(2))*mass(2)*mass(2) +
+*     &            (dmr(2)-dmt(1))*mass(1)*mass(1))/
+*     &           (mass(1)+mass(2))**2
+*         djorb = djorb*dt
+*         write(*,*) "Mdot:", tphys,mass(1),mass(2),27.0-mass(1)-mass(2),
+*     &              sep, kstar(1),jorb, rad(1)/rol(1), djorb,
+*     &              sep*sep*sqome2*oorb, dmr(1)-dmt(2)
+* TESTING
 *
 * For super-Eddington mass transfer rates, for gamma = -2.0,
 * and for novae systems, assume that material is lost from
