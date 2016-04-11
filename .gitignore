@@ -27,3 +27,10 @@ code/bse_code/popbin
 code/bse_code/pybse.so
 code/bse_code/binary.dat
 SF_history/sf_history.pyc
+notebooks/Backward Evolution.ipynb
+documents/abstract*
+code/bse_code/.ipynb_checkpoints
+code/bse_code/evolve.dat
+code/bse_code/fort.99
+code/bse_code/*.pdf
+data/lmc_data/proposed_regions.txt
