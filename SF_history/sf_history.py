@@ -460,7 +460,7 @@ def test_SMC_SFH_plots():
 
     plt.figure(figsize=(12,15))
 
-    # Load LMC data
+    # Load SMC data
     smc_coor = load_smc_coor()
     smc_sfh = load_smc_sfh(z=0.008)
 
