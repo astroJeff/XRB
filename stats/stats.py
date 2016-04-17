@@ -11,7 +11,7 @@ import binary_evolve
 from binary_evolve import A_to_P, P_to_A
 sys.path.append('../constants')
 import constants as c
-sys.path.append('../sf_history')
+sys.path.append('../SF_history')
 import sf_history
 from sf_history import deg_to_rad, rad_to_deg
 

@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import maxwell, norm, uniform, powerlaw, truncnorm
 sys.path.append('../constants')
 import constants as c
-sys.path.append('../sf_history')
+sys.path.append('../SF_history')
 import sf_history
 from sf_history import deg_to_rad, rad_to_deg
 sys.path.append('../binary')
@@ -549,7 +549,6 @@ def run_pop_synth(input_sys, N_sys=10000, t_low=15.0, t_high=60.0, delta_t=1):
     theta_sep = np.array([])
 
     for t_b in np.linspace(14.0, 56.0, 43):
-        print t_b
         HMXB_t, init_params_t = create_HMXBs(t_b, N_sys=N_sys, ra_in=ra_sys, dec_in=dec_sys)
         HMXB = np.concatenate((HMXB, HMXB_t))
 
