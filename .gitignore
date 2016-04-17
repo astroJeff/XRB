@@ -34,3 +34,4 @@ code/bse_code/evolve.dat
 code/bse_code/fort.99
 code/bse_code/*.pdf
 data/lmc_data/proposed_regions.txt
+binary/load_sse.pyc
