@@ -40,3 +40,4 @@ constants/constants.pyc
 stats/stats.pyc
 notebooks/density_contour.pyc
 pop_synth/pop_synth.pyc
+data/*.obj
