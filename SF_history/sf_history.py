@@ -378,6 +378,9 @@ def get_LMC_plot(age):
         Contour plot of the star formation history
     """
 
+    if lmc_coor is None: load_lmc_coor()
+    if lmc_sfh is None: load_lmc_sfh()
+
     sfr = np.array([])
     for i in np.arange(len(lmc_coor)):
         sfr = np.append(sfr, get_SFH(lmc_coor["ra"][i], \
@@ -622,6 +625,9 @@ def get_SMC_plot(age):
     plt : matplotlib.pyplot plot
         Contour plot of the star formation history
     """
+
+    if smc_coor is None: load_smc_coor()
+    if smc_sfh is None: load_smc_sfh()
 
     sfr = np.array([])
     for i in np.arange(len(smc_coor)):
