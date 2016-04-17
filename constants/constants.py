@@ -1,3 +1,5 @@
+# Constants to be used throughout module
+
 G = 6.674e-8 # Gravitational constant in cgs
 GGG = 1.909e5 # Gravitational constant in Rsun * (km/s)^2 / Msun
 km_to_cm = 1.0e5 # km to cm
