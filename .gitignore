@@ -35,3 +35,7 @@ code/bse_code/fort.99
 code/bse_code/*.pdf
 data/lmc_data/proposed_regions.txt
 binary/load_sse.pyc
+binary/binary_evolve.pyc
+constants/constants.pyc
+stats/stats.pyc
+notebooks/density_contour.pyc
