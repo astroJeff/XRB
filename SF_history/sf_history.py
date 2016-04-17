@@ -5,6 +5,12 @@ from astropy.coordinates import SkyCoord
 from astropy import units as u
 from scipy.interpolate import interp1d
 
+lmc_sfh = None
+lmc_coor = None
+smc_sfh = None
+smc_coor = None
+
+
 
 def deg_to_rad(theta):
     """ Convert from degrees to radians """
@@ -67,6 +73,22 @@ def get_dist_closest(ra, dec, coor):
     index = np.argmin(dist)
 
     return rad_to_deg(dist[index])
+
+
+def load_sf_history(z=0.008):
+    """ Load star formation history data for both SMC and LMC
+
+    Parameters
+    ----------
+    z : float
+        Metallicity of star formation history
+        Default = 0.008
+    """
+
+    if lmc_coor is None: load_lmc_coor()
+    if lmc_sfh is None: load_lmc_sfh(z)
+    if smc_coor is None: load_smc_coor()
+    if smc_sfh is None: load_smc_sfh(z)
 
 
 def get_SFH(ra, dec, t_b, coor, sfh):
@@ -192,11 +214,16 @@ def load_lmc_coor():
                 ('ra','float64'),
                 ('dec','float64')]
     """
-    # Test to load data
+
+    global lmc_coor
+
+    # If already loaded, no need to reload
+    if lmc_coor is not None: return lmc_coor
+
+    # Load data
     this_dir, this_filename = os.path.split(__file__)
     data_file = os.path.join(this_dir, "lmc_coordinates.dat")
 
-#    data_file = os.path.abspath("./lmc_coordinates.dat")
     lmc_coor_2 = np.genfromtxt(data_file, dtype="S10,S2,S2,S3,S2")
 
     lmc_coor = np.recarray(0, dtype=[('region','<S10'),('ra','float64'),('dec','float64')])
@@ -238,12 +265,17 @@ def load_lmc_sfh(z=0.008):
         Array of star formation histories for each region
     """
 
+    global lmc_sfh
+
+    # If already loaded, no need to reload
+    if lmc_sfh is not None: return lmc_sfh
+
     # Load the LMC coordinates and SFH data
     lmc_data = load_lmc_data()
 
     regions = np.unique(lmc_data["region"])
 
-    SF_history = np.array([])
+    lmc_sfh = np.array([])
     age = np.array([])
     sfr = np.array([])
     for r in regions:
@@ -263,9 +295,9 @@ def load_lmc_sfh(z=0.008):
             print "Possible options are 0.001, 0.0025, 0.004, 0.008"
             return -1
 
-        SF_history = np.append(SF_history, interp1d(age[::-1], sfr[::-1], bounds_error=False, fill_value=0.0))
+        lmc_sfh = np.append(lmc_sfh, interp1d(age[::-1], sfr[::-1], bounds_error=False, fill_value=0.0))
 
-    return SF_history
+    return lmc_sfh
 
 
 
@@ -332,6 +364,32 @@ def test_LMC_SFH_plots():
 
     plt.show()
 
+def get_LMC_plot(age):
+    """ return a plot of the star formation history of the LMC at a particular age
+
+    Parameters
+    ----------
+    age : float
+        Star formation history age to calculate (Myr)
+
+    Returns
+    -------
+    plt : matplotlib.pyplot plot
+        Contour plot of the star formation history
+    """
+
+    sfr = np.array([])
+    for i in np.arange(len(lmc_coor)):
+        sfr = np.append(sfr, get_SFH(lmc_coor["ra"][i], \
+                        lmc_coor["dec"][i], age, lmc_coor, lmc_sfh))
+
+    plt.tricontourf(lmc_coor["ra"], lmc_coor["dec"], sfr)
+    plt.title(str(int(age)) + ' Myr')
+
+    return plt
+
+
+
 
 def load_smc_coor():
     """ Load coordinates to SMC regions
@@ -345,11 +403,15 @@ def load_smc_coor():
                 ('dec','float64')]
     """
 
-    # Test to load data
+    global smc_coor
+
+    # If already loaded, no need to reload
+    if smc_coor is not None: return smc_coor
+
+    # Load data
     this_dir, this_filename = os.path.split(__file__)
     data_file = os.path.join(this_dir, "smc_coordinates.dat")
 
-#    data_file = os.path.abspath("./smc_coordinates.dat")
     smc_coor_2 = np.genfromtxt(data_file, dtype="S10,S2,S2,S3,S2")
 
     smc_coor = np.recarray(0, dtype=[('region','<S10'),('ra','float64'),('dec','float64')])
@@ -449,10 +511,15 @@ def load_smc_sfh(z=0.008):
         Array of star formation histories for each region
     """
 
+    global smc_sfh
+
+    # If already loaded, no need to reload
+    if smc_sfh is not None: return smc_sfh
+
     # Load the LMC coordinates and SFH data
     smc_data = load_smc_data()
 
-    SF_history = np.array([])
+    smc_sfh = np.array([])
     age = np.array([])
     sfr = np.array([])
 
@@ -475,9 +542,9 @@ def load_smc_sfh(z=0.008):
             print "Possible options are 0.001, 0.004, 0.008"
             return -1
 
-        SF_history = np.append(SF_history, interp1d(age[::-1], sfr[::-1], bounds_error=False, fill_value=0.0))
+        smc_sfh = np.append(smc_sfh, interp1d(age[::-1], sfr[::-1], bounds_error=False, fill_value=0.0))
 
-    return SF_history
+    return smc_sfh
 
 
 def test_SMC_SFH_plots():
@@ -540,3 +607,28 @@ def test_SMC_SFH_plots():
     get_SMC_plot(7000.0)
 
     plt.show()
+
+
+def get_SMC_plot(age):
+    """ return a plot of the star formation history of the SMC at a particular age
+
+    Parameters
+    ----------
+    age : float
+        Star formation history age to calculate (Myr)
+
+    Returns
+    -------
+    plt : matplotlib.pyplot plot
+        Contour plot of the star formation history
+    """
+
+    sfr = np.array([])
+    for i in np.arange(len(smc_coor)):
+        sfr = np.append(sfr, get_SFH(smc_coor["ra"][i], \
+                        smc_coor["dec"][i], age, smc_coor, smc_sfh))
+
+    plt.tricontourf(smc_coor["ra"], smc_coor["dec"], sfr)
+    plt.title(str(int(age)) + ' Myr')
+
+    return plt

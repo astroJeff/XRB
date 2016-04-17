@@ -1,3 +1,4 @@
+import sys
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -292,18 +293,18 @@ def func_Lx_forward(M_1_a, M_2_a, M_2_in, A_in, ecc_in, t_obs):
             else:
                 if isinstance(M_2_in, np.ndarray):
                     if M_2_in[i] > c.max_mass:
-                        a, b, c = 0.0, 0.0, 0.0
+                        aa, bb, cc = 0.0, 0.0, 0.0
                     else:
-                        a, b, c = load_sse.func_get_sse_star(M_2_in[i], t_eff_obs[i])
+                        aa, bb, cc = load_sse.func_get_sse_star(M_2_in[i], t_eff_obs[i])
                 else:
                     if M_2_in > c.max_mass:
-                        a, b, c = 0.0, 0.0, 0.0
+                        aa, bb, cc = 0.0, 0.0, 0.0
                     else:
-                        a, b, c = load_sse.func_get_sse_star(M_2_in, t_eff_obs[i])
+                        aa, bb, cc = load_sse.func_get_sse_star(M_2_in, t_eff_obs[i])
 
-                M_2_out = np.append(M_2_out, a)
-                M_dot_wind = np.append(M_dot_wind, b)
-                R_out = np.append(R_out, c)
+                M_2_out = np.append(M_2_out, aa)
+                M_dot_wind = np.append(M_dot_wind, bb)
+                R_out = np.append(R_out, cc)
     else:
         if (t_eff_obs < 0.0 or M_2_in > c.max_mass or ecc_in < 0.0 or ecc_in > 1.0):
             M_2_out = M_2_in

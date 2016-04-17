@@ -1,11 +1,14 @@
+import sys
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 from scipy.stats import maxwell, norm, uniform, powerlaw, truncnorm
+import emcee
 sys.path.append('../binary')
 import load_sse
 import binary_evolve
+from binary_evolve import A_to_P, P_to_A
 sys.path.append('../constants')
 import constants as c
 sys.path.append('../sf_history')
@@ -56,7 +59,7 @@ def get_stars_formed(ra, dec, t_min, t_max, v_sys, dist, N_size=512):
     ran_dec = rad_to_deg(ran_theta) * np.sin(ran_phi) + dec
 
     # Specific star formation rate (Msun/Myr/steradian)
-    SFR = sf_history.get_SFH(ran_ra, ran_dec, ran_t_b/(yr_to_sec*1.0e6), smc_coor, smc_sfh)
+    SFR = sf_history.get_SFH(ran_ra, ran_dec, ran_t_b/(c.yr_to_sec*1.0e6), sf_history.smc_coor, sf_history.smc_sfh)
 
     return np.mean(SFR)
 
@@ -106,7 +109,7 @@ def ln_priors(y):
 
     # P(v_k)
     if v_k < 0.0: return -np.inf
-    lp += np.log( maxwell.pdf(v_k, scale=v_k_sigma) )
+    lp += np.log( maxwell.pdf(v_k, scale=c.v_k_sigma) )
 
     # P(theta)
     if theta <= 0.0 or theta >= np.pi: return -np.inf
@@ -117,7 +120,7 @@ def ln_priors(y):
     lp += -np.log( 2.0*np.pi )
 
     # Get star formation history
-    sfh = sf_history.get_SFH(ra_b, dec_b, t_b, smc_coor, smc_sfh)
+    sfh = sf_history.get_SFH(ra_b, dec_b, t_b, sf_history.smc_coor, sf_history.smc_sfh)
     if sfh == 0.0: return -np.inf
 
     # P(alpha, delta)
@@ -125,7 +128,7 @@ def ln_priors(y):
     # field of view of the CCD in the survey: 24' x 24' which is
     # 0.283 degrees from center to corner. We round up to 0.3
     # Area probability depends only on declination
-    dist_closest = sf_history.get_dist_closest(ra_b, dec_b, smc_coor)
+    dist_closest = sf_history.get_dist_closest(ra_b, dec_b, sf_history.smc_coor)
     if dist_closest > 0.3: return -np.inf
     lp += np.log(np.cos(deg_to_rad(dec_b)) / 2.0)
 
@@ -149,13 +152,13 @@ def ln_priors(y):
     # around the observed position, over solid angle and time.
     # Prior is in Msun/Myr/steradian
     ##################################################################
-    t_min = load_sse.func_sse_tmax(M1) * 1.0e6 * yr_to_sec
-    t_max = (load_sse.func_sse_tmax(M2_b) - binary_evolve.func_get_time(M1, M2, 0.0)) * 1.0e6 * yr_to_sec
+    t_min = load_sse.func_sse_tmax(M1) * 1.0e6 * c.yr_to_sec
+    t_max = (load_sse.func_sse_tmax(M2_b) - binary_evolve.func_get_time(M1, M2, 0.0)) * 1.0e6 * c.yr_to_sec
     if t_max-t_min < 0.0: return -np.inf
-    theta_C = (v_sys * (t_max - t_min)) / dist_SMC
-    stars_formed = get_stars_formed(ra, dec, t_min, t_max, v_sys, dist_SMC)
+    theta_C = (v_sys * (t_max - t_min)) / c.dist_SMC
+    stars_formed = get_stars_formed(ra, dec, t_min, t_max, v_sys, c.dist_SMC)
     if stars_formed == 0.0: return -np.inf
-    volume_cone = (np.pi/3.0 * theta_C**2 * (t_max - t_min) / yr_to_sec / 1.0e6)
+    volume_cone = (np.pi/3.0 * theta_C**2 * (t_max - t_min) / c.yr_to_sec / 1.0e6)
     lp += np.log(sfh / stars_formed / volume_cone)
     ##################################################################
 
@@ -266,7 +269,7 @@ def ln_posterior(x, args):
     M1_b, M2_b, A_b = binary_evolve.func_MT_forward(M1, M2, A, ecc)
     A_c, v_sys, ecc_out = binary_evolve.func_SN_forward(M1_b, M2_b, A_b, v_k, theta, phi)
     M2_d_out, L_x_out, M_dot_out, A_d = binary_evolve.func_Lx_forward(M1, M2, M2_b, A_c, ecc_out, t_b)
-    P_orb_d = A_to_P(M_NS, M2_d_out, A_d)
+    P_orb_d = A_to_P(c.M_NS, M2_d_out, A_d)
 
     # If system disrupted or no X-ray luminosity, return -infty
     if ecc_out < 0.0 or ecc_out > 1.0 or np.isnan(ecc) or L_x_out==0.0: return -np.inf
@@ -297,8 +300,8 @@ def ln_posterior(x, args):
 
     ######## Under Construction #######
     theta_proj = get_theta_proj(deg_to_rad(ra), deg_to_rad(dec), deg_to_rad(ra_b), deg_to_rad(dec_b))  # Projected travel distance
-    t_sn = (t_b - load_sse.func_sse_tmax(M1)) * 1.0e6 * yr_to_sec  # The time since the primary's core collapse
-    tmp = (v_sys * t_sn) / dist_SMC  # Unitless
+    t_sn = (t_b - load_sse.func_sse_tmax(M1)) * 1.0e6 * c.yr_to_sec  # The time since the primary's core collapse
+    tmp = (v_sys * t_sn) / c.dist_SMC  # Unitless
     conds = [theta_proj>tmp, theta_proj<=tmp]  # Define conditional
     funcs = [lambda theta_proj: -np.inf, lambda theta_proj: np.log(np.tan(np.arcsin(theta_proj/tmp))/tmp)]
     J_coor = np.abs(get_J_coor(deg_to_rad(ra), deg_to_rad(dec), deg_to_rad(ra_b), deg_to_rad(dec_b))) # Jacobian for coordinate change
@@ -347,6 +350,9 @@ def run_emcee(M2_d, P_orb_obs, ecc_obs, ra, dec, nburn=1000, nsteps=1000):
     sampler : emcee object
     """
 
+    # First thing is to load the sse data and SF_history data
+    load_sse.load_sse()
+    sf_history.load_sf_history()
 
     # Get initial values
     initial_vals = get_initial_values(M2_d)
@@ -473,10 +479,10 @@ def get_initial_values(M2_d):
 
     # Picking the initial masses and birth time will need to be optimized
     t_b = 1000.0
-    M1_tmp = max(0.6*M2_d, min_mass)
+    M1_tmp = max(0.6*M2_d, c.min_mass)
     M2_tmp = 1.1*M2_d - M1_tmp
     p_i = [M1_tmp, M2_tmp,t_b]
-    tmp = func_get_time(*p_i) - 1000.0
+    tmp = binary_evolve.func_get_time(*p_i) - 1000.0
     t_b = 0.9 * (load_sse.func_sse_tmax(p_i[0] + p_i[1] - load_sse.func_sse_he_mass(p_i[0])) - tmp)
     p_i[2] = t_b
 
@@ -497,7 +503,7 @@ def get_initial_values(M2_d):
         if t_eff_obs < 0.0: continue
 
         M_b_prime = p_i[0] + p_i[1] - load_sse.func_sse_he_mass(p_i[0])
-        if M_b_prime > max_mass: continue
+        if M_b_prime > c.max_mass: continue
 
         M_tmp, Mdot_tmp, R_tmp = load_sse.func_get_sse_star(M_b_prime, t_eff_obs)
 
@@ -508,7 +514,7 @@ def get_initial_values(M2_d):
 
     # initial positions for walkers
     p0 = np.zeros((nwalkers,3))
-    a, b = (min_M - p_i[0]) / 0.5, (max_mass - p_i[0]) / 0.5
+    a, b = (min_M - p_i[0]) / 0.5, (c.max_mass - p_i[0]) / 0.5
     p0[:,0] = truncnorm.rvs(a, b, loc=p_i[0], scale=1.0, size=nwalkers) # M1
     p0[:,1] = np.random.normal(p_i[1], 0.5, size=nwalkers) # M2
     p0[:,2] = np.random.normal(p_i[2], 0.2, size=nwalkers) # t_b
