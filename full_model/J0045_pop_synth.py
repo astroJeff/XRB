@@ -21,7 +21,7 @@ ecc_J0045 = 0.808  # eccentricity
 
 
 J0045 = ra_J0045, dec_J0045, P_orb_J0045, ecc_J0045, M2_d_J0045
-HMXB_J0045, init_params_J0045 = pop_synth.run_pop_synth(J0045, N_sys=100000)
+HMXB_J0045, init_params_J0045 = pop_synth.run_pop_synth(J0045, N_sys=1000000)
 
 pickle.dump( init_params_J0045, open( "../data/J0045_pop_synth_init_conds.obj", "wb" ) )
 pickle.dump( HMXB_J0045, open( "../data/J0045_pop_synth_HMXB.obj", "wb" ) )

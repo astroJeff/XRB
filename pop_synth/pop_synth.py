@@ -548,25 +548,31 @@ def run_pop_synth(input_sys, N_sys=10000, t_low=15.0, t_high=60.0, delta_t=1):
 
     theta_sep = np.array([])
 
+    batch_size = 1000
+    n_batch = int(np.ceil(float(N_sys)/float(batch_size)))
+
     for t_b in np.linspace(14.0, 56.0, 43):
-        HMXB_t, init_params_t = create_HMXBs(t_b, N_sys=N_sys, ra_in=ra_sys, dec_in=dec_sys)
-        HMXB = np.concatenate((HMXB, HMXB_t))
 
-        for i in np.arange(len(HMXB_t)):
+        for batch in np.arange(n_batch):
+            n_run = min(batch_size, N_sys - (batch)*batch_size)
+            HMXB_t, init_params_t = create_HMXBs(t_b, N_sys=n_run, ra_in=ra_sys, dec_in=dec_sys)
+            HMXB = np.concatenate((HMXB, HMXB_t))
 
-            h = HMXB_t[i]
-            p = init_params_t[i]
+            for i in np.arange(len(HMXB_t)):
 
-            angle = rad_to_deg(sf_history.get_theta_proj_degree(ra_sys, dec_sys, h["ra"], h["dec"]))
-            theta_sep = np.append(theta_sep, angle)
+                h = HMXB_t[i]
+                p = init_params_t[i]
 
-            if angle < 0.2 \
-                and np.abs(h["P_orb"] - P_orb_sys) < 5.0 \
-                and np.abs(h["ecc"] - ecc_sys) < 0.1 \
-                and np.abs(h["M_2_d"] - M2_d_sys) < 1.0:
+                angle = rad_to_deg(sf_history.get_theta_proj_degree(ra_sys, dec_sys, h["ra"], h["dec"]))
+                theta_sep = np.append(theta_sep, angle)
 
-                HMXB_sys = np.append(HMXB_sys, h)
-                init_params_sys = np.append(init_params_sys, p)
+                if angle < 0.2 \
+                    and np.abs(h["P_orb"] - P_orb_sys) < 5.0 \
+                    and np.abs(h["ecc"] - ecc_sys) < 0.1 \
+                    and np.abs(h["M_2_d"] - M2_d_sys) < 1.0:
+
+                    HMXB_sys = np.append(HMXB_sys, h)
+                    init_params_sys = np.append(init_params_sys, p)
 
 
     return HMXB_sys, init_params_sys
