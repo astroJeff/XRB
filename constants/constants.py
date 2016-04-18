@@ -24,6 +24,10 @@ max_mass = 39.0
 min_A = 1.0e2
 max_A = 1.0e4
 v_k_sigma = 265.0
+v_k_sigma_ECS = 50.0  # Kick velocity maxwellian dispersion - ECS
+ECS_Fe_mass = 10.0  # Mass differentiating ECS from Fe-core collapse
+
+
 alpha = -2.35
 
 dist_LMC = 5.0e4 * pc_to_km # Distance in km
