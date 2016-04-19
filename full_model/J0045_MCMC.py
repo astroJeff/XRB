@@ -19,6 +19,6 @@ M2_d_J0045 = 11.0  # M2 in Msun
 P_orb_J0045 = 51.17  # P_orb in days
 ecc_J0045 = 0.808  # eccentricity
 
-sampler = stats.run_emcee(M2_d_J0045, P_orb_J0045, ecc_J0045, ra_J0045, dec_J0045, nburn=10, nsteps=100)
+sampler = stats.run_emcee(M2_d_J0045, P_orb_J0045, ecc_J0045, ra_J0045, dec_J0045, nburn=10000, nsteps=500000)
 
 pickle.dump( sampler, open( "../data/J0045_MCMC_sampler.obj", "wb" ) )
