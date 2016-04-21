@@ -47,19 +47,20 @@ def func_MT_forward(M_1_in, M_2_in, A_in, ecc_in):
     A_out = A_in * (1.0-ecc_in) * (M_1_in*M_2_in/M_1_out/M_2_out)**2
 
     # Make sure systems don't overfill their Roche lobes
-    r_1_max = load_sse.func_sse_r_MS_max(M_1_out)
+#    r_1_max = load_sse.func_sse_r_MS_max(M_1_out)
     r_1_roche = func_Roche_radius(M_1_in, M_2_in, A_in)
-    r_2_max = load_sse.func_sse_r_MS_max(M_2_out)
-    r_2_roche = func_Roche_radius(M_2_in, M_1_in, A_in)
+#    r_2_max = load_sse.func_sse_r_MS_max(M_2_out)
+#    r_2_roche = func_Roche_radius(M_2_in, M_1_in, A_in)
 
     # Get the k-type when the primary overfills its Roche lobe
     k_RLOF = load_sse.func_sse_get_k_from_r(M_1_in, r_1_roche)
 
+    # Only systems with k_RLOF = 2, 4 survive
     if isinstance(A_out, np.ndarray):
-        A_out[np.where(r_1_max > r_1_roche)] = -1.0
-        A_out[np.where(r_2_max > r_2_roche)] = -1.0
+        idx = np.intersect1d(np.where(k_RLOF!=2), np.where(k_RLOF!=4))
+        A_out[idx] = -1.0
     else:
-        if r_1_max > r_1_roche or r_2_max > r_2_roche: A_out = -1.0
+        if (k_RLOF != 2) & (k_RLOF != 4): A_out = -1.0
 
     return M_1_out, M_2_out, A_out
 
