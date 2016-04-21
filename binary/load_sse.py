@@ -16,6 +16,7 @@ func_sse_r_MS_max = None
 func_sse_he_mass = None
 func_sse_ms_time = None
 func_sse_k_type = None
+func_sse_k_from_r = None
 
 
 def load_sse():
@@ -64,6 +65,7 @@ def read_sse_data():
     global func_sse_rmax
     global func_sse_r_MS_max
     global func_sse_k_type
+    global func_sse_k_from_r
 
     func_sse_mass = np.array([])
     func_sse_mdot = np.array([])
@@ -84,6 +86,7 @@ def read_sse_data():
         func_sse_mdot = np.append(func_sse_mdot, interp1d(sse_tmp_data["time"], sse_tmp_data["mdot"], bounds_error=False, fill_value=0.0))
         func_sse_radius = np.append(func_sse_radius, interp1d(sse_tmp_data["time"], sse_tmp_data["radius"], bounds_error=False, fill_value=0.0))
         func_sse_k_type = np.append(func_sse_k_type, func_sse_calc_k(sse_tmp_data["time"],sse_tmp_data["type"]))
+        func_sse_k_from_r = np.append(func_sse_k_from_r, func_sse_calc_k_from_r(sse_tmp_data["radius"], sse_tmp_data["type"]))
 
         sse_tmp_time = np.append(sse_tmp_time, max(sse_tmp_data["time"])-1.0)
         sse_tmp_mass = np.append(sse_tmp_mass, sse_tmp_data["mass"][0])
@@ -156,6 +159,84 @@ def func_sse_calc_k(time, k_type):
         return None
 
 
+
+
+def func_sse_calc_k_from_r(radius, k_type):
+    """ Creates a numpy piecewise function to determine
+    the k-type of a star for a given radius. Specifically,
+    the k-type of the star the first time it reaches
+    that radius. This function is used for determining
+    the type of star when it will overfill its Roche lobe.
+
+    Parameters
+    ----------
+    radius : ndarray float
+        array of radii
+    k_type : ndarray int
+        array of stellar k-types
+
+    Returns
+    -------
+    func_k_type : lambda function
+        lambda function containing a numpy piecewise function
+    """
+
+    conditions = np.array([])
+    values = np.array([])
+
+    # Store previous values
+    conditions_last = 0.0
+    max_radius = 0.0
+    k_last = 1
+
+    # Loop through star's evolution
+    for i in np.arange(len(radius)):
+
+        if (k_type[i] != k_last):
+            if (max_radius > conditions_last):
+                values = np.append(values, k_last)
+                conditions = np.append(conditions, max_radius)
+                conditions_last = max_radius
+
+            k_last = k_type[i]
+            continue
+
+        if radius[i] > max_radius:
+            max_radius = radius[i]
+
+    # Add the compact object stage to the end
+    values = np.append(values, k_type[-1])
+
+
+    if len(values) == 2:
+        return lambda x: np.piecewise(x, [x<=conditions[0], conditions[0]<x], values)
+    elif len(values) == 3:
+        return lambda x: np.piecewise(x, [x<=conditions[0], (conditions[0]<x) & (x<=conditions[1]), \
+                        (conditions[1]<x)], values)
+    elif len(values) == 4:
+        return lambda x: np.piecewise(x, [x<=conditions[0], (conditions[0]<x) & (x<=conditions[1]), \
+                        (conditions[1]<x) & (x<=conditions[2]), conditions[2]<x], values)
+    elif len(values) == 5:
+        return lambda x: np.piecewise(x, [x<=conditions[0], (conditions[0]<x) & (x<=conditions[1]), \
+                        (conditions[1]<x) & (x<=conditions[2]), (conditions[2]<x) & (x<=conditions[3]), \
+                        conditions[3]<x], values)
+    elif len(values) == 6:
+        return lambda x: np.piecewise(x, [x<=conditions[0], (conditions[0]<x) & (x<=conditions[1]), \
+                        (conditions[1]<x) & (x<=conditions[2]), (conditions[2]<x) & (x<=conditions[3]), \
+                        (conditions[3]<x) & (x<=conditions[4]), conditions[4]<x], values)
+    elif len(values) == 7:
+        return lambda x: np.piecewise(x, [x<=conditions[0], (conditions[0]<x) & (x<=conditions[1]), \
+                        (conditions[1]<x) & (x<=conditions[2]), (conditions[2]<x) & (x<=conditions[3]), \
+                        (conditions[3]<x) & (x<=conditions[4]), (conditions[4]<x) & (x<=conditions[5]), \
+                        conditions[5]<x], values)
+    elif len(values) == 8:
+        return lambda x: np.piecewise(x, [x<=conditions[0], (conditions[0]<x) & (x<=conditions[1]), \
+                        (conditions[1]<x) & (x<=conditions[2]), (conditions[2]<x) & (x<=conditions[3]), \
+                        (conditions[3]<x) & (x<=conditions[4]), (conditions[4]<x) & (x<=conditions[5]), \
+                        (conditions[5]<x) & (x<=conditions[6]), conditions[6]<x], values)
+    else:
+        print "ERROR: k_type from radius conditionals"
+        return None
 
 
 
@@ -235,3 +316,26 @@ def func_get_sse_star(mass, time):
         k_out = np.append(k_out, func_sse_k_type[int(mass*100.0)-100](time))
 
     return mass_out, mdot_out, radius_out, k_out
+
+
+def func_sse_get_k_from_r(mass, radius):
+    """ For a given input mass, this function returns the
+    stellar k-type when the star first reaches the input radius.
+
+    Parameters
+    ----------
+    mass : float
+        ZAMS mass of the star
+    radius : float
+        Radius for the star to reach
+
+    Returns
+    -------
+    k-type : float
+        k-type of the star when it first reaches the input radius
+    """
+
+    # Make sure sse data has been called
+    if func_sse_k_from_r is None: read_sse_data()
+
+    return func_sse_k_from_r[int(mass*100.0)-100](radius)

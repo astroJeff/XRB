@@ -52,6 +52,9 @@ def func_MT_forward(M_1_in, M_2_in, A_in, ecc_in):
     r_2_max = load_sse.func_sse_r_MS_max(M_2_out)
     r_2_roche = func_Roche_radius(M_2_in, M_1_in, A_in)
 
+    # Get the k-type when the primary overfills its Roche lobe
+    k_RLOF = load_sse.func_sse_get_k_from_r(M_1_in, r_1_roche)
+
     if isinstance(A_out, np.ndarray):
         A_out[np.where(r_1_max > r_1_roche)] = -1.0
         A_out[np.where(r_2_max > r_2_roche)] = -1.0
