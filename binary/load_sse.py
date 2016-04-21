@@ -313,7 +313,8 @@ def func_get_sse_star(mass, time):
         mass_out = np.append(mass_out, func_sse_mass[int(mass*100.0)-100](time))
         mdot_out = np.append(mdot_out, func_sse_mdot[int(mass*100.0)-100](time))
         radius_out = np.append(radius_out, func_sse_radius[int(mass*100.0)-100](time))
-        k_out = np.append(k_out, func_sse_k_type[int(mass*100.0)-100](time))
+#        k_out = np.append(k_out, func_sse_k_type[int(mass*100.0)-100](time))
+        k_out = np.append(k_out, func_sse_k_type[int(mass*100.0)-100](np.asarray([time])))
 
     return mass_out, mdot_out, radius_out, k_out
 

@@ -53,7 +53,11 @@ def func_MT_forward(M_1_in, M_2_in, A_in, ecc_in):
 #    r_2_roche = func_Roche_radius(M_2_in, M_1_in, A_in)
 
     # Get the k-type when the primary overfills its Roche lobe
-    k_RLOF = load_sse.func_sse_get_k_from_r(M_1_in, r_1_roche)
+    if isinstance(M_1_in, np.ndarray):
+        k_RLOF = load_sse.func_sse_get_k_from_r(M_1_in, r_1_roche)
+    else:
+        k_RLOF = load_sse.func_sse_get_k_from_r(np.asarray([M_1_in]), np.asarray([r_1_roche]))
+
 
     # Only systems with k_RLOF = 2, 4 survive
     if isinstance(A_out, np.ndarray):
@@ -285,6 +289,7 @@ def func_Lx_forward(M_1_a, M_2_a, M_2_in, A_in, ecc_in, t_obs):
         M_2_out = np.array([])
         M_dot_wind = np.array([])
         R_out = np.array([])
+        k_out = np.array([])
         for i in np.arange(len(t_eff_obs)):
             if (t_eff_obs[i] < 0.0 or ecc_in[i] < 0.0 or ecc_in[i] >= 1.0):
                 ecc_in[i] = 0.0
@@ -299,16 +304,17 @@ def func_Lx_forward(M_1_a, M_2_a, M_2_in, A_in, ecc_in, t_obs):
                     if M_2_in[i] > c.max_mass:
                         aa, bb, cc = 0.0, 0.0, 0.0
                     else:
-                        aa, bb, cc = load_sse.func_get_sse_star(M_2_in[i], t_eff_obs[i])
+                        aa, bb, cc, dd = load_sse.func_get_sse_star(M_2_in[i], t_eff_obs[i])
                 else:
                     if M_2_in > c.max_mass:
                         aa, bb, cc = 0.0, 0.0, 0.0
                     else:
-                        aa, bb, cc = load_sse.func_get_sse_star(M_2_in, t_eff_obs[i])
+                        aa, bb, cc, dd = load_sse.func_get_sse_star(M_2_in, t_eff_obs[i])
 
                 M_2_out = np.append(M_2_out, aa)
                 M_dot_wind = np.append(M_dot_wind, bb)
                 R_out = np.append(R_out, cc)
+                k_out = np.append(k_out, dd)
     else:
         if (t_eff_obs < 0.0 or M_2_in > c.max_mass or ecc_in < 0.0 or ecc_in > 1.0):
             M_2_out = M_2_in
@@ -316,7 +322,7 @@ def func_Lx_forward(M_1_a, M_2_a, M_2_in, A_in, ecc_in, t_obs):
             R_out = 0.0
             ecc_in = 0.0
         else:
-            M_2_out, M_dot_wind, R_out = load_sse.func_get_sse_star(M_2_in, t_eff_obs)
+            M_2_out, M_dot_wind, R_out, k_out = load_sse.func_get_sse_star(M_2_in, t_eff_obs)
 
     # Get wind velocity
     v_wind = get_v_wind(M_2_out, R_out)

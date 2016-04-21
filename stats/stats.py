@@ -104,7 +104,7 @@ def ln_priors(y):
     lp += np.log( norm_const / A )
     # A must avoid RLOF at ZAMS, by a factor of 2
     r_1_roche = binary_evolve.func_Roche_radius(M1, M2, A*(1.0-ecc))
-    if load_sse.func_sse_r_ZAMS(M1) < 2.0 * r_1_roche: return -np.inf
+    if 2.0 * load_sse.func_sse_r_ZAMS(M1) > r_1_roche: return -np.inf
 
     # P(ecc)
     if ecc < 0.0 or ecc > 1.0: return -np.inf
@@ -491,7 +491,7 @@ def get_initial_values(M2_d):
 
     t_eff_obs = binary_evolve.func_get_time(*p_i)
     M_b_prime = p_i[0] + p_i[1] - load_sse.func_sse_he_mass(p_i[0])
-    M_tmp, Mdot_tmp, R_tmp = load_sse.func_get_sse_star(M_b_prime, t_eff_obs)
+    M_tmp, Mdot_tmp, R_tmp, k_tmp = load_sse.func_get_sse_star(M_b_prime, t_eff_obs)
 
     min_M = load_sse.func_sse_min_mass(t_b)
 
@@ -508,7 +508,7 @@ def get_initial_values(M2_d):
         M_b_prime = p_i[0] + p_i[1] - load_sse.func_sse_he_mass(p_i[0])
         if M_b_prime > c.max_mass: continue
 
-        M_tmp, Mdot_tmp, R_tmp = load_sse.func_get_sse_star(M_b_prime, t_eff_obs)
+        M_tmp, Mdot_tmp, R_tmp, k_tmp = load_sse.func_get_sse_star(M_b_prime, t_eff_obs)
 
         # Exit condition
         n_tries += 1
@@ -556,7 +556,7 @@ def ln_posterior_initial(x, args):
     # Get observed mass, mdot
     t_eff_obs = binary_evolve.func_get_time(M1, M2, t_obs)
     M2_c = M1 + M2 - load_sse.func_sse_he_mass(M1)
-    M2_tmp, M2_dot, R_tmp = load_sse.func_get_sse_star(M2_c, t_eff_obs)
+    M2_tmp, M2_dot, R_tmp, k_tmp = load_sse.func_get_sse_star(M2_c, t_eff_obs)
 
     # Somewhat arbitrary definition of mass error
     delta_M_err = 1.0
@@ -601,7 +601,7 @@ def ln_priors_initial(x):
     if t_eff_obs < 0.0: return -np.inf
 
     # Add a prior so that only those masses with a non-zero Mdot are allowed
-    M2_tmp, M2_dot, R_tmp = load_sse.func_get_sse_star(M2_c, t_eff_obs)
+    M2_tmp, M2_dot, R_tmp, k_tmp = load_sse.func_get_sse_star(M2_c, t_eff_obs)
     if M2_dot == 0.0: return -np.inf
 
     return 0.0
