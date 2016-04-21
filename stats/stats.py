@@ -398,7 +398,7 @@ def set_walkers(initial_masses, args, nwalkers=32):
     p0[:,0] = initial_masses.T[0] # M1
     p0[:,1] = initial_masses.T[1] # M2
 
-    p0[:,2] = np.power(10.0, np.random.uniform(2.0, 3.0, size=nwalkers)) # A
+    p0[:,2] = np.power(10.0, np.random.uniform(1.0, 3.0, size=nwalkers)) # A
     p0[:,3] = np.random.uniform(0.0, 0.99, size=nwalkers) # ecc
     p0[:,4] = np.random.normal(50.0, 10.0, size=nwalkers) # v_k
     p0[:,5] = np.random.normal(np.pi, 0.2, size=nwalkers) # theta
@@ -412,7 +412,7 @@ def set_walkers(initial_masses, args, nwalkers=32):
 
         prob = ln_posterior(p0[i], args)
         while(np.isinf(prob)):
-            p0[i,2] = np.power(10.0, np.random.uniform(2.0, 3.0)) # A
+            p0[i,2] = np.power(10.0, np.random.uniform(1.0, 3.0)) # A
             p0[i,3] = np.random.uniform(0.0, 0.99) # ecc
             p0[i,4] = np.random.normal(50.0, 10.0) # v_k
             p0[i,5] = np.random.normal(np.pi, 0.2) # theta
