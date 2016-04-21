@@ -21,7 +21,7 @@ R_NS = 12.0  # NS radius in km
 
 min_mass = 8.0
 max_mass = 39.0
-min_A = 1.0e2
+min_A = 1.0e1
 max_A = 1.0e4
 v_k_sigma = 265.0
 v_k_sigma_ECS = 50.0  # Kick velocity maxwellian dispersion - ECS

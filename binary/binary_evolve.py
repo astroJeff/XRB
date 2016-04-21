@@ -48,7 +48,7 @@ def func_MT_forward(M_1_in, M_2_in, A_in, ecc_in):
 
     # Make sure systems don't overfill their Roche lobes
 #    r_1_max = load_sse.func_sse_r_MS_max(M_1_out)
-    r_1_roche = func_Roche_radius(M_1_in, M_2_in, A_in)
+    r_1_roche = func_Roche_radius(M_1_in, M_2_in, A_in*(1.0-ecc_in))
 #    r_2_max = load_sse.func_sse_r_MS_max(M_2_out)
 #    r_2_roche = func_Roche_radius(M_2_in, M_1_in, A_in)
 

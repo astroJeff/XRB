@@ -89,19 +89,22 @@ def ln_priors(y):
     if M1 < c.min_mass or M1 > c.max_mass: return -np.inf
     norm_const = (c.alpha+1.0) / (np.power(c.max_mass, c.alpha+1.0) - np.power(c.min_mass, c.alpha+1.0))
     lp += np.log( norm_const * np.power(M1, c.alpha) )
-
     # M1 must be massive enough to evolve off the MS by t_obs
     if load_sse.func_sse_tmax(M1) > t_b: return -np.inf
 
     # P(M2)
+    # Normalization is over full q in (0,1.0)
     q = M2 / M1
     if q < 0.3 or q > 1.0: return -np.inf
-    lp += np.log( (1.0 / 0.7) * (1.0 / M1 ) )
+    lp += np.log( (1.0 / M1 ) )
 
     # P(A)
     if A*(1.0-ecc) < c.min_A or A*(1.0+ecc) > c.max_A: return -np.inf
     norm_const = np.log(c.max_A) - np.log(c.min_A)
     lp += np.log( norm_const / A )
+    # A must avoid RLOF at ZAMS, by a factor of 2
+    r_1_roche = binary_evolve.func_Roche_radius(M1, M2, A*(1.0-ecc))
+    if load_sse.func_sse_r_ZAMS(M1) < 2.0 * r_1_roche: return -np.inf
 
     # P(ecc)
     if ecc < 0.0 or ecc > 1.0: return -np.inf
