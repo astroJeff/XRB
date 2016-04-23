@@ -41,3 +41,6 @@ stats/stats.pyc
 notebooks/density_contour.pyc
 pop_synth/pop_synth.pyc
 data/*.obj
+full_model/*.out
+full_model/*.sbatch
+full_model/test*
