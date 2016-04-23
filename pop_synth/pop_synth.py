@@ -413,6 +413,10 @@ def full_forward(M1, M2, A, ecc, v_k, theta, phi, t_obs):
         Projected angular distance traveled from birth location (radians)
     """
 
+    if load_sse.func_sse_mass is None:
+        load_sse.load_sse()
+
+
     if isinstance(M1, np.ndarray):
         dtypes = [('M_NS','<f8'), \
                 ('M_2','<f8'), \

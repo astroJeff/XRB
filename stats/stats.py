@@ -403,8 +403,8 @@ def set_walkers(initial_masses, args, nwalkers=32):
     p0[:,4] = np.random.normal(50.0, 10.0, size=nwalkers) # v_k
     p0[:,5] = np.random.normal(np.pi, 0.2, size=nwalkers) # theta
     p0[:,6] = np.random.normal(1.0, 0.2, size=nwalkers) # phi
-    p0[:,7] = np.random.normal(ra, 0.01, size=nwalkers) # ra
-    p0[:,8] = np.random.normal(dec, 0.01, size=nwalkers) # dec
+    p0[:,7] = np.random.normal(ra, 0.1, size=nwalkers) # ra
+    p0[:,8] = np.random.normal(dec, 0.1, size=nwalkers) # dec
     p0[:,9] = initial_masses.T[2] # t_b
 
     for i in np.arange(nwalkers):
@@ -417,8 +417,8 @@ def set_walkers(initial_masses, args, nwalkers=32):
             p0[i,4] = np.random.normal(50.0, 10.0) # v_k
             p0[i,5] = np.random.normal(np.pi, 0.2) # theta
             p0[i,6] = np.random.normal(1.0, 0.2) # phi
-            p0[i,7] = np.random.normal(ra, 0.01) # ra
-            p0[i,8] = np.random.normal(dec, 0.01) # dec
+            p0[i,7] = np.random.normal(ra, 0.1) # ra
+            p0[i,8] = np.random.normal(dec, 0.1) # dec
 #            p0[:,8] = np.random.normal(1.2 * func_sse_tmax(initial_masses.T[0]), 1.0, size=nwalkers) # t_b
 
             prob = ln_posterior(p0[i], args)
