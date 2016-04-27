@@ -364,13 +364,16 @@ def test_LMC_SFH_plots():
 
     plt.show()
 
-def get_LMC_plot(age):
+def get_LMC_plot(age, ax=None):
     """ return a plot of the star formation history of the LMC at a particular age
 
     Parameters
     ----------
     age : float
         Star formation history age to calculate (Myr)
+    ax : matplotlib.Axes (optional)
+        If supplied, plot the contour to this axis. Otherwise, open a new figure
+
 
     Returns
     -------
@@ -386,10 +389,14 @@ def get_LMC_plot(age):
         sfr = np.append(sfr, get_SFH(lmc_coor["ra"][i], \
                         lmc_coor["dec"][i], age, lmc_coor, lmc_sfh))
 
-    plt.tricontourf(lmc_coor["ra"], lmc_coor["dec"], sfr)
-    plt.title(str(int(age)) + ' Myr')
+    if ax:
+        lmc_plot = ax.tricontourf(lmc_coor["ra"], lmc_coor["dec"], sfr)
+        lmc_plot = ax.set_title(str(int(age)) + ' Myr')
+    else:
+        lmc_plot = plt.tricontourf(lmc_coor["ra"], lmc_coor["dec"], sfr)
+        lmc_plot = plt.title(str(int(age)) + ' Myr')
 
-    return plt
+    return lmc_plot
 
 
 
@@ -612,13 +619,15 @@ def test_SMC_SFH_plots():
     plt.show()
 
 
-def get_SMC_plot(age):
+def get_SMC_plot(age, ax=None):
     """ return a plot of the star formation history of the SMC at a particular age
 
     Parameters
     ----------
     age : float
         Star formation history age to calculate (Myr)
+    ax : matplotlib.Axes (optional)
+        If supplied, plot the contour to this axis. Otherwise, open a new figure
 
     Returns
     -------
@@ -634,7 +643,11 @@ def get_SMC_plot(age):
         sfr = np.append(sfr, get_SFH(smc_coor["ra"][i], \
                         smc_coor["dec"][i], age, smc_coor, smc_sfh))
 
-    plt.tricontourf(smc_coor["ra"], smc_coor["dec"], sfr)
-    plt.title(str(int(age)) + ' Myr')
+    if ax:
+        smc_plot = ax.tricontourf(smc_coor["ra"], smc_coor["dec"], sfr)
+        smc_plot = ax.set_title(str(int(age)) + ' Myr')
+    else:
+        smc_plot = plt.tricontourf(smc_coor["ra"], smc_coor["dec"], sfr)
+        smc_plot = plt.title(str(int(age)) + ' Myr')
 
-    return plt
+    return smc_plot
