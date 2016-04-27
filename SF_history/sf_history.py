@@ -114,6 +114,8 @@ def get_SFH(ra, dec, t_b, coor, sfh):
         Star formation history (Msun/Myr)
     """
 
+    if (coor is None) or (sfh is None): load_sf_history()
+
     if isinstance(ra, np.ndarray):
 
         ra1, ra2 = np.meshgrid(deg_to_rad(ra), deg_to_rad(coor["ra"]))

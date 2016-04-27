@@ -31,15 +31,15 @@ M1_obs, M2_obs, L_x_obs, v_sys_obs, M2_dot_obs, A_obs, ecc_obs, theta_obs \
 
 
 # Now, define system observations
-ra_obs = 13.2
-dec_obs = -72.5
+ra_obs = 13.5
+dec_obs = -72.6
 P_obs = binary_evolve.A_to_P(M1_obs, M2_obs, A_obs)
 
 # Record time
 start_time = time.time()
 
 # Run sampler
-sampler = stats.run_emcee(M2_obs, P_obs, ecc_obs, ra_obs, dec_obs, nburn=10, nsteps=100)
+sampler = stats.run_emcee(M2_obs, P_obs, ecc_obs, ra_obs, dec_obs, nburn=10000, nsteps=250000)
 
 print "Simulation took", time.time()-start_time, "seconds"
 
