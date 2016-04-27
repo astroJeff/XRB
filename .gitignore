@@ -44,3 +44,4 @@ data/*.obj
 full_model/*.out
 full_model/*.sbatch
 full_model/test*
+documents/*.key
