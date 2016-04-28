@@ -397,6 +397,7 @@ def get_LMC_plot(age, ax=None):
     else:
         lmc_plot = plt.tricontourf(lmc_coor["ra"], lmc_coor["dec"], sfr)
         lmc_plot = plt.title(str(int(age)) + ' Myr')
+        lmc_plot = plt.gca().invert_xaxis()
 
     return lmc_plot
 
@@ -651,5 +652,6 @@ def get_SMC_plot(age, ax=None):
     else:
         smc_plot = plt.tricontourf(smc_coor["ra"], smc_coor["dec"], sfr)
         smc_plot = plt.title(str(int(age)) + ' Myr')
+        smc_plot = plt.gca().invert_xaxis()
 
     return smc_plot
