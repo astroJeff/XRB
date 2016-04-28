@@ -16,7 +16,7 @@ coor_J0045 = SkyCoord('00h45m35.26s', '-73d19m03.32s')
 
 ra_J0045 = coor_J0045.ra.degree
 dec_J0045 = coor_J0045.dec.degree
-M2_d_J0045 = 11.0  # M2 in Msun
+M2_d_J0045 = 8.8  # M2 in Msun
 P_orb_J0045 = 51.17  # P_orb in days
 ecc_J0045 = 0.808  # eccentricity
 

@@ -278,7 +278,7 @@ def ln_posterior(x, args):
     if ecc_out < 0.0 or ecc_out > 1.0 or np.isnan(ecc) or L_x_out==0.0: return -np.inf
 
     # Observed secondary mass
-    delta_M_err = 0.2
+    delta_M_err = 1.8 # uncertainty : 1.8 Msun
     coeff_M = -0.5 * np.log( 2. * np.pi * delta_M_err**2 )
     argument_M = -( M2_d - M2_d_out ) * ( M2_d - M2_d_out ) / ( 2. * delta_M_err**2 )
     ll += coeff_M + argument_M
