@@ -29,6 +29,31 @@ init_params_J0045 = pickle.load( open( "../data/J0045_pop_synth_init_conds.obj",
 HMXB_J0045 = pickle.load( open( "../data/J0045_pop_synth_HMXB.obj", "rb" ) )
 
 
+# Specific distribution plots
+plt.rc('font', size=18)
+# M1 vs M2
+M1 = sampler.flatchain.T[0]
+M2 = sampler.flatchain.T[1]
+corner.hist2d(M1, M2)
+plt.xlabel(r'$M_1\ ({\rm M_{\odot}})$', fontsize=22)
+plt.ylabel(r'$M_2\ ({\rm M_{\odot}})$', fontsize=22)
+plt.savefig('../figures/J0045_M1_M2.pdf')
+#plt.show()
+# V_k vs theta
+v_k = sampler.flatchain.T[4]
+theta = sampler.flatchain.T[5]
+corner.hist2d(v_k, theta)
+plt.xlabel(r'$v_k\ ({\rm km/s})$', fontsize=22)
+plt.ylabel(r'$\theta$', fontsize=22)
+plt.savefig('../figures/J0045_vk_theta.pdf')
+#plt.show()
+# t_b histogram
+t_b = sampler.flatchain.T[9]
+plt.hist(t_b, histtype='step', color='k', bins=50)
+plt.xlabel(r'$t_b\ ({\rm Myr})$')
+plt.savefig('../figures/J0045_tb.pdf')
+#plt.show()
+
 
 # Corner plot
 labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
@@ -56,7 +81,7 @@ sf_history.get_SMC_plot(42.0)
 plt.scatter(ra_J0045, dec_J0045, marker="*", s=20, color='r')
 plt_kwargs = {'colors':'k'}
 density_contour.density_contour(ra_out, dec_out, nbins_x=25, nbins_y=25, **plt_kwargs)
-plt.xlim(10.0, 13.0)
+plt.xlim(13.0, 10.0)
 plt.ylim(-73.7, -72.5)
 
 plt.subplot(1,2,1)
@@ -64,7 +89,7 @@ sf_history.get_SMC_plot(42.0)
 plt.scatter(ra_J0045, dec_J0045, marker="*", s=20, color='r')
 plt_kwargs = {'colors':'k'}
 density_contour.density_contour(ra_out, dec_out, nbins_x=25, nbins_y=25, **plt_kwargs)
-plt.xlim(9.0, 18.0)
+plt.xlim(18.0, 9.0)
 plt.ylim(-74.0, -71.5)
 plt.tight_layout()
 plt.savefig('../figures/J0045_dist_birth_location.pdf')
