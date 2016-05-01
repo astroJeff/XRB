@@ -17,7 +17,7 @@ import density_contour
 
 
 # Load sampler using pickle
-sampler = pickle.load( open( "../data/smc_MCMC_sampler.obj", "rb" ) )
+sampler = pickle.load( open( "../data/SMC_MCMC_sampler.obj", "rb" ) )
 
 
 # Chains plot
