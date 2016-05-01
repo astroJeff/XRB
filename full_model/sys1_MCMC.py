@@ -29,6 +29,10 @@ t_b = 22.0
 M1_obs, M2_obs, L_x_obs, v_sys_obs, M2_dot_obs, A_obs, ecc_obs, theta_obs \
     = pop_synth.full_forward(M1,M2,A,ecc,v_k,theta,phi,t_b)
 
+# Let's put some uncertainties on those observations
+M2_d_err = 1.0
+P_orb_obs_err = 1.0
+ecc_obs_err = 0.05
 
 # Now, define system observations
 ra_obs = 13.5
@@ -39,7 +43,9 @@ P_obs = binary_evolve.A_to_P(M1_obs, M2_obs, A_obs)
 start_time = time.time()
 
 # Run sampler
-sampler = stats.run_emcee(M2_obs, P_obs, ecc_obs, ra_obs, dec_obs, nburn=10000, nsteps=250000)
+sampler = stats.run_emcee(M2_obs, P_obs, ecc_obs, ra_obs, dec_obs, \
+    M2_d_err=M2_d_err, P_orb_obs_err=P_orb_obs_err, ecc_obs_err=ecc_obs_err, \
+    nburn=10000, nsteps=50000)
 
 print "Simulation took", time.time()-start_time, "seconds"
 

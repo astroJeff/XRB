@@ -16,7 +16,7 @@ import sf_history
 from sf_history import deg_to_rad, rad_to_deg
 
 
-nwalkers = 32
+nwalkers = 80
 
 
 def get_stars_formed(ra, dec, t_min, t_max, v_sys, dist, N_size=512):
@@ -259,7 +259,7 @@ def ln_posterior(x, args):
     """
 
     M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
-    M2_d, P_orb_obs, ecc_obs, ra, dec = args
+    M2_d, M2_d_err, P_orb_obs, P_orb_obs_err, ecc_obs, ecc_obs_err, ra, dec = args
     y = ra, dec, M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b
 
 
@@ -278,7 +278,7 @@ def ln_posterior(x, args):
     if ecc_out < 0.0 or ecc_out > 1.0 or np.isnan(ecc) or L_x_out==0.0: return -np.inf
 
     # Observed secondary mass
-    delta_M_err = 1.8 # uncertainty : 1.8 Msun
+    delta_M_err = M2_d_err # uncertainty is user input
     coeff_M = -0.5 * np.log( 2. * np.pi * delta_M_err**2 )
     argument_M = -( M2_d - M2_d_out ) * ( M2_d - M2_d_out ) / ( 2. * delta_M_err**2 )
     ll += coeff_M + argument_M
@@ -290,13 +290,13 @@ def ln_posterior(x, args):
 #    ll += coeff_ln_L_x + argument_ln_L_x
 
     # Observed orbital period
-    delta_P_orb_err = 1.0 # uncertainty: 1 day
+    delta_P_orb_err = P_orb_obs_err # uncertainty is user input
     coeff_P_orb = -0.5 * np.log( 2. * np.pi * delta_P_orb_err**2)
     argument_P_orb = -( P_orb_obs - P_orb_d )**2 / ( 2. * delta_P_orb_err**2 )
     ll += coeff_P_orb + argument_P_orb
 
     # Observed eccentricity
-    delta_ecc_err = 0.05 # uncertainty: 0.05
+    delta_ecc_err = ecc_obs_err # uncertainty is user input
     coeff_ecc = -0.5 * np.log( 2. * np.pi * delta_ecc_err**2)
     argument_ecc = -( ecc_obs - ecc_out )**2 / ( 2. * delta_ecc_err**2 )
     ll += coeff_ecc + argument_ecc
@@ -331,8 +331,11 @@ def ln_posterior(x, args):
     return ll + lp
 
 
+
+
 # This function runs emcee
-def run_emcee(M2_d, P_orb_obs, ecc_obs, ra, dec, nburn=1000, nsteps=1000):
+def run_emcee(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
+    P_orb_obs_err=1.0, ecc_obs_err=0.05, nburn=1000, nsteps=1000):
     """ Run the emcee function
 
     Parameters
@@ -358,28 +361,196 @@ def run_emcee(M2_d, P_orb_obs, ecc_obs, ra, dec, nburn=1000, nsteps=1000):
     sf_history.load_sf_history()
 
     # Get initial values
-    initial_vals = get_initial_values(M2_d)
+    initial_vals = get_initial_values(M2_d, nwalkers=nwalkers)
 
     # Define sampler
-    args = [[M2_d, P_orb_obs, ecc_obs, ra, dec]]
+    args = [[M2_d, M2_d_err, P_orb_obs, P_orb_obs_err, ecc_obs, ecc_obs_err, ra, dec]]
     sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=ln_posterior, args=args)
-
 
     # Assign initial values
     p0 = np.zeros((nwalkers,10))
-    p0 = set_walkers(initial_vals, args[0])
-
+    p0 = set_walkers(initial_vals, args[0], nwalkers=nwalkers)
 
     # Burn-in
     pos,prob,state = sampler.run_mcmc(p0, N=nburn)
-
 
     # Full run
     sampler.reset()
     pos,prob,state = sampler.run_mcmc(pos, N=nsteps)
 
+    return sampler
+
+
+
+
+
+# Priors
+def ln_priors_population(y):
+    """ Priors on the model parameters
+
+    Parameters
+    ----------
+    y : M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b
+        10 model parameters
+
+    Returns
+    -------
+    lp : float
+        Natural log of the prior
+    """
+
+    M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = y
+
+    lp = 0.0
+
+    # P(M1)
+    if M1 < c.min_mass or M1 > c.max_mass: return -np.inf
+    norm_const = (c.alpha+1.0) / (np.power(c.max_mass, c.alpha+1.0) - np.power(c.min_mass, c.alpha+1.0))
+    lp += np.log( norm_const * np.power(M1, c.alpha) )
+    # M1 must be massive enough to evolve off the MS by t_obs
+    if load_sse.func_sse_tmax(M1) > t_b: return -np.inf
+
+    # P(M2)
+    # Normalization is over full q in (0,1.0)
+    q = M2 / M1
+    if q < 0.3 or q > 1.0: return -np.inf
+    lp += np.log( (1.0 / M1 ) )
+
+    # P(A)
+    if A*(1.0-ecc) < c.min_A or A*(1.0+ecc) > c.max_A: return -np.inf
+    norm_const = np.log(c.max_A) - np.log(c.min_A)
+    lp += np.log( norm_const / A )
+    # A must avoid RLOF at ZAMS, by a factor of 2
+    r_1_roche = binary_evolve.func_Roche_radius(M1, M2, A*(1.0-ecc))
+    if 2.0 * load_sse.func_sse_r_ZAMS(M1) > r_1_roche: return -np.inf
+
+    # P(ecc)
+    if ecc < 0.0 or ecc > 1.0: return -np.inf
+    lp += np.log(2.0 * ecc)
+
+    # P(v_k)
+    if v_k < 0.0: return -np.inf
+    lp += np.log( maxwell.pdf(v_k, scale=c.v_k_sigma) )
+
+    # P(theta)
+    if theta <= 0.0 or theta >= np.pi: return -np.inf
+    lp += np.log(np.sin(theta) / 2.0)
+
+    # P(phi)
+    if phi < 0.0 or phi > 2.0*np.pi: return -np.inf
+    lp += -np.log( 2.0*np.pi )
+
+    # Get star formation history
+    sfh = sf_history.get_SFH(ra_b, dec_b, t_b, sf_history.smc_coor, sf_history.smc_sfh)
+    if sfh == 0.0: return -np.inf
+
+    # P(alpha, delta)
+    # Closest point must be within survey. We estimate using the
+    # field of view of the CCD in the survey: 24' x 24' which is
+    # 0.283 degrees from center to corner. We round up to 0.3
+    # Area probability depends only on declination
+    dist_closest = sf_history.get_dist_closest(ra_b, dec_b, sf_history.smc_coor)
+    if dist_closest > 0.3: return -np.inf
+    lp += np.log(np.cos(deg_to_rad(dec_b)) / 2.0)
+
+    ##################################################################
+    # We add an additional prior that scales the RA and Dec by the
+    # area available to it, i.e. pi theta^2, where theta is the angle
+    # of the maximum projected separation over the distance.
+    #
+    # Still under construction
+    ##################################################################
+    M1_b, M2_b, A_b = binary_evolve.func_MT_forward(M1, M2, A, ecc)
+    A_c, v_sys, ecc = binary_evolve.func_SN_forward(M1_b, M2_b, A_b, v_k, theta, phi)
+    if ecc < 0.0 or ecc > 1.0 or np.isnan(ecc): return -np.inf
+
+    # Add a prior so that the post-MT secondary is within the correct bounds
+    M2_c = M1 + M2 - load_sse.func_sse_he_mass(M1)
+    if M2_c > c.max_mass or M2_c < c.min_mass: return -np.inf
+
+    # Add a prior so the effective time remains bounded
+    t_eff_obs = binary_evolve.func_get_time(M1, M2, t_b)
+    if t_eff_obs < 0.0: return -np.inf
+
+    return lp
+
+def ln_posterior_population(x):
+    """ Calculate the natural log of the posterior probability
+
+    Parameters
+    ----------
+    x : M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b
+        10 model parameters
+    args : M2_d, P_orb_obs, ecc_obs, ra, dec
+        System observations
+
+    Returns
+    -------
+    lp : float
+        Natural log of the posterior probability
+    """
+
+    M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
+
+    # Call priors
+    lp = ln_priors_population(x)
+    if np.isinf(lp): return -np.inf
+
+    ll = 0
+
+    M1_b, M2_b, A_b = binary_evolve.func_MT_forward(M1, M2, A, ecc)
+    A_c, v_sys, ecc_out = binary_evolve.func_SN_forward(M1_b, M2_b, A_b, v_k, theta, phi)
+    M2_d_out, L_x_out, M_dot_out, A_d = binary_evolve.func_Lx_forward(M1, M2, M2_b, A_c, ecc_out, t_b)
+    P_orb_d = A_to_P(c.M_NS, M2_d_out, A_d)
+
+    # If system disrupted or no X-ray luminosity, return -infty
+    if ecc_out < 0.0 or ecc_out > 1.0 or np.isnan(ecc) or L_x_out==0.0: return -np.inf
+
+    if np.isnan(ll): return -np.inf
+
+    return ll + lp
+
+def run_emcee_population(nburn=10000, nsteps=100000):
+    """ Run emcee on the entire X-ray binary population
+
+    Parameters
+    ----------
+    nburn : float (optional)
+        number of steps for the Burn-in (default=10000)
+    nsteps : float (optional)
+        number of steps for the simulation (default=100000)
+
+    Returns
+    -------
+    sampler : emcee object
+    """
+
+    # First thing is to load the sse data and SF_history data
+    load_sse.load_sse()
+    sf_history.load_sf_history()
+
+    # Get initial values - choose 12 Msun as a seed for initial position
+    initial_vals = get_initial_values(12.0, nwalkers=nwalkers)
+
+    # Define sampler
+    sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=ln_posterior_population)
+
+    # Assign initial values based on a random binary
+    args = [12.0, 2.0, 500.0, 20.0, 0.50, 0.2, 13.5, -72.7]
+    p0 = np.zeros((nwalkers,10))
+    p0 = set_walkers(initial_vals, args, nwalkers=nwalkers)
+
+    # Burn-in
+    pos,prob,state = sampler.run_mcmc(p0, N=nburn)
+
+    # Full run
+    sampler.reset()
+    pos,prob,state = sampler.run_mcmc(pos, N=nsteps)
 
     return sampler
+
+
+
 
 def set_walkers(initial_masses, args, nwalkers=32):
     """ Get the initial positions for the walkers
@@ -392,7 +563,7 @@ def set_walkers(initial_masses, args, nwalkers=32):
         observed system parameters
     """
 
-    M2_d, P_orb_obs, ecc_obs, ra, dec = args
+    M2_d, M2_d_err, P_orb_obs, P_orb_obs_err, ecc_obs, ecc_obs_err, ra, dec = args
 
     p0 = np.zeros((nwalkers,10))
     p0[:,0] = initial_masses.T[0] # M1
@@ -425,7 +596,7 @@ def set_walkers(initial_masses, args, nwalkers=32):
 
             counter += 1
 
-            if counter > 1000: break
+            if counter > 2000: break
 
 
 
@@ -460,7 +631,7 @@ def set_walkers(initial_masses, args, nwalkers=32):
 
     return p0
 
-def get_initial_values(M2_d):
+def get_initial_values(M2_d, nwalkers=32):
     """ Calculate an array of initial masses and birth times
 
     Parameters
