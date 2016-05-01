@@ -14,6 +14,12 @@ sys.path.append('../stats')
 import stats
 sys.path.append('../notebooks')
 import density_contour
+sys.path.append('../pop_synth')
+import pop_synth
+sys.path.append('../binary')
+import binary_evolve
+sys.path.append('../constants')
+import constants as c
 
 
 # Load sampler using pickle
@@ -39,8 +45,6 @@ fig = corner.corner(sampler.flatchain, labels=labels)
 plt.rc('font', size=18)
 plt.savefig('../figures/smc_population_corner.pdf')
 plt.rc('font', size=10)
-
-
 
 
 # M1 vs. M2
@@ -71,5 +75,53 @@ plt.savefig("../figures/smc_population_vk_theta.pdf")
 
 
 
+# Now, we want to run all the sampler positions forward to
+# get the distribution today of HMXBs
+HMXB_ra = np.array([])
+HMXB_dec = np.array([])
+HMXB_Porb = np.array([])
+HMXB_ecc = np.array([])
+HMXB_M2 = np.array([])
+HMXB_vsys = np.array([])
+HMXB_Lx = np.array([])
+
+for s in sampler.flatchain():
+
+    # Run forward model
+    data_out = pop_synth.full_forward(s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[9])
+
+    # Get a random phi for position angle
+    ran_phi = pop_synth.get_phi(1)
+
+    # Get the new ra and dec
+    ra_out, dec_out = pop_synth.get_new_ra_dec(s[7], s[8], data_out[7], ran_phi)
+
+    # Get the output orbital period
+    Porb = binary_evolve.A_to_P(data_out[0], data_out[1], data_out[5])
+
+    # Save outputs
+    HMXB_ra = np.append(HMXB_ra, ra_out)
+    HMXB_dec = np.append(HMXB_dec, dec_out)
+    HMXB_Porb = np.append(HMXB_Porb, Porb)
+    HMXB_ecc = np.append(HMXB_ecc, data_out[6])
+    HMXB_M2 = np.append(HMXB_M2, data_out[1])
+    HMXB_vsys = np.append(HMXB_vsys, data_out[3])
+    HMXB_Lx = np.append(HMXB_Lx, data_out[2])
 
 
+# HMXB Orbital period vs. eccentricity
+corner.hist2d(HMXB_Porb, HMXB_ecc)
+plt.xlabel(r"$P_{\rm orb}$", size=16)
+plt.ylabel(r"$e$", size=16)
+plt.savefig('../figures/smc_population_HMXB_P_ecc.pdf')
+
+# X-ray luminosity
+plt.hist(HMXB_Lx, color='k', histtype='step', bins=50)
+plt.xlabel(r"$L_x$", size=16)
+plt.savefig('../figures/smc_population_HMXB_Lx.pdf')
+
+# Birth location
+sf_history.get_SMC_plot(30.0)
+plt_kwargs = {'colors':'k'}
+density_contour.density_contour(HMXB_ra, HMXB_dec, nbins_x=40, nbins_y=40, **plt_kwargs)
+plt.savefig('../figures/smc_population_HMXB_ra_dec.pdf')
