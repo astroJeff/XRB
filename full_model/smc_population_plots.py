@@ -27,24 +27,24 @@ sampler = pickle.load( open( "../data/SMC_MCMC_sampler.obj", "rb" ) )
 
 
 # Chains plot
-fig, ax = plt.subplots(sampler.dim, 1, sharex=True, figsize=(7.0,20.0))
-for i in range(sampler.dim):
-    for chain in sampler.chain[...,i]:
-        ax[i].plot(chain, alpha=0.25, color='k', drawstyle='steps')
-        yloc = plt.MaxNLocator(3)
-        ax[i].yaxis.set_major_locator(yloc)
-#        ax[i].set_yticks(fontsize=8)
-fig.subplots_adjust(hspace=0)
-#plt.yticks(fontsize = 8)
-plt.savefig('../figures/smc_population_chains.pdf')
+# fig, ax = plt.subplots(sampler.dim, 1, sharex=True, figsize=(7.0,20.0))
+# for i in range(sampler.dim):
+#     for chain in sampler.chain[...,i]:
+#         ax[i].plot(chain, alpha=0.25, color='k', drawstyle='steps')
+#         yloc = plt.MaxNLocator(3)
+#         ax[i].yaxis.set_major_locator(yloc)
+# #        ax[i].set_yticks(fontsize=8)
+# fig.subplots_adjust(hspace=0)
+# #plt.yticks(fontsize = 8)
+# plt.savefig('../figures/smc_population_chains.pdf')
 
 
 # Corner plot
-labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
-fig = corner.corner(sampler.flatchain, labels=labels)
-plt.rc('font', size=18)
-plt.savefig('../figures/smc_population_corner.pdf')
-plt.rc('font', size=10)
+#labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
+#fig = corner.corner(sampler.flatchain, labels=labels)
+#plt.rc('font', size=18)
+#plt.savefig('../figures/smc_population_corner.pdf')
+#plt.rc('font', size=10)
 
 
 # M1 vs. M2
@@ -85,7 +85,7 @@ HMXB_M2 = np.array([])
 HMXB_vsys = np.array([])
 HMXB_Lx = np.array([])
 
-for s in sampler.flatchain():
+for s in sampler.flatchain:
 
     # Run forward model
     data_out = pop_synth.full_forward(s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[9])
