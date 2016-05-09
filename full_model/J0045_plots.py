@@ -56,11 +56,11 @@ plt.savefig('../figures/J0045_tb.pdf')
 
 
 # Corner plot
-labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
-fig = corner.corner(sampler.flatchain, labels=labels)
-plt.rc('font', size=18)
-plt.savefig('../figures/J0045_corner.pdf')
-plt.rc('font', size=10)
+#labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
+#fig = corner.corner(sampler.flatchain, labels=labels)
+#plt.rc('font', size=18)
+#plt.savefig('../figures/J0045_corner.pdf')
+#plt.rc('font', size=10)
 
 
 # Chains plot

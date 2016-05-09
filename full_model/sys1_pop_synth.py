@@ -29,8 +29,8 @@ M1_obs, M2_obs, L_x_obs, v_sys_obs, M2_dot_obs, A_obs, ecc_obs, theta_obs \
 
 
 # Now, define system observations
-ra_obs = 13.2
-dec_obs = -72.5
+ra_obs = 13.5
+dec_obs = -72.6
 P_obs = binary_evolve.A_to_P(M1_obs, M2_obs, A_obs)
 
 sys1 = ra_obs, dec_obs, P_obs, ecc_obs, M2_obs
@@ -38,9 +38,9 @@ sys1 = ra_obs, dec_obs, P_obs, ecc_obs, M2_obs
 
 start_time = time.time()
 
-HMXB, init_params = pop_synth.run_pop_synth(sys1, N_sys=2000000)
+HMXB, init_params = pop_synth.run_pop_synth(sys1, N_sys=1000000)
 
-print "Population Synthesis ran 2000000 binaries in", time.time()-start_time, "seconds"
+print "Population Synthesis ran 1000000 binaries in", time.time()-start_time, "seconds"
 
 pickle.dump( init_params, open( "../data/sys1_pop_synth_init_conds.obj", "wb" ) )
 pickle.dump( HMXB, open( "../data/sys1_pop_synth_HMXB.obj", "wb" ) )
