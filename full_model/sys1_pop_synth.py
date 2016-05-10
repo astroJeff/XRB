@@ -38,9 +38,9 @@ sys1 = ra_obs, dec_obs, P_obs, ecc_obs, M2_obs
 
 start_time = time.time()
 
-HMXB, init_params = pop_synth.run_pop_synth(sys1, N_sys=2000000)
+HMXB, init_params = pop_synth.run_pop_synth(sys1, N_sys=1000000)
 
-print "Population Synthesis ran 2000000 binaries in", time.time()-start_time, "seconds"
+print "Population Synthesis ran 1000000 binaries in", time.time()-start_time, "seconds"
 
 pickle.dump( init_params, open( "../data/sys1_pop_synth_init_conds.obj", "wb" ) )
 pickle.dump( HMXB, open( "../data/sys1_pop_synth_HMXB.obj", "wb" ) )
