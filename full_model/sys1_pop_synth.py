@@ -29,8 +29,8 @@ M1_obs, M2_obs, L_x_obs, v_sys_obs, M2_dot_obs, A_obs, ecc_obs, theta_obs \
 
 
 # Now, define system observations
-ra_obs = 13.2
-dec_obs = -72.5
+ra_obs = 13.5
+dec_obs = -72.63
 P_obs = binary_evolve.A_to_P(M1_obs, M2_obs, A_obs)
 
 sys1 = ra_obs, dec_obs, P_obs, ecc_obs, M2_obs

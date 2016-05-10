@@ -36,7 +36,7 @@ ecc_obs_err = 0.05
 
 # Now, define system observations
 ra_obs = 13.5
-dec_obs = -72.6
+dec_obs = -72.63
 P_obs = binary_evolve.A_to_P(M1_obs, M2_obs, A_obs)
 
 # Record time

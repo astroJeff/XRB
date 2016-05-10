@@ -24,8 +24,8 @@ ecc_true = 0.3
 v_k_true = 250.0
 theta_true = 2.9
 phi_true = 0.9
-ra_true = 13.2
-dec_true = -72.5
+ra_true = 13.5
+dec_true = -72.63
 t_b_true = 22.0
 
 

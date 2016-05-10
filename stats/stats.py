@@ -310,7 +310,6 @@ def ln_posterior(x, args):
     J_coor = np.abs(get_J_coor(deg_to_rad(ra), deg_to_rad(dec), deg_to_rad(ra_b), deg_to_rad(dec_b))) # Jacobian for coordinate change
     P_omega = 1.0 / (2.0 * np.pi)
     ll += np.piecewise(theta_proj, conds, funcs) + np.log(P_omega) + np.log(1.0 / J_coor)
-#    print np.piecewise(theta_proj, conds, funcs), np.log(J_coor), np.log(P_omega), rad_to_dec(np.arcsin(theta_proj/tmp))
 
 
 #    print rad_to_dec(theta_proj)*3600.0, tmp, t_sn, v_sys, v_sys*t_sn, \
