@@ -570,7 +570,7 @@ def set_walkers(initial_masses, args, nwalkers=32):
 
     p0[:,2] = np.power(10.0, np.random.uniform(1.0, 3.0, size=nwalkers)) # A
     p0[:,3] = np.random.uniform(0.0, 0.99, size=nwalkers) # ecc
-    p0[:,4] = np.random.normal(50.0, 10.0, size=nwalkers) # v_k
+    p0[:,4] = 500.0 * np.random.uniform(size=nwalkers) # v_k
     p0[:,5] = np.random.normal(np.pi, 0.2, size=nwalkers) # theta
     p0[:,6] = np.random.normal(1.0, 0.2, size=nwalkers) # phi
     p0[:,7] = np.random.normal(ra, 0.1, size=nwalkers) # ra
@@ -584,7 +584,7 @@ def set_walkers(initial_masses, args, nwalkers=32):
         while(np.isinf(prob)):
             p0[i,2] = np.power(10.0, np.random.uniform(1.0, 3.0)) # A
             p0[i,3] = np.random.uniform(0.0, 0.99) # ecc
-            p0[i,4] = np.random.normal(50.0, 10.0) # v_k
+            p0[i,4] = 500.0* np.random.normal() # v_k
             p0[i,5] = np.random.normal(np.pi, 0.2) # theta
             p0[i,6] = np.random.normal(1.0, 0.2) # phi
             p0[i,7] = np.random.normal(ra, 0.1) # ra
