@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 from scipy.interpolate import interp1d
+import scipy.optimize as so
 
 lmc_sfh = None
 lmc_coor = None
@@ -659,5 +660,151 @@ def get_SMC_plot(age, ax=None):
 
     smc_plot = plt.xlabel("Right Ascension (degrees)")
     smc_plot = plt.ylabel("Declination (degrees)")
+
+    return smc_plot
+
+
+def get_SMC_plot_polar(age, ax=None, ra_dist=None, dec_dist=None, ra=None, dec=None):
+    """ return a plot of the star formation history of the SMC at a particular age.
+    In this case, the plot should be curvelinear, instead of flattened.
+
+    Parameters
+    ----------
+    age : float
+        Star formation history age to calculate (Myr)
+    ax : matplotlib.Axes (optional)
+        If supplied, plot the contour to this axis. Otherwise, open a new figure
+    ra_dist, dec_dist : array (optional)
+        If supplied, plots contours around the distribution of these inputs
+    ra, dec : float (optional)
+        If supplied, plot a red star at these coordinates (degrees)
+
+    Returns
+    -------
+    plt : matplotlib.pyplot plot
+        Contour plot of the star formation history
+    """
+
+    import  mpl_toolkits.axisartist.angle_helper as angle_helper
+    from matplotlib.projections import PolarAxes
+    from matplotlib.transforms import Affine2D
+    from mpl_toolkits.axisartist import SubplotHost
+    from mpl_toolkits.axisartist import GridHelperCurveLinear
+
+    def curvelinear_test2(fig, rect=111):
+        """
+        polar projection, but in a rectangular box.
+        """
+
+        tr = Affine2D().translate(0,90)
+        tr += Affine2D().scale(np.pi/180., 1.)
+        tr += PolarAxes.PolarTransform()
+        tr += Affine2D().rotate(1.34)  # This rotates the grid
+
+        extreme_finder = angle_helper.ExtremeFinderCycle(10, 60,
+                                                        lon_cycle = 360,
+                                                        lat_cycle = None,
+                                                        lon_minmax = None,
+                                                        lat_minmax = (-90, np.inf),
+                                                        )
+
+        grid_locator1 = angle_helper.LocatorHMS(8) #changes theta gridline count
+        tick_formatter1 = angle_helper.FormatterHMS()
+        grid_locator2 = angle_helper.LocatorDMS(5) #changes theta gridline count
+        tick_formatter2 = angle_helper.FormatterDMS()
+
+
+        grid_helper = GridHelperCurveLinear(tr,
+                                            extreme_finder=extreme_finder,
+                                            grid_locator1=grid_locator1,
+                                            grid_locator2=grid_locator2,
+                                            tick_formatter1=tick_formatter1,
+                                            tick_formatter2=tick_formatter2
+                                            )
+
+        ax1 = SubplotHost(fig, rect, grid_helper=grid_helper)
+
+        # make ticklabels of right and top axis visible.
+        ax1.axis["right"].major_ticklabels.set_visible(False)
+        ax1.axis["top"].major_ticklabels.set_visible(False)
+        ax1.axis["bottom"].major_ticklabels.set_visible(True) #Turn off?
+
+        # let right and bottom axis show ticklabels for 1st coordinate (angle)
+        ax1.axis["right"].get_helper().nth_coord_ticks=0
+        ax1.axis["bottom"].get_helper().nth_coord_ticks=0
+
+        fig.add_subplot(ax1)
+
+        grid_helper = ax1.get_grid_helper()
+
+        # These move the grid
+        ax1.set_xlim(-1.5, 1.4) # moves the origin left-right in ax1
+        ax1.set_ylim(15.8, 18.8) # moves the origin up-down
+
+        ax1.set_ylabel('Declination')
+        ax1.set_xlabel('Right Ascension')
+        ax1.grid(True, linestyle='-')
+        #ax1.grid(linestyle='--', which='x') # either keyword applies to both
+        #ax1.grid(linestyle=':', which='y')  # sets of gridlines
+
+        return ax1,tr
+
+
+
+    fig = plt.figure(1, figsize=(8, 6))
+    fig.clf()
+
+    ax1, tr = curvelinear_test2(fig,111) # tr.transform_point((x, 0)) is always (0,0)
+                            # => (theta, r) in but (r, theta) out...
+
+    # Load star formation histories
+    if smc_coor is None: load_smc_coor()
+    if smc_sfh is None: load_smc_sfh()
+
+    sfr = np.array([])
+    for i in np.arange(len(smc_coor)):
+        sfr = np.append(sfr, get_SFH(smc_coor["ra"][i], \
+                        smc_coor["dec"][i], age, smc_coor, smc_sfh))
+
+    # Apply transformation to smc_coor ra and dec
+    out_test = tr.transform(zip(smc_coor["ra"], smc_coor["dec"]))
+
+    # Plot star formation histories on adjusted coordinates
+    smc_plot = plt.tricontourf(out_test[:,0], out_test[:,1], sfr)
+    smc_plot = plt.title(str(int(age)) + ' Myr')
+
+    # Plot a star at the coordinate position, if supplied
+    if ra is not None and dec is not None:
+        coor_pol1, coor_pol2 = tr.transform(zip(np.array([ra, ra]), np.array([dec, dec])))
+        smc_plot = plt.scatter(coor_pol1[0], coor_pol1[1], color='r', s=50, marker="*")
+
+    # Plot the contours defining the distributions of ra_dist and dec_dist
+    if ra_dist is not None and dec_dist is not None:
+
+        # Need this function
+        def find_confidence_interval(x, pdf, confidence_level):
+            return pdf[pdf > x].sum() - confidence_level
+
+        # Transform distribution
+        coor_dist_polar = tr.transform(zip(ra_dist, dec_dist))
+
+        # Create 2D histogram
+        nbins_x = 25
+        nbins_y = 25
+        H, xedges, yedges = np.histogram2d(coor_dist_polar[:,0], coor_dist_polar[:,1], bins=(nbins_x,nbins_y), normed=True)
+        x_bin_sizes = (xedges[1:] - xedges[:-1]).reshape((1,nbins_x))
+        y_bin_sizes = (yedges[1:] - yedges[:-1]).reshape((nbins_y,1))
+        pdf = (H*(x_bin_sizes*y_bin_sizes))
+
+        # Find intervals
+        one_quad = so.brentq(find_confidence_interval, 0., 1., args=(pdf, 0.25))
+        two_quad = so.brentq(find_confidence_interval, 0., 1., args=(pdf, 0.50))
+        three_quad = so.brentq(find_confidence_interval, 0., 1., args=(pdf, 0.75))
+        levels = [one_quad, two_quad, three_quad]
+        X, Y = 0.5*(xedges[1:]+xedges[:-1]), 0.5*(yedges[1:]+yedges[:-1])
+        Z = pdf.T
+
+        # Plot contours
+        contour = plt.contour(X, Y, Z, levels=levels[::-1], origin="lower")
 
     return smc_plot
