@@ -316,7 +316,7 @@ def func_Lx_forward(M_1_a, M_2_a, M_2_in, A_in, ecc_in, t_obs):
                 R_out = np.append(R_out, cc)
                 k_out = np.append(k_out, dd)
     else:
-        if (t_eff_obs < 0.0 or M_2_in > c.max_mass or ecc_in < 0.0 or ecc_in > 1.0):
+        if (t_eff_obs < 0.0 or M_2_in > c.max_mass or ecc_in < 0.0 or ecc_in > 1.0 or t_eff_obs > load_sse.func_sse_tmax(M_2_in)):
             M_2_out = M_2_in
             M_dot_wind = 0.0
             R_out = 0.0

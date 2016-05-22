@@ -468,10 +468,10 @@ def full_forward(M1, M2, A, ecc, v_k, theta, phi, t_obs):
             # XRB
             if isinstance(t_obs, np.ndarray):
                 M_2_tmp, L_x_tmp, M2_dot_out, A_out = binary_evolve.func_Lx_forward(M1[i], M2[i], M_2_b, A_tmp, e_tmp, t_obs[i])
-                theta_out = (t_obs[i] - load_sse.func_sse_tmax(M1[i])) * v_sys_tmp / c.dist_SMC * c.yr_to_sec * 1.0e6 * get_theta(1)
+                theta_out = (t_obs[i] - load_sse.func_sse_tmax(M1[i])) * v_sys_tmp / c.dist_SMC * c.yr_to_sec * 1.0e6 * np.sin(get_theta(1))
             else:
                 M_2_tmp, L_x_tmp, M2_dot_out, A_out = binary_evolve.func_Lx_forward(M1[i], M2[i], M_2_b, A_tmp, e_tmp, t_obs)
-                theta_out = (t_obs - load_sse.func_sse_tmax(M1[i])) * v_sys_tmp / c.dist_SMC * c.yr_to_sec * 1.0e6 * get_theta(1)
+                theta_out = (t_obs - load_sse.func_sse_tmax(M1[i])) * v_sys_tmp / c.dist_SMC * c.yr_to_sec * 1.0e6 * np.sin(get_theta(1))
 
 
             HMXB["M_NS"][i] = c.M_NS
@@ -489,13 +489,13 @@ def full_forward(M1, M2, A, ecc, v_k, theta, phi, t_obs):
     else:
 
         # Star does not make it to MT phase
-        if t_obs < load_sse.func_sse_ms_time(M1): return M1, M2, 0.0, 0.0, 0.0, A, 0.0, 0.0
+        if t_obs < load_sse.func_sse_ms_time(M1): return M1, M2, 0.0, 0.0, 0.0, A, ecc, 0.0
 
         # MT phase
         M_1_b, M_2_b, A_b = binary_evolve.func_MT_forward(M1, M2, A, ecc)
 
         # Star does not make it to SN
-        if t_obs < load_sse.func_sse_tmax(M1): return M_1_b, M_2_b, 0.0, 0.0, 0.0, A_b, 0.0, 0.0
+        if t_obs < load_sse.func_sse_tmax(M1): return M_1_b, M_2_b, 0.0, 0.0, 0.0, A_b, ecc, 0.0
 
         # SN
         A_tmp, v_sys_tmp, e_tmp = binary_evolve.func_SN_forward(M_1_b, M_2_b, A_b, v_k, theta, phi)
@@ -503,7 +503,7 @@ def full_forward(M1, M2, A, ecc, v_k, theta, phi, t_obs):
         # XRB
         M_2_tmp, L_x_tmp, M2_dot_out, A_out = binary_evolve.func_Lx_forward(M1, M2, M_2_b, A_tmp, e_tmp, t_obs)
 
-        theta_out = (t_obs - load_sse.func_sse_tmax(M1)) * v_sys_tmp / c.dist_SMC * c.yr_to_sec * 1.0e6 * get_theta(1)
+        theta_out = (t_obs - load_sse.func_sse_tmax(M1)) * v_sys_tmp / c.dist_SMC * c.yr_to_sec * 1.0e6 * np.sin(get_theta(1))
 
         return c.M_NS, M_2_tmp, L_x_tmp, v_sys_tmp, M2_dot_out, A_out, e_tmp, theta_out
 

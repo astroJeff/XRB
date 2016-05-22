@@ -311,7 +311,6 @@ def ln_posterior(x, args):
     P_omega = 1.0 / (2.0 * np.pi)
     ll += np.piecewise(theta_proj, conds, funcs) + np.log(P_omega) + np.log(1.0 / J_coor)
 
-
 #    print rad_to_dec(theta_proj)*3600.0, tmp, t_sn, v_sys, v_sys*t_sn, \
 #        np.arcsin(theta_proj/tmp), np.tan(np.arcsin(theta_proj/tmp)), np.piecewise(theta_proj, conds, funcs), \
 #        np.log(J_coor * P_omega)
