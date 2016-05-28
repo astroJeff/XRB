@@ -39,16 +39,16 @@ HMXB = pickle.load( open( "../data/sys1_pop_synth_HMXB.obj", "rb" ) )
 
 
 # Chains plot
-#fig, ax = plt.subplots(sampler.dim, 1, sharex=True, figsize=(7.0,20.0))
-#for i in range(sampler.dim):
-#    for chain in sampler.chain[...,i]:
-#        ax[i].plot(chain, alpha=0.25, color='k', drawstyle='steps')
-#        yloc = plt.MaxNLocator(3)
-#        ax[i].yaxis.set_major_locator(yloc)
-#        ax[i].set_yticks(fontsize=8)
-#fig.subplots_adjust(hspace=0)
-#plt.yticks(fontsize = 8)
-#plt.savefig('../figures/sys1_chains.pdf')
+fig, ax = plt.subplots(sampler.dim, 1, sharex=True, figsize=(7.0,20.0))
+for i in range(sampler.dim):
+    for chain in sampler.chain[...,i]:
+        ax[i].plot(chain, alpha=0.25, color='k', drawstyle='steps')
+        yloc = plt.MaxNLocator(3)
+        ax[i].yaxis.set_major_locator(yloc)
+        ax[i].set_yticks(fontsize=8)
+fig.subplots_adjust(hspace=0)
+plt.yticks(fontsize = 8)
+plt.savefig('../figures/sys1_chains.pdf')
 
 
 # Corner plot
