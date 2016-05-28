@@ -45,9 +45,9 @@ start_time = time.time()
 # Run sampler
 sampler = stats.run_emcee(M2_obs, P_obs, ecc_obs, ra_obs, dec_obs, \
     M2_d_err=M2_d_err, P_orb_obs_err=P_orb_obs_err, ecc_obs_err=ecc_obs_err, \
-    nburn=10000, nsteps=50000)
+    nburn=100000, nsteps=100000)
 
 print "Simulation took", time.time()-start_time, "seconds"
 
 # Save samples
-pickle.dump( sampler, open( "../data/sys2_test_MCMC_sampler.obj", "wb" ) )
+pickle.dump( sampler, open( "../data/sys2_MCMC_sampler.obj", "wb" ) )

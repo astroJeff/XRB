@@ -64,36 +64,40 @@ plt.savefig('../figures/J0045_tb.pdf')
 
 
 # Chains plot
-for i in range(sampler.dim):
-    plt.figure()
-    for chain in sampler.chain[...,i]:
-        plt.plot(chain, alpha=0.25, color='k', drawstyle='steps')
-plt.savefig('../figures/J0045_chains.pdf')
+#for i in range(sampler.dim):
+#    plt.figure()
+#    for chain in sampler.chain[...,i]:
+#        plt.plot(chain, alpha=0.25, color='k', drawstyle='steps')
+#plt.savefig('../figures/J0045_chains.pdf')
 
 
 
 # Birth position plot
-plt.figure(figsize=(10.0, 6.0))
-ra_out = sampler.flatchain.T[7]
+#plt.figure(figsize=(10.0, 6.0))
+#plt.subplot(1,2,2)
+#sf_history.get_SMC_plot(42.0)
+#plt.scatter(ra_J0045, dec_J0045, marker="*", s=20, color='r')
+#plt_kwargs = {'colors':'k'}
+#density_contour.density_contour(ra_out, dec_out, nbins_x=25, nbins_y=25, **plt_kwargs)
+#plt.xlim(13.0, 10.0)
+#plt.ylim(-73.7, -72.5)
+
+#plt.subplot(1,2,1)
+#sf_history.get_SMC_plot(42.0)
+#plt.scatter(ra_J0045, dec_J0045, marker="*", s=20, color='r')
+#plt_kwargs = {'colors':'k'}
+#density_contour.density_contour(ra_out, dec_out, nbins_x=25, nbins_y=25, **plt_kwargs)
+#plt.xlim(18.0, 9.0)
+#plt.ylim(-74.0, -71.5)
+#plt.tight_layout()
+#plt.savefig('../figures/J0045_dist_birth_location.pdf')
+
+# Better birth distribution plot
+plt.figure(figsize=(8,8))
+ra_out = sampler.flatchain.T[7] 
 dec_out = sampler.flatchain.T[8]
-plt.subplot(1,2,2)
-sf_history.get_SMC_plot(42.0)
-plt.scatter(ra_J0045, dec_J0045, marker="*", s=20, color='r')
-plt_kwargs = {'colors':'k'}
-density_contour.density_contour(ra_out, dec_out, nbins_x=25, nbins_y=25, **plt_kwargs)
-plt.xlim(13.0, 10.0)
-plt.ylim(-73.7, -72.5)
-
-plt.subplot(1,2,1)
-sf_history.get_SMC_plot(42.0)
-plt.scatter(ra_J0045, dec_J0045, marker="*", s=20, color='r')
-plt_kwargs = {'colors':'k'}
-density_contour.density_contour(ra_out, dec_out, nbins_x=25, nbins_y=25, **plt_kwargs)
-plt.xlim(18.0, 9.0)
-plt.ylim(-74.0, -71.5)
-plt.tight_layout()
+sf_history.get_SMC_plot_polar(50, ra_dist=ra_out, dec_dist=dec_out, ra=ra_J0045, dec=dec_J0045)
 plt.savefig('../figures/J0045_dist_birth_location.pdf')
-
 
 
 

@@ -17,23 +17,23 @@ import density_contour
 
 
 # System 1 test parameters
-M1_true = 13.0
-M2_true = 10.0
-A_true = 100.0
-ecc_true = 0.3
-v_k_true = 250.0
-theta_true = 2.9
-phi_true = 0.9
-ra_true = 13.51
-dec_true = -72.7
-t_b_true = 22.0
+M1_true = 9.0
+M2_true = 4.0
+A_true = 500.0
+ecc_true = 0.5
+v_k_true = 100.0
+theta_true = 2.7
+phi_true = 1.2
+ra_true = 15.8
+dec_true = -72.1
+t_b_true = 50.0
 
 
 
 # Load pickled data
-sampler = pickle.load( open( "../data/sys1_MCMC_sampler.obj", "rb" ) )
-init_params = pickle.load( open( "../data/sys1_pop_synth_init_conds.obj", "rb" ) )
-HMXB = pickle.load( open( "../data/sys1_pop_synth_HMXB.obj", "rb" ) )
+sampler = pickle.load( open( "../data/sys2_MCMC_sampler.obj", "rb" ) )
+#init_params = pickle.load( open( "../data/sys2_pop_synth_init_conds.obj", "rb" ) )
+#HMXB = pickle.load( open( "../data/sys2_pop_synth_HMXB.obj", "rb" ) )
 
 
 
@@ -48,7 +48,7 @@ HMXB = pickle.load( open( "../data/sys1_pop_synth_HMXB.obj", "rb" ) )
 #        ax[i].set_yticks(fontsize=8)
 #fig.subplots_adjust(hspace=0)
 #plt.yticks(fontsize = 8)
-#plt.savefig('../figures/sys1_chains.pdf')
+#plt.savefig('../figures/sys2_chains.pdf')
 
 
 # Corner plot
@@ -56,7 +56,7 @@ labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", 
 truths = [M1_true, M2_true, A_true, ecc_true, v_k_true, theta_true, phi_true, ra_true, dec_true, t_b_true]
 fig = corner.corner(sampler.flatchain, labels=labels, truths=truths)
 plt.rc('font', size=18)
-plt.savefig('../figures/sys1_corner.pdf')
+plt.savefig('../figures/sys2_corner.pdf')
 plt.rc('font', size=10)
 
 
@@ -83,7 +83,7 @@ dec_out = sampler.flatchain.T[8]
 #plt.xlim(9.0, 18.0)
 #plt.ylim(-74.0, -71.5)
 #plt.tight_layout()
-#plt.savefig('../figures/sys1_dist_birth_location.pdf')
+#plt.savefig('../figures/sys2_dist_birth_location.pdf')
 
 
 
@@ -92,7 +92,7 @@ plt.figure(figsize=(8,8))
 ra_obs = 13.5
 dec_obs = -72.63
 sf_history.get_SMC_plot_polar(24, ra_dist=ra_out, dec_dist=dec_out, ra=ra_obs, dec=dec_obs)
-plt.savefig('../figures/sys1_dist_birth_location.pdf')
+plt.savefig('../figures/sys2_dist_birth_location.pdf')
 
 
 
@@ -133,4 +133,4 @@ for i in np.arange(len(init_params)):
     plt.axvline(init_params["t_b"][i])
 plt.xlabel(r"$t_b$", size=16)
 plt.tight_layout()
-plt.savefig('../figures/sys1_MCMC_pop_synth_compare.pdf')
+plt.savefig('../figures/sys2_MCMC_pop_synth_compare.pdf')
