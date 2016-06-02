@@ -106,7 +106,7 @@ plt.savefig('../figures/sys1_posterior_params_multiburn.pdf')
 
 
 ################# Chains plot #####################
-fig, ax = plt.subplots(sampler1.dim, 3, sharex=True, figsize=(16.0,20.0))
+fig, ax = plt.subplots(sampler1.dim, 3, sharex=False, figsize=(16.0,20.0))
 for i in range(sampler1.dim):
     for j in np.arange(len(sampler1.chain[...])):
 
