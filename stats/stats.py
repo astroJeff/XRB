@@ -124,6 +124,7 @@ def ln_priors(y):
     lp += -np.log( 2.0*np.pi )
 
     # Get star formation history
+    sf_history.load_sf_history()
     sfh = sf_history.get_SFH(ra_b, dec_b, t_b, sf_history.smc_coor, sf_history.smc_sfh)
     if sfh == 0.0: return -np.inf
 
