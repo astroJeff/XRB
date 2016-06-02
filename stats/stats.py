@@ -1,5 +1,6 @@
 import sys
 import os
+import copy
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
@@ -407,15 +408,15 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
     sf_history.load_sf_history()
 
     # Get initial values
-    initial_vals = stats.get_initial_values(M2_d, nwalkers=nwalkers)
+    initial_vals = get_initial_values(M2_d, nwalkers=nwalkers)
 
     # Define sampler
     args = [[M2_d, M2_d_err, P_orb_obs, P_orb_obs_err, ecc_obs, ecc_obs_err, ra, dec]]
-    sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=stats.ln_posterior, args=args)
+    sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=ln_posterior, args=args)
 
     # Assign initial values
     p0 = np.zeros((nwalkers,10))
-    p0 = stats.set_walkers(initial_vals, args[0], nwalkers=nwalkers)
+    p0 = set_walkers(initial_vals, args[0], nwalkers=nwalkers)
 
     # Burn-in 1
     pos,prob,state = sampler.run_mcmc(p0, N=nburn)
