@@ -380,6 +380,80 @@ def run_emcee(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
 
 
 
+def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
+    P_orb_obs_err=1.0, ecc_obs_err=0.05, nburn=1000, nsteps=1000):
+    """ Run the emcee function
+
+    Parameters
+    ----------
+    M2_d : float
+        Observed secondary mass
+    P_orb_obs : float
+        Observed orbital period
+    ecc_obs : float
+        Observed orbital eccentricity
+    ra : float
+        Observed right ascension
+    dec : float
+        Observed declination
+
+    Returns
+    -------
+    sampler : emcee object
+    """
+
+    # First thing is to load the sse data and SF_history data
+    load_sse.load_sse()
+    sf_history.load_sf_history()
+
+    # Get initial values
+    initial_vals = stats.get_initial_values(M2_d, nwalkers=nwalkers)
+
+    # Define sampler
+    args = [[M2_d, M2_d_err, P_orb_obs, P_orb_obs_err, ecc_obs, ecc_obs_err, ra, dec]]
+    sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=stats.ln_posterior, args=args)
+
+    # Assign initial values
+    p0 = np.zeros((nwalkers,10))
+    p0 = stats.set_walkers(initial_vals, args[0], nwalkers=nwalkers)
+
+    # Burn-in 1
+    pos,prob,state = sampler.run_mcmc(p0, N=nburn)
+    sampler1 = copy.copy(sampler)
+
+
+
+    # TESTING BEGIN - Get limiting ln_prob for worst 8 chains
+    prob_lim = (np.sort(prob)[7] + np.sort(prob)[8])/2.0
+    index_best = np.argmax(prob)
+
+    for i in np.arange(len(prob)):
+        if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+    # TESTING END
+
+
+    # Burn-in 2
+    sampler.reset()
+    pos,prob,state = sampler.run_mcmc(pos, N=nburn)
+    sampler2 = copy.copy(sampler)
+
+
+    # TESTING BEGIN - Get limiting ln_prob for worst 8 chains
+    prob_lim = (np.sort(prob)[7] + np.sort(prob)[8])/2.0
+    index_best = np.argmax(prob)
+
+    for i in np.arange(len(prob)):
+        if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+    # TESTING END
+
+
+
+    # Full run
+    sampler.reset()
+    pos,prob,state = sampler.run_mcmc(pos, N=nsteps)
+
+    return sampler1, sampler2, sampler
+
 
 
 # Priors
