@@ -423,12 +423,9 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
     pos,prob,state = sampler.run_mcmc(p0, N=nburn)
     sampler1 = copy.copy(sampler)
 
-
-
     # TESTING BEGIN - Get limiting ln_prob for worst 8 chains
     prob_lim = (np.sort(prob)[7] + np.sort(prob)[8])/2.0
     index_best = np.argmax(prob)
-
     for i in np.arange(len(prob)):
         if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
     # TESTING END
@@ -439,22 +436,45 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
     pos,prob,state = sampler.run_mcmc(pos, N=nburn)
     sampler2 = copy.copy(sampler)
 
-
     # TESTING BEGIN - Get limiting ln_prob for worst 8 chains
     prob_lim = (np.sort(prob)[7] + np.sort(prob)[8])/2.0
     index_best = np.argmax(prob)
-
     for i in np.arange(len(prob)):
         if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
     # TESTING END
 
+
+    # Burn-in 3
+    sampler.reset()
+    pos,prob,state = sampler.run_mcmc(pos, N=nburn)
+    sampler3 = copy.copy(sampler)
+
+    # TESTING BEGIN - Get limiting ln_prob for worst 8 chains
+    prob_lim = (np.sort(prob)[7] + np.sort(prob)[8])/2.0
+    index_best = np.argmax(prob)
+    for i in np.arange(len(prob)):
+        if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+    # TESTING END
+
+
+    # Burn-in 4
+    sampler.reset()
+    pos,prob,state = sampler.run_mcmc(pos, N=nburn)
+    sampler4 = copy.copy(sampler)
+
+    # TESTING BEGIN - Get limiting ln_prob for worst 8 chains
+    prob_lim = (np.sort(prob)[7] + np.sort(prob)[8])/2.0
+    index_best = np.argmax(prob)
+    for i in np.arange(len(prob)):
+        if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+    # TESTING END
 
 
     # Full run
     sampler.reset()
     pos,prob,state = sampler.run_mcmc(pos, N=nsteps)
 
-    return sampler1, sampler2, sampler
+    return sampler1, sampler2, sampler3, sampler4, sampler
 
 
 
