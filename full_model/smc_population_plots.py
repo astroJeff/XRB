@@ -48,6 +48,7 @@ sampler = pickle.load( open( "../data/SMC_MCMC_sampler.obj", "rb" ) )
 
 
 # M1 vs. M2
+fig, host = plt.subplots(figsize=(8,8))
 #plt.subplot(4,1,1)
 corner.hist2d(sampler.flatchain.T[0], sampler.flatchain.T[1])
 #plt.scatter(init_params["M1"], init_params["M2"], color='r')
@@ -58,6 +59,7 @@ plt.ylabel(r"$M_2$", size=16)
 plt.savefig('../figures/smc_population_M1_M2.pdf')
 
 # Orbital separation vs. eccentricity
+fig, host = plt.subplots(figsize=(8,8))
 #plt.subplot(4,1,2)
 corner.hist2d(sampler.flatchain.T[2], sampler.flatchain.T[3])
 #plt.scatter(init_params["A"], init_params["ecc"], color='r')
@@ -68,6 +70,7 @@ plt.ylabel(r"$e$", size=16)
 plt.savefig('../figures/smc_population_A_ecc.pdf')
 
 # v_kick vs. theta
+fig, host = plt.subplots(figsize=(8,8))
 corner.hist2d(sampler.flatchain.T[4], sampler.flatchain.T[5])
 plt.xlabel(r"$v_k$")
 plt.ylabel(r"$\theta$")
@@ -110,17 +113,20 @@ for s in sampler.flatchain:
 
 
 # HMXB Orbital period vs. eccentricity
+fig, host = plt.subplots(figsize=(8,8))
 corner.hist2d(HMXB_Porb, HMXB_ecc)
 plt.xlabel(r"$P_{\rm orb}$", size=16)
 plt.ylabel(r"$e$", size=16)
 plt.savefig('../figures/smc_population_HMXB_P_ecc.pdf')
 
 # X-ray luminosity
+fig, host = plt.subplots(figsize=(8,8))
 plt.hist(HMXB_Lx, color='k', histtype='step', bins=50)
 plt.xlabel(r"$L_x$", size=16)
 plt.savefig('../figures/smc_population_HMXB_Lx.pdf')
 
 # Birth location
+fig, host = plt.subplots(figsize=(8,8))
 sf_history.get_SMC_plot(30.0)
 plt_kwargs = {'colors':'k'}
 density_contour.density_contour(HMXB_ra, HMXB_dec, nbins_x=40, nbins_y=40, **plt_kwargs)

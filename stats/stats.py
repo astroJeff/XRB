@@ -547,13 +547,6 @@ def ln_priors_population(y):
     if dist_closest > 0.3: return -np.inf
     lp += np.log(np.cos(deg_to_rad(dec_b)) / 2.0)
 
-    ##################################################################
-    # We add an additional prior that scales the RA and Dec by the
-    # area available to it, i.e. pi theta^2, where theta is the angle
-    # of the maximum projected separation over the distance.
-    #
-    # Still under construction
-    ##################################################################
     M1_b, M2_b, A_b = binary_evolve.func_MT_forward(M1, M2, A, ecc)
     A_c, v_sys, ecc = binary_evolve.func_SN_forward(M1_b, M2_b, A_b, v_k, theta, phi)
     if ecc < 0.0 or ecc > 1.0 or np.isnan(ecc): return -np.inf
@@ -630,7 +623,7 @@ def run_emcee_population(nburn=10000, nsteps=100000):
     sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=ln_posterior_population)
 
     # Assign initial values based on a random binary
-    args = [12.0, 2.0, 500.0, 20.0, 0.50, 0.2, 13.5, -72.7]
+    args = [12.0, 2.0, 500.0, 20.0, 0.50, 0.2, 13.5, -72.7] # SMC
     p0 = np.zeros((nwalkers,10))
     p0 = set_walkers(initial_vals, args, nwalkers=nwalkers)
 
