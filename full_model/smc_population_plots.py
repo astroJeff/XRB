@@ -40,17 +40,17 @@ sampler = pickle.load( open( "../data/SMC_MCMC_sampler.obj", "rb" ) )
 
 
 # Corner plot
-#labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
-#fig = corner.corner(sampler.flatchain, labels=labels)
-#plt.rc('font', size=18)
-#plt.savefig('../figures/smc_population_corner.pdf')
-#plt.rc('font', size=10)
+labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
+fig = corner.corner(sampler.flatchain, labels=labels, )
+plt.rc('font', size=18)
+plt.savefig('../figures/smc_population_corner.pdf')
+plt.rc('font', size=10)
 
 
 # M1 vs. M2
 fig, host = plt.subplots(figsize=(8,8))
 #plt.subplot(4,1,1)
-corner.hist2d(sampler.flatchain.T[0], sampler.flatchain.T[1])
+corner.hist2d(sampler.flatchain.T[0], sampler.flatchain.T[1], bins=100, plot_datapoints=False)
 #plt.scatter(init_params["M1"], init_params["M2"], color='r')
 plt.xlabel(r"$M_1$", size=16)
 plt.ylabel(r"$M_2$", size=16)
@@ -61,7 +61,7 @@ plt.savefig('../figures/smc_population_M1_M2.pdf')
 # Orbital separation vs. eccentricity
 fig, host = plt.subplots(figsize=(8,8))
 #plt.subplot(4,1,2)
-corner.hist2d(sampler.flatchain.T[2], sampler.flatchain.T[3])
+corner.hist2d(sampler.flatchain.T[2], sampler.flatchain.T[3], bins=100, plot_datapoints=False)
 #plt.scatter(init_params["A"], init_params["ecc"], color='r')
 plt.xlabel(r"$a$", size=16)
 plt.ylabel(r"$e$", size=16)
@@ -71,7 +71,7 @@ plt.savefig('../figures/smc_population_A_ecc.pdf')
 
 # v_kick vs. theta
 fig, host = plt.subplots(figsize=(8,8))
-corner.hist2d(sampler.flatchain.T[4], sampler.flatchain.T[5])
+corner.hist2d(sampler.flatchain.T[4], sampler.flatchain.T[5], bins=100, plot_datapoints=False)
 plt.xlabel(r"$v_k$")
 plt.ylabel(r"$\theta$")
 plt.savefig("../figures/smc_population_vk_theta.pdf")
@@ -114,7 +114,7 @@ for s in sampler.flatchain:
 
 # HMXB Orbital period vs. eccentricity
 fig, host = plt.subplots(figsize=(8,8))
-corner.hist2d(HMXB_Porb, HMXB_ecc)
+corner.hist2d(HMXB_Porb, HMXB_ecc, bins=100, plot_datapoints=False)
 plt.xlabel(r"$P_{\rm orb}$", size=16)
 plt.ylabel(r"$e$", size=16)
 plt.savefig('../figures/smc_population_HMXB_P_ecc.pdf')
