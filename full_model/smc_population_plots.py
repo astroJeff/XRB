@@ -27,54 +27,43 @@ sampler = pickle.load( open( "../data/SMC_MCMC_sampler.obj", "rb" ) )
 
 
 # Chains plot
-# fig, ax = plt.subplots(sampler.dim, 1, sharex=True, figsize=(7.0,20.0))
-# for i in range(sampler.dim):
-#     for chain in sampler.chain[...,i]:
-#         ax[i].plot(chain, alpha=0.25, color='k', drawstyle='steps')
-#         yloc = plt.MaxNLocator(3)
-#         ax[i].yaxis.set_major_locator(yloc)
-# #        ax[i].set_yticks(fontsize=8)
-# fig.subplots_adjust(hspace=0)
-# #plt.yticks(fontsize = 8)
-# plt.savefig('../figures/smc_population_chains.pdf')
+fig, ax = plt.subplots(sampler.dim, 1, sharex=True, figsize=(7.0,20.0))
+for i in range(sampler.dim):
+    for chain in sampler.chain[...,i]:
+        ax[i].plot(chain, alpha=0.25, color='k', drawstyle='steps', rasterized=True)
+        yloc = plt.MaxNLocator(3)
+        ax[i].yaxis.set_major_locator(yloc)
+#        ax[i].set_yticks(fontsize=8)
+fig.subplots_adjust(hspace=0)
+plt.yticks(fontsize = 8)
+plt.savefig('../figures/smc_population_chains.pdf', rasterized=True)
 
 
 # Corner plot
-#labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
-#fig = corner.corner(sampler.flatchain, labels=labels)
-#plt.rc('font', size=18)
-#plt.savefig('../figures/smc_population_corner.pdf')
-#plt.rc('font', size=10)
+labels = [r"$M_1$", r"$M_2$", r"$a$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
+plt_range = ([7,24], [2.5,15], [0,1500], [0,1], [0,450], [0,np.pi], [0,2.0*np.pi], [6,21], [-76,-70], [0,70])
+hist2d_kwargs = {"plot_datapoints" : False}
+fig = corner.corner(sampler.flatchain, labels=labels, range=plt_range, bins=40, max_n_ticks=4, **hist2d_kwargs)
+plt.rc('font', size=18)
+plt.savefig('../figures/smc_population_corner.pdf')
+plt.rc('font', size=10)
 
 
 # M1 vs. M2
-fig, host = plt.subplots(figsize=(8,8))
-#plt.subplot(4,1,1)
-corner.hist2d(sampler.flatchain.T[0], sampler.flatchain.T[1])
-#plt.scatter(init_params["M1"], init_params["M2"], color='r')
+fig, host = plt.subplots(figsize=(5,5))
+plt_range = ([7,25], [2.5,15])
+corner.hist2d(sampler.flatchain.T[0], sampler.flatchain.T[1], bins=40, range=plt_range, plot_datapoints=False)
 plt.xlabel(r"$M_1$", size=16)
 plt.ylabel(r"$M_2$", size=16)
-#plt.xlim(8.5, 12.0)
-#plt.ylim(3.0, 4.5)
 plt.savefig('../figures/smc_population_M1_M2.pdf')
 
 # Orbital separation vs. eccentricity
-fig, host = plt.subplots(figsize=(8,8))
-#plt.subplot(4,1,2)
-corner.hist2d(sampler.flatchain.T[2], sampler.flatchain.T[3])
-#plt.scatter(init_params["A"], init_params["ecc"], color='r')
+fig, host = plt.subplots(figsize=(5,5))
+plt_range = ([0,2000], [0,1])
+corner.hist2d(sampler.flatchain.T[2], sampler.flatchain.T[3], bins=40, range=plt_range, plot_datapoints=False)
 plt.xlabel(r"$a$", size=16)
 plt.ylabel(r"$e$", size=16)
-#plt.xlim(10.0, 1500.0)
-#plt.ylim(0.0, 1.0)
 plt.savefig('../figures/smc_population_A_ecc.pdf')
-
-# v_kick vs. theta
-fig, host = plt.subplots(figsize=(8,8))
-corner.hist2d(sampler.flatchain.T[4], sampler.flatchain.T[5])
-plt.xlabel(r"$v_k$")
-plt.ylabel(r"$\theta$")
-plt.savefig("../figures/smc_population_vk_theta.pdf")
 
 
 
@@ -113,20 +102,30 @@ for s in sampler.flatchain:
 
 
 # HMXB Orbital period vs. eccentricity
-fig, host = plt.subplots(figsize=(8,8))
-corner.hist2d(HMXB_Porb, HMXB_ecc)
+fig, ax = plt.subplots(3, 1, figsize=(5,5))
+plt_range = ([0, 1.0e7], [0,1])
+corner.hist2d(HMXB_Porb, HMXB_ecc, ax=ax[0], bins=40, range=plt_range, plot_datapoints=False)
 plt.xlabel(r"$P_{\rm orb}$", size=16)
 plt.ylabel(r"$e$", size=16)
-plt.savefig('../figures/smc_population_HMXB_P_ecc.pdf')
 
-# X-ray luminosity
-fig, host = plt.subplots(figsize=(8,8))
-plt.hist(HMXB_Lx, color='k', histtype='step', bins=50)
-plt.xlabel(r"$L_x$", size=16)
-plt.savefig('../figures/smc_population_HMXB_Lx.pdf')
+plt_range = ([5, 20], [0,200])
+corner.hist2d(HMXB_M2, HMXB_vsys, ax=ax[1], bins=40, range=plt_range, plot_datapoints=False)
+plt.xlabel(r"$M_2$", size=16)
+plt.ylabel(r"$v_{\rm sys}$", size=16)
+
+plt_range = ([0, 70], [0,200])
+corner.hist2d(sampler.flatchain.T[9], data_out[7]*180.0/np.pi*3600.0, ax=ax[2], bins=40, range=plt_range, plot_datapoints=False)
+plt.xlabel(r"$t_i$", size=16)
+plt.ylabel(r"$\theta$", size=16)
+
+plt.savefig('../figures/smc_population_HMXB.pdf')
+
+
+
+
 
 # Birth location
-fig, host = plt.subplots(figsize=(8,8))
+fig, host = plt.subplots(figsize=(5,5))
 sf_history.get_SMC_plot(30.0)
 plt_kwargs = {'colors':'k'}
 density_contour.density_contour(HMXB_ra, HMXB_dec, nbins_x=40, nbins_y=40, **plt_kwargs)

@@ -64,11 +64,11 @@ plt.savefig('../figures/J0045_tb.pdf')
 
 
 # Chains plot
-#for i in range(sampler.dim):
-#    plt.figure()
-#    for chain in sampler.chain[...,i]:
-#        plt.plot(chain, alpha=0.25, color='k', drawstyle='steps')
-#plt.savefig('../figures/J0045_chains.pdf')
+for i in range(sampler.dim):
+    plt.figure()
+    for chain in sampler.chain[...,i]:
+        plt.plot(chain, alpha=0.25, color='k', drawstyle='steps')
+plt.savefig('../figures/J0045_chains.pdf')
 
 
 
