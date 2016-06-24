@@ -32,8 +32,8 @@ t_b_true = 22.0
 
 # Load pickled data
 sampler = pickle.load( open( "../data/sys1_MCMC_sampler.obj", "rb" ) )
-init_params = pickle.load( open( "../data/sys1_pop_synth_init_conds.obj", "rb" ) )
-HMXB = pickle.load( open( "../data/sys1_pop_synth_HMXB.obj", "rb" ) )
+# init_params = pickle.load( open( "../data/sys1_pop_synth_init_conds.obj", "rb" ) )
+# HMXB = pickle.load( open( "../data/sys1_pop_synth_HMXB.obj", "rb" ) )
 
 
 
@@ -45,7 +45,7 @@ for i in range(sampler.dim):
         ax[i].plot(chain, alpha=0.25, color='k', drawstyle='steps')
         yloc = plt.MaxNLocator(3)
         ax[i].yaxis.set_major_locator(yloc)
-        ax[i].set_yticks(fontsize=8)
+        # ax[i].set_yticks(fontsize=8)
 fig.subplots_adjust(hspace=0)
 plt.yticks(fontsize = 8)
 plt.savefig('../figures/sys1_chains.pdf', rasterized=True)
@@ -54,6 +54,7 @@ plt.savefig('../figures/sys1_chains.pdf', rasterized=True)
 
 # Likelihood as a function of each parametersplt.rc('font', size=8)
 fig, ax = plt.subplots(2,5, figsize=(14,6))
+labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
 for i in np.arange(10):
     a = np.int(i/5)
     b = i%5
