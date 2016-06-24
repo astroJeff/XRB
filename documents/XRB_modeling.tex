@@ -147,39 +147,46 @@ where random $\vec{x}_i$ are drawn from $P(\vec{x})$.
 
 
 
+\subsection{High Mass X-ray Binaries - Population}
 
-\subsection{High Mass X-ray Binaries}
-Our goal is to identify quantitatively how the individual HMXBs formed in our sample. We begin with Bayes' Rule:
+Our goal is to identify quantitatively how a population of HMXBs formed. We begin with Bayes' Rule:
 \begin{equation}
 P( \vec{x}_i \given D, M ) = \frac{P( D \given M, \vec{x}_i ) P(\vec{x}_i \given M)}{P(D \given M)},
 \end{equation}
-where $\vec{x}_i$ are the binary parameters described above, $M$ is the binary evolution model and $D$ contains the observed data. For any individual HMXB, the evolution can be determined uniquely (at least to first order) by its initial masses, $M_{1,i}$ and $M_{2,i}$, its initial binary separation, $a_i$, and eccentricity $e_i$, and the kick velocity it received after the primary collapsed to form a NS or BH, $\vec{v}_k$. For the problem at hand, we also include the binary's birth position, $\alpha_i$ and $\delta_i$, and its birth time, $t_i$:
+where $\vec{x}_i$ are the binary parameters described above, $M$ is the binary evolution model and $D$ contains the observed data. To simulate an HMXB population, $D$ may be an X-ray bright object, quantified as an accreting binary with an $L_x$ above some observationally-motivated threshold. To first order HMXBs can be determined uniquely by its initial masses, $M_{1,i}$ and $M_{2,i}$, its initial binary separation, $a_i$, and eccentricity $e_i$, and the kick velocity it received after the primary collapsed to form a NS or BH, $\vec{v}_k$. For the problem at hand, we also include the binary's birth position, $\alpha_i$ and $\delta_i$, and its birth time, $t_i$:
 \begin{equation}
-\vec{x}_i \in (M_{1,i}, M_{2,i,} a_i, e_i, \vec{v}_k, \alpha_i, \delta_i, t_i). \label{eq:x_i}
+\vec{x}_i \in ( M_{1,i}, M_{2,i}, a_i, e_i, \vec{v}_k, \alpha_i, \delta_i, t_i ). \label{eq:x_i}
 \end{equation}
-For the HMXB population in the LMC, observations include the position of the binary, $\alpha$ and $\delta$, its observed X-ray luminosity, $L'_x$, and its optical counterpart's observed current mass $M'_2$:
-\begin{equation}
-D \in (\alpha, \delta, L'_x, M'_2). \label{eq:D}
-%D \in (\alpha, \delta, L_x, \vec{m}). \label{eq:D}
-\end{equation}
-We use primed quantities to denote observed values that are, in general, different from the true, physical values $L_x$ and $M_2$. We ignore uncertainties on the position.
-%We use vector notation for the magnitudes, because an individual object may have been observed using multiple filters. 
+
+In this case, calculating the integrand in Equation \ref{eq:bayes_marginalize} is straightforward; $P(obs \given \vec{x}_i)$ are the priors which we discuss in Section \ref{sec:priors} and $P(obs \given \vec{x})$ ensures that only HMXBs are selected (unity for accreting binaries, and zero for non-accreting binaries).
 
 
-We now marginalize the likelihood over three parameters, the true (current) companion mass $M_2$, the true $L_x$, and the systemic velocity ($v_{\rm sys}$):
+
+\subsection{High Mass X-ray Binaries - Individual Systems}
+
+In our model we simulate individual HMXBs using the same model parameters as we use for a population, so $\vec{x}_i$ is determined by Equation \ref{eq:x_i}. However, HMXBs in the SMC and LMC may have well measured $P'_{\rm orb}$, $e'$, and $M'_2$ determined from identifying the observational counterpart to the X-ray source. Each of these measured quantities has some uncertainty associated with it. Furthermore, individual HMXBs have a specific location that we are trying to associate with nearby star forming regions. Therefore, the likelihood function in Equation \ref{eq:bayes_marginalize} is somewhat more complicated. We start by defining $D$ as:
 \begin{equation}
-P(D \given M, \vec{x}_i) =  \int \dd M_2\ \dd L_x\ \dd v_{\rm sys}\ P( M_2, L_x, v_{\rm sys}, \alpha, \delta, M'_2, L'_x \given M_{1,i}, M_{2,i}, a_i, e_i, \vec{v}_k, \alpha_i, \delta_i, t_i, M).
+D \in (\alpha, \delta, P'_{\rm orb}, e', M'_2). \label{eq:D}
+\end{equation}
+We use primed quantities to denote observed values that are, in general, different from the true, physical values $P'_{\rm orb}$, $e'$, and $M'_2$. We ignore uncertainties on the position.
+
+
+To generate our likelihood function, we now marginalize over four parameters, the true orbital parameters, $P_{\rm orb}$ and $e$, the true (current) companion mass $M_2$, and the systemic velocity ($v_{\rm sys}$):
+\begin{equation}
+P(D \given \vec{x}_i, M) =  \int \dd P_{\rm orb}\ \dd e\ \dd M_2\ \dd v_{\rm sys}\ P( P_{\rm orb}, e, M_2, v_{\rm sys}, D \given \vec{x}_i, M).
 \end{equation}
 Based on independence, we express this integral into separate, tractable parts:
 \begin{eqnarray}
-P(D \given M, \vec{x}_i) &=&  \int \dd M_2\ \dd L_x\ \dd v_{\rm sys}\ P(L'_x \given L_x) \nonumber \\
-	& & \qquad \times P(M'_2 \given M_2) \nonumber \\
+P(D \given M, \vec{x}_i) &=&  \int \dd P_{\rm orb}\ \dd e\ \dd M_2\ \dd v_{\rm sys}\ P(P'_{\rm orb} \given P_{\rm orb}) \nonumber \\
+	& & \qquad \times P(e' \given e)\ P(M'_2 \given M_2) \nonumber \\
 	& & \qquad \times P(\alpha, \delta \given \alpha_i, \delta_i, t_i, M_{1,i}, v_{\rm sys}) \nonumber \\
-	& & \qquad \times P(L_x, M_2, v_{\rm sys} \given M_{1,i}, M_{2,i}, a_i, e_i, \vec{v}_k, t_i). \label{eq:marginalized}
+	& & \qquad \times P(P_{\rm orb}, e, M_2, v_{\rm sys} \given M_{1,i}, M_{2,i}, a_i, e_i, \vec{v}_k, t_i). \label{eq:marginalized}
 \end{eqnarray}
-The first term in the integrand, $P(L'_x \given L_x)$, includes the observational uncertainty in the X-ray luminosity of the binary. Typically, this is a Gaussian uncertainty (in logspace?), but in principle, can account for any observational distribution. Similarly, $P(M'_2 \given M_2)$ accounts for the observational uncertainty on $M_2$. This term again can be approximated as a Gaussian distribution, but a more careful determination will include a comparison between the observed magnitudes in various filters and stellar models on a color-magnitude diagram. 
+The two terms in the integrand, $P(P'_{\rm orb} \given P_{\rm orb})$ and $P(e' \given e)$, include the observational uncertainties on the binary's orbit. We model these with Gaussian uncertainties, but in principle, can account for any observationally-derived distribution. Similarly, $P(M'_2 \given M_2)$ accounts for the observational uncertainty on $M_2$. This term again can be approximated as a Gaussian distribution, but a more careful determination will include a comparison between the observed magnitudes in various filters and stellar models on a color-magnitude diagram. 
 
-The third term in the integrand accounts for the fact that the system's birth place may, in general, be different from its observed position since the center of mass of a system received a kick during the primary's core collapse. We explicitly include dependencies on $v_{\rm sys}$, $t_i$, and $M_{1,i}$ since the distance travelled depends on both the system's velocity and time since the primary's supernova. We derive this term in Section \ref{sec:ra_dec} below. The last term of the integrand, which we discuss in Section \ref{sec:binary_evolve}, includes the binary evolution from its {\it ab initio} state to the $M_2$, $L_x$, and $v_{\rm sys}$ of the system today. In section \ref{sec:priors} we derive the prior distributions for each of our nine model parameters.
+The fourth term in the integrand accounts for the fact that the system's birth place may, in general, be different from its observed position since the center of mass of a system received a kick during the primary's core collapse. We explicitly include dependencies on $v_{\rm sys}$, $t_i$, and $M_{1,i}$ since the distance travelled depends on both the system's velocity and time since the primary's supernova. We derive this term in Section \ref{sec:ra_dec} below. 
+
+The last term of the integrand, which we discuss in Section \ref{sec:binary_evolve}, includes the binary evolution from its {\it ab initio} state to the $P_{\rm orb}$, $e$, $M_2$, and $v_{\rm sys}$ of the system today. In section \ref{sec:priors} we derive the prior distributions for each of our ten model parameters.
 
 
 
