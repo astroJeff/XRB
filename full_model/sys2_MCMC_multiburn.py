@@ -20,14 +20,14 @@ import binary_evolve
 
 
 # Start with initial binary conditions for our test system
-M1 = 13.0
-M2 = 10.0
-A = 150.0
-ecc = 0.3
-v_k = 250.0
-theta = 2.9
-phi = 0.9
-t_b = 22.0
+M1 = 9.0
+M2 = 4.0
+A = 500.0
+ecc = 0.5
+v_k = 100.0
+theta = 2.7
+phi = 1.2
+t_b = 50.0
 
 # Now, run full evolution
 M1_obs, M2_obs, L_x_obs, v_sys_obs, M2_dot_obs, A_obs, ecc_obs, theta_obs \
@@ -39,13 +39,13 @@ P_orb_obs_err = 1.0
 ecc_obs_err = 0.05
 
 # Now, define system observations
-ra_obs = 13.5
-dec_obs = -72.63
+ra_obs = 15.9
+dec_obs = -72.25
 P_obs = binary_evolve.A_to_P(M1_obs, M2_obs, A_obs)
 
 # Birth position
-ra_b = 13.51
-dec_b = -72.7
+ra_b = 15.8
+dec_b = -72.1
 
 # Truths
 truths=[M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b]
@@ -79,7 +79,7 @@ labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", 
 hist2d_kwargs = {"plot_datapoints" : False}
 fig = corner.corner(sampler.flatchain, labels=labels, truths=truths, **hist2d_kwargs)
 plt.rc('font', size=18)
-plt.savefig('../figures/sys1_corner_multiburn.pdf')
+plt.savefig('../figures/sys2_corner_multiburn.pdf')
 plt.rc('font', size=10)
 
 
@@ -103,7 +103,7 @@ for i in np.arange(10):
     ax[a,b].axvline(truths[i], color='r')
 
 plt.tight_layout()
-plt.savefig('../figures/sys1_posterior_params_multiburn.pdf')
+plt.savefig('../figures/sys2_posterior_params_multiburn.pdf')
 
 
 ################# Chains plot #####################
@@ -160,7 +160,7 @@ for i in range(sampler1.dim):
 
 fig.subplots_adjust(hspace=0, wspace=0)
 plt.yticks(fontsize = 8)
-plt.savefig('../figures/sys1_chain_multiburn.pdf')
+plt.savefig('../figures/sys2_chain_multiburn.pdf')
 
 
 
@@ -173,4 +173,4 @@ print "Burn-in 4:", sampler4.acor
 print "Production run:", sampler.acor
 
 # Save samples
-pickle.dump( sampler, open( "../data/sys1_MCMC_multiburn_sampler.obj", "wb" ) )
+pickle.dump( sampler, open( "../data/sys2_MCMC_multiburn_sampler.obj", "wb" ) )

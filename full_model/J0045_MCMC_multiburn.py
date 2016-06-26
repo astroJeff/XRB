@@ -19,55 +19,26 @@ import binary_evolve
 
 
 
-# Start with initial binary conditions for our test system
-M1 = 13.0
-M2 = 10.0
-A = 150.0
-ecc = 0.3
-v_k = 250.0
-theta = 2.9
-phi = 0.9
-t_b = 22.0
+# Set J0045 parameters
+coor_J0045 = SkyCoord('00h45m35.26s', '-73d19m03.32s')
 
-# Now, run full evolution
-M1_obs, M2_obs, L_x_obs, v_sys_obs, M2_dot_obs, A_obs, ecc_obs, theta_obs \
-    = pop_synth.full_forward(M1,M2,A,ecc,v_k,theta,phi,t_b)
-
-# Let's put some uncertainties on those observations
-M2_d_err = 1.0
-P_orb_obs_err = 1.0
-ecc_obs_err = 0.05
-
-# Now, define system observations
-ra_obs = 13.5
-dec_obs = -72.63
-P_obs = binary_evolve.A_to_P(M1_obs, M2_obs, A_obs)
-
-# Birth position
-ra_b = 13.51
-dec_b = -72.7
-
-# Truths
-truths=[M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b]
-
-
-############## Print prior, posterior probabilities ##############
-x = M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b
-y = ra_obs, dec_obs, M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b
-args = M2_obs, M2_d_err, P_obs, P_orb_obs_err, ecc_obs, ecc_obs_err, ra_obs, dec_obs
-
-prior_truths = stats.ln_priors(y)
-posterior_truths = stats.ln_posterior(x, args)
-print "Prior:", prior_truths
-print "Posterior:", posterior_truths
+ra_J0045 = coor_J0045.ra.degree
+dec_J0045 = coor_J0045.dec.degree
+M2_d_J0045 = 8.8  # M2 in Msun
+M2_d_J0045_err = 1.8
+P_orb_J0045 = 51.17  # P_orb in days
+P_orb_J0045_err = 1.0
+ecc_J0045 = 0.808  # eccentricity
+ecc_J0045_err = 0.05
 
 
 
 ############## Run sampler ###################
 start_time = time.time()
 
-sampler1, sampler2, sampler3, sampler4, sampler = stats.run_emcee_2(M2_obs, P_obs, ecc_obs, ra_obs, dec_obs, \
-    M2_d_err=M2_d_err, P_orb_obs_err=P_orb_obs_err, ecc_obs_err=ecc_obs_err, \
+
+sampler1, sampler2, sampler3, sampler4, sampler = stats.run_emcee(M2_d_J0045, P_orb_J0045, ecc_J0045, ra_J0045, dec_J0045, \
+    M2_d_err=M2_d_J0045_err, P_orb_obs_err=P_orb_J0045_err, ecc_obs_err=ecc_J0045_err, \
     nburn=5000, nsteps=10000)
 
 print "Simulation took", time.time()-start_time, "seconds"
@@ -77,9 +48,9 @@ print "Simulation took", time.time()-start_time, "seconds"
 ############## Corner pyplot ###################
 labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
 hist2d_kwargs = {"plot_datapoints" : False}
-fig = corner.corner(sampler.flatchain, labels=labels, truths=truths, **hist2d_kwargs)
+fig = corner.corner(sampler.flatchain, labels=labels, **hist2d_kwargs)
 plt.rc('font', size=18)
-plt.savefig('../figures/sys1_corner_multiburn.pdf')
+plt.savefig('../figures/J0045_corner_multiburn.pdf')
 plt.rc('font', size=10)
 
 
@@ -99,11 +70,9 @@ for i in np.arange(10):
     ax[a,b].set_xlabel(labels[i])
 
     ax[a,b].set_ylim(-30,0)
-    ax[a,b].axhline(posterior_truths)
-    ax[a,b].axvline(truths[i], color='r')
 
 plt.tight_layout()
-plt.savefig('../figures/sys1_posterior_params_multiburn.pdf')
+plt.savefig('../figures/J0045_posterior_params_multiburn.pdf')
 
 
 ################# Chains plot #####################
@@ -140,12 +109,6 @@ for i in range(sampler1.dim):
         ax[i,3].set_xticklabels([])
         ax[i,4].set_xticklabels([])
 
-    # Add truths as a red lines across entire plot
-    ax[i,0].axhline(truths[i], color='r')
-    ax[i,1].axhline(truths[i], color='r')
-    ax[i,2].axhline(truths[i], color='r')
-    ax[i,3].axhline(truths[i], color='r')
-    ax[i,4].axhline(truths[i], color='r')
 
 # Make all plots have the same y-range - plots must already be created
 for i in range(sampler1.dim):
@@ -160,7 +123,7 @@ for i in range(sampler1.dim):
 
 fig.subplots_adjust(hspace=0, wspace=0)
 plt.yticks(fontsize = 8)
-plt.savefig('../figures/sys1_chain_multiburn.pdf')
+plt.savefig('../figures/J0045_chain_multiburn.pdf')
 
 
 
@@ -173,4 +136,4 @@ print "Burn-in 4:", sampler4.acor
 print "Production run:", sampler.acor
 
 # Save samples
-pickle.dump( sampler, open( "../data/sys1_MCMC_multiburn_sampler.obj", "wb" ) )
+pickle.dump( sampler, open( "../data/J0045_MCMC_multiburn_sampler.obj", "wb" ) )
