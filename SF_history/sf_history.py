@@ -805,6 +805,6 @@ def get_SMC_plot_polar(age, ax=None, ra_dist=None, dec_dist=None, ra=None, dec=N
         Z = pdf.T
 
         # Plot contours
-        contour = plt.contour(X, Y, Z, levels=levels[::-1], origin="lower")
+        contour = plt.contour(X, Y, Z, levels=levels[::-1], origin="lower", colors=['k'])
 
     return smc_plot
