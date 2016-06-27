@@ -58,7 +58,7 @@ labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", 
 for i in np.arange(10):
     a = np.int(i/5)
     b = i%5
-    corner.hist2d(sampler.chain[:,:,i], sampler.lnprobability, ax=ax[a,b], bins=30)
+    corner.hist2d(sampler.chain[:,:,i], sampler.lnprobability, ax=ax[a,b], bins=20)
     ax[a,b].set_xlabel(labels[i])
 plt.tight_layout()
 plt.savefig('../figures/sys2_likelihoods.pdf')

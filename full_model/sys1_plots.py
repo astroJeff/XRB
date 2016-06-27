@@ -58,7 +58,7 @@ labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", 
 for i in np.arange(10):
     a = np.int(i/5)
     b = i%5
-    corner.hist2d(sampler.chain[:,:,i], sampler.lnprobability, ax=ax[a,b], bins=30)
+    corner.hist2d(sampler.chain[:,:,i], sampler.lnprobability, ax=ax[a,b], bins=20)
     ax[a,b].set_xlabel(labels[i])
 plt.tight_layout()
 plt.savefig('../figures/sys1_likelihoods.pdf')
@@ -68,7 +68,7 @@ plt.savefig('../figures/sys1_likelihoods.pdf')
 plt.rc('font', size=18)
 labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
 truths = [M1_true, M2_true, A_true, ecc_true, v_k_true, theta_true, phi_true, ra_true, dec_true, t_b_true]
-fig = corner.corner(sampler.flatchain, labels=labels, truths=truths, bins=30)
+fig = corner.corner(sampler.flatchain, labels=labels, truths=truths, bins=20)
 
 ax2 = plt.subplot2grid((5,5), (0,3), colspan=2, rowspan=2)
 ra_out = sampler.flatchain.T[7]
