@@ -664,7 +664,8 @@ def get_SMC_plot(age, ax=None):
     return smc_plot
 
 
-def get_SMC_plot_polar(age, ax=None, ra_dist=None, dec_dist=None, ra=None, dec=None):
+def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_dist=None,
+        ra=None, dec=None, xlabel="Right Ascension", ylabel="Declination", xgrid_density=8, ygrid_density=5):
     """ return a plot of the star formation history of the SMC at a particular age.
     In this case, the plot should be curvelinear, instead of flattened.
 
@@ -672,12 +673,18 @@ def get_SMC_plot_polar(age, ax=None, ra_dist=None, dec_dist=None, ra=None, dec=N
     ----------
     age : float
         Star formation history age to calculate (Myr)
-    ax : matplotlib.Axes (optional)
+    fig : matplotlib.figure (optional)
         If supplied, plot the contour to this axis. Otherwise, open a new figure
+    rect : int
+        Subplot number
     ra_dist, dec_dist : array (optional)
         If supplied, plots contours around the distribution of these inputs
     ra, dec : float (optional)
         If supplied, plot a red star at these coordinates (degrees)
+    xlabel, ylabel : string (optional)
+        X-axis, y-axis label
+    xgrid_density, ygrid_density : int (optional)
+        Density of RA, Dec grid axes
 
     Returns
     -------
@@ -691,7 +698,7 @@ def get_SMC_plot_polar(age, ax=None, ra_dist=None, dec_dist=None, ra=None, dec=N
     from mpl_toolkits.axisartist import SubplotHost
     from mpl_toolkits.axisartist import GridHelperCurveLinear
 
-    def curvelinear_test2(fig, rect=111):
+    def curvelinear_test2(fig, rect=111, xlabel=xlabel, ylabel=ylabel, xgrid_density=8, ygrid_density=5):
         """
         polar projection, but in a rectangular box.
         """
@@ -708,9 +715,9 @@ def get_SMC_plot_polar(age, ax=None, ra_dist=None, dec_dist=None, ra=None, dec=N
                                                         lat_minmax = (-90, np.inf),
                                                         )
 
-        grid_locator1 = angle_helper.LocatorHMS(8) #changes theta gridline count
+        grid_locator1 = angle_helper.LocatorHMS(xgrid_density) #changes theta gridline count
         tick_formatter1 = angle_helper.FormatterHMS()
-        grid_locator2 = angle_helper.LocatorDMS(5) #changes theta gridline count
+        grid_locator2 = angle_helper.LocatorDMS(ygrid_density) #changes theta gridline count
         tick_formatter2 = angle_helper.FormatterDMS()
 
 
@@ -741,8 +748,12 @@ def get_SMC_plot_polar(age, ax=None, ra_dist=None, dec_dist=None, ra=None, dec=N
         ax1.set_xlim(-1.5, 1.4) # moves the origin left-right in ax1
         ax1.set_ylim(15.8, 18.8) # moves the origin up-down
 
-        ax1.set_ylabel('Declination')
-        ax1.set_xlabel('Right Ascension')
+        if xlabel is not None:
+            ax1.set_xlabel(xlabel)
+        if ylabel is not None:
+            ax1.set_ylabel(ylabel)
+        # ax1.set_ylabel('Declination')
+        # ax1.set_xlabel('Right Ascension')
         ax1.grid(True, linestyle='-')
         #ax1.grid(linestyle='--', which='x') # either keyword applies to both
         #ax1.grid(linestyle=':', which='y')  # sets of gridlines
@@ -750,12 +761,17 @@ def get_SMC_plot_polar(age, ax=None, ra_dist=None, dec_dist=None, ra=None, dec=N
         return ax1,tr
 
 
+    # User supplied input
+    if fig_in is None:
+        fig = plt.figure(1, figsize=(8, 6))
+        fig.clf()
+    else:
+        fig = fig_in
 
-    fig = plt.figure(1, figsize=(8, 6))
-    fig.clf()
-
-    ax1, tr = curvelinear_test2(fig,111) # tr.transform_point((x, 0)) is always (0,0)
-                            # => (theta, r) in but (r, theta) out...
+    # tr.transform_point((x, 0)) is always (0,0)
+            # => (theta, r) in but (r, theta) out...
+    ax1, tr = curvelinear_test2(fig, rect, xlabel=xlabel, ylabel=ylabel,
+                    xgrid_density=xgrid_density, ygrid_density=ygrid_density)
 
     # Load star formation histories
     if smc_coor is None: load_smc_coor()
