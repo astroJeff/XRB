@@ -81,7 +81,7 @@ HMXB_Lx = np.zeros(l)
 
 for i in np.arange(l):
 
-    s = sampler.flatchain[l]
+    s = sampler.flatchain[i]
 
     # Run forward model
     data_out = pop_synth.full_forward(s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[9])
