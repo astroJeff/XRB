@@ -69,15 +69,19 @@ plt.savefig('../figures/smc_population_A_ecc.pdf')
 
 # Now, we want to run all the sampler positions forward to
 # get the distribution today of HMXBs
-HMXB_ra = np.array([])
-HMXB_dec = np.array([])
-HMXB_Porb = np.array([])
-HMXB_ecc = np.array([])
-HMXB_M2 = np.array([])
-HMXB_vsys = np.array([])
-HMXB_Lx = np.array([])
+l = len(sampler.flatchain)
 
-for s in sampler.flatchain:
+HMXB_ra = np.zeros(l)
+HMXB_dec = np.zeros(l)
+HMXB_Porb = np.zeros(l)
+HMXB_ecc = np.zeros(l)
+HMXB_M2 = np.zeros(l)
+HMXB_vsys = np.zeros(l)
+HMXB_Lx = np.zeros(l)
+
+for i in np.arange(l):
+
+    s = sampler.flatchain[l]
 
     # Run forward model
     data_out = pop_synth.full_forward(s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[9])
@@ -92,13 +96,13 @@ for s in sampler.flatchain:
     Porb = binary_evolve.A_to_P(data_out[0], data_out[1], data_out[5])
 
     # Save outputs
-    HMXB_ra = np.append(HMXB_ra, ra_out)
-    HMXB_dec = np.append(HMXB_dec, dec_out)
-    HMXB_Porb = np.append(HMXB_Porb, Porb)
-    HMXB_ecc = np.append(HMXB_ecc, data_out[6])
-    HMXB_M2 = np.append(HMXB_M2, data_out[1])
-    HMXB_vsys = np.append(HMXB_vsys, data_out[3])
-    HMXB_Lx = np.append(HMXB_Lx, data_out[2])
+    HMXB_ra[i] = ra_out
+    HMXB_dec[i] = dec_out
+    HMXB_Porb[i] = Porb
+    HMXB_ecc[i] = data_out[6]
+    HMXB_M2[i] = data_out[1]
+    HMXB_vsys[i] = data_out[3]
+    HMXB_Lx[i] = data_out[2]
 
 
 # HMXB Orbital period vs. eccentricity
