@@ -23,7 +23,7 @@ import binary_evolve
 M1 = 13.0
 M2 = 10.0
 A = 150.0
-ecc = 0.3
+ecc = 0.7
 v_k = 250.0
 theta = 2.9
 phi = 0.9
@@ -68,9 +68,39 @@ start_time = time.time()
 
 sampler1, sampler2, sampler3, sampler4, sampler = stats.run_emcee_2(M2_obs, P_obs, ecc_obs, ra_obs, dec_obs, \
     M2_d_err=M2_d_err, P_orb_obs_err=P_orb_obs_err, ecc_obs_err=ecc_obs_err, \
-    nburn=5000, nsteps=10000)
+    nburn=10000, nsteps=20000)
 
 print "Simulation took", time.time()-start_time, "seconds"
+
+
+
+
+# Print autocorrelation length
+print "Burn-in 1:"
+print "Autocorrelation lengths", sampler1.acor
+print "Acceptance fraction", sampler1.acceptance_fraction
+
+print "Burn-in 2:"
+print "Autocorrelation lengths", sampler2.acor
+print "Acceptance fraction", sampler2.acceptance_fraction
+
+print "Burn-in 3:"
+print "Autocorrelation lengths", sampler3.acor
+print "Acceptance fraction", sampler3.acceptance_fraction
+
+print "Burn-in 4:"
+print "Autocorrelation lengths", sampler4.acor
+print "Acceptance fraction", sampler4.acceptance_fraction
+
+print "Production run:"
+print "Autocorrelation lengths", sampler.acor
+print "Acceptance fraction", sampler.acceptance_fraction
+
+# Save samples
+pickle.dump( sampler, open( "../data/sys1_MCMC_multiburn_sampler.obj", "wb" ) )
+
+
+
 
 
 
@@ -164,13 +194,3 @@ plt.savefig('../figures/sys1_chain_multiburn.pdf')
 
 
 
-# Print autocorrelation length
-print "Autocorrelation lengths:"
-print "Burn-in 1:", sampler1.acor
-print "Burn-in 2:", sampler2.acor
-print "Burn-in 3:", sampler3.acor
-print "Burn-in 4:", sampler4.acor
-print "Production run:", sampler.acor
-
-# Save samples
-pickle.dump( sampler, open( "../data/sys1_MCMC_multiburn_sampler.obj", "wb" ) )
