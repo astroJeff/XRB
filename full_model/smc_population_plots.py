@@ -26,50 +26,51 @@ import constants as c
 sampler = pickle.load( open( "../data/SMC_MCMC_sampler.obj", "rb" ) )
 
 
-# Chains plot
-fig, ax = plt.subplots(sampler.dim, 1, sharex=True, figsize=(7.0,20.0))
-for i in range(sampler.dim):
-    for chain in sampler.chain[...,i]:
-        ax[i].plot(chain, alpha=0.25, color='k', drawstyle='steps', rasterized=True)
-        yloc = plt.MaxNLocator(3)
-        ax[i].yaxis.set_major_locator(yloc)
-#        ax[i].set_yticks(fontsize=8)
-fig.subplots_adjust(hspace=0)
-plt.yticks(fontsize = 8)
-plt.savefig('../figures/smc_population_chains.pdf', rasterized=True)
+# # Chains plot
+# fig, ax = plt.subplots(sampler.dim, 1, sharex=True, figsize=(7.0,20.0))
+# for i in range(sampler.dim):
+#     for chain in sampler.chain[...,i]:
+#         ax[i].plot(chain, alpha=0.25, color='k', drawstyle='steps', rasterized=True)
+#         yloc = plt.MaxNLocator(3)
+#         ax[i].yaxis.set_major_locator(yloc)
+# fig.subplots_adjust(hspace=0)
+# plt.yticks(fontsize = 8)
+# plt.savefig('../figures/smc_population_chains.pdf', rasterized=True)
 
 
-# Corner plot
-labels = [r"$M_1$", r"$M_2$", r"$a$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
-plt_range = ([7,24], [2.5,15], [0,1500], [0,1], [0,450], [0,np.pi], [0,2.0*np.pi], [6,21], [-76,-70], [0,70])
-hist2d_kwargs = {"plot_datapoints" : False}
-fig = corner.corner(sampler.flatchain, labels=labels, range=plt_range, bins=40, max_n_ticks=4, **hist2d_kwargs)
-plt.rc('font', size=18)
-plt.savefig('../figures/smc_population_corner.pdf')
-plt.rc('font', size=10)
+# # Corner plot
+# labels = [r"$M_1$", r"$M_2$", r"$a$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
+# plt_range = ([7,24], [2.5,15], [0,1500], [0,1], [0,450], [0,np.pi], [0,2.0*np.pi], [6,21], [-76,-70], [0,70])
+# hist2d_kwargs = {"plot_datapoints" : False}
+# fig = corner.corner(sampler.flatchain, labels=labels, range=plt_range, bins=40, max_n_ticks=4, **hist2d_kwargs)
+# plt.rc('font', size=18)
+# plt.savefig('../figures/smc_population_corner.pdf')
+# plt.rc('font', size=10)
 
 
-# M1 vs. M2
-fig, host = plt.subplots(figsize=(5,5))
-plt_range = ([7,25], [2.5,15])
-corner.hist2d(sampler.flatchain.T[0], sampler.flatchain.T[1], bins=40, range=plt_range, plot_datapoints=False)
-plt.xlabel(r"$M_1$", size=16)
-plt.ylabel(r"$M_2$", size=16)
-plt.savefig('../figures/smc_population_M1_M2.pdf')
+# # M1 vs. M2
+# fig, host = plt.subplots(figsize=(5,5))
+# plt_range = ([7,25], [2.5,15])
+# corner.hist2d(sampler.flatchain.T[0], sampler.flatchain.T[1], bins=40, range=plt_range, plot_datapoints=False)
+# plt.xlabel(r"$M_1$", size=16)
+# plt.ylabel(r"$M_2$", size=16)
+# plt.savefig('../figures/smc_population_M1_M2.pdf')
 
-# Orbital separation vs. eccentricity
-fig, host = plt.subplots(figsize=(5,5))
-plt_range = ([0,2000], [0,1])
-corner.hist2d(sampler.flatchain.T[2], sampler.flatchain.T[3], bins=40, range=plt_range, plot_datapoints=False)
-plt.xlabel(r"$a$", size=16)
-plt.ylabel(r"$e$", size=16)
-plt.savefig('../figures/smc_population_A_ecc.pdf')
+# # Orbital separation vs. eccentricity
+# fig, host = plt.subplots(figsize=(5,5))
+# plt_range = ([0,2000], [0,1])
+# corner.hist2d(sampler.flatchain.T[2], sampler.flatchain.T[3], bins=40, range=plt_range, plot_datapoints=False)
+# plt.xlabel(r"$a$", size=16)
+# plt.ylabel(r"$e$", size=16)
+# plt.savefig('../figures/smc_population_A_ecc.pdf')
 
 
 
 # Now, we want to run all the sampler positions forward to
 # get the distribution today of HMXBs
-l = len(sampler.flatchain)
+l = len(sampler.flatchain.T[0])
+
+print "length:", l
 
 HMXB_ra = np.zeros(l)
 HMXB_dec = np.zeros(l)
@@ -78,6 +79,7 @@ HMXB_ecc = np.zeros(l)
 HMXB_M2 = np.zeros(l)
 HMXB_vsys = np.zeros(l)
 HMXB_Lx = np.zeros(l)
+HMXB_theta = np.zeros(l)
 
 for i in np.arange(l):
 
@@ -103,7 +105,7 @@ for i in np.arange(l):
     HMXB_M2[i] = data_out[1]
     HMXB_vsys[i] = data_out[3]
     HMXB_Lx[i] = data_out[2]
-
+    HMXB_theta[i] = data_out[7] * 180.0*3600.0/np.pi
 
 # HMXB Orbital period vs. eccentricity
 fig, ax = plt.subplots(3, 1, figsize=(5,5))
@@ -118,7 +120,7 @@ plt.xlabel(r"$M_2$", size=16)
 plt.ylabel(r"$v_{\rm sys}$", size=16)
 
 plt_range = ([0, 70], [0,200])
-corner.hist2d(sampler.flatchain.T[9], data_out[7]*180.0/np.pi*3600.0, ax=ax[2], bins=40, range=plt_range, plot_datapoints=False)
+corner.hist2d(sampler.flatchain.T[9], HMXB_theta, ax=ax[2], bins=40, range=plt_range, plot_datapoints=False)
 plt.xlabel(r"$t_i$", size=16)
 plt.ylabel(r"$\theta$", size=16)
 
