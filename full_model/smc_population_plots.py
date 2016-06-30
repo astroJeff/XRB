@@ -66,6 +66,8 @@ sampler = pickle.load( open( "../data/SMC_MCMC_sampler.obj", "rb" ) )
 
 
 
+
+
 # Now, we want to run all the sampler positions forward to
 # get the distribution today of HMXBs
 l = len(sampler.flatchain.T[0])
@@ -105,24 +107,35 @@ for i in np.arange(l):
     HMXB_M2[i] = data_out[1]
     HMXB_vsys[i] = data_out[3]
     HMXB_Lx[i] = data_out[2]
-    HMXB_theta[i] = data_out[7] * 180.0*3600.0/np.pi
+    HMXB_theta[i] = data_out[7] * 180.0*60.0/np.pi
+
+# Save current HMXB parameters as an object
+HMXB = np.array([HMXB_ra, HMXB_dec, HMXB_Porb, HMXB_ecc, HMXB_M2, HMXB_vsys, HMXB_Lx, HMXB_theta])
+pickle.dump( sampler, open( "../data/SMC_MCMC_HMXB.obj", "wb" ) )
+
+
+
+
+
 
 # HMXB Orbital period vs. eccentricity
 fig, ax = plt.subplots(3, 1, figsize=(5,5))
-plt_range = ([0, 1.0e7], [0,1])
+plt_range = ([0, 1.0e5], [0,1])
 corner.hist2d(HMXB_Porb, HMXB_ecc, ax=ax[0], bins=40, range=plt_range, plot_datapoints=False)
-plt.xlabel(r"$P_{\rm orb}$", size=16)
-plt.ylabel(r"$e$", size=16)
+ax[0].set_xlabel(r"$P_{\rm orb}$ (days)", size=16)
+ax[0].set_ylabel(r"$e$", size=16)
 
-plt_range = ([5, 20], [0,200])
+plt_range = ([8, 24], [0,100])
 corner.hist2d(HMXB_M2, HMXB_vsys, ax=ax[1], bins=40, range=plt_range, plot_datapoints=False)
-plt.xlabel(r"$M_2$", size=16)
-plt.ylabel(r"$v_{\rm sys}$", size=16)
+ax[1].set_xlabel(r"$M_2$ (R$_{\odot}$)", size=16)
+ax[1].set_ylabel(r"$v_{\rm sys}$ (km s$^{-1}$)", size=16)
 
-plt_range = ([0, 70], [0,200])
+plt_range = ([0, 55], [0,4])
 corner.hist2d(sampler.flatchain.T[9], HMXB_theta, ax=ax[2], bins=40, range=plt_range, plot_datapoints=False)
-plt.xlabel(r"$t_i$", size=16)
-plt.ylabel(r"$\theta$", size=16)
+ax[2].set_xlabel(r"$t_i$ (Myr)", size=16)
+ax[2].set_ylabel(r"$\theta$ (amin)", size=16)
+
+plt.tight_layout()
 
 plt.savefig('../figures/smc_population_HMXB.pdf')
 
@@ -130,7 +143,16 @@ plt.savefig('../figures/smc_population_HMXB.pdf')
 
 
 
+
 # Birth location
+fig, host = plt.subplots(figsize=(5,5))
+sf_history.get_SMC_plot(30.0)
+plt_kwargs = {'colors':'k'}
+density_contour.density_contour(sampler.flatchain.T[7], sampler.flatchain.T[8], nbins_x=40, nbins_y=40, **plt_kwargs)
+plt.savefig('../figures/smc_population_ra_dec.pdf')
+
+
+# Current location
 fig, host = plt.subplots(figsize=(5,5))
 sf_history.get_SMC_plot(30.0)
 plt_kwargs = {'colors':'k'}
