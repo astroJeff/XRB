@@ -665,7 +665,8 @@ def get_SMC_plot(age, ax=None):
 
 
 def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_dist=None,
-        ra=None, dec=None, xlabel="Right Ascension", ylabel="Declination", xgrid_density=8, ygrid_density=5):
+        ra=None, dec=None, xcenter=0.0, ycenter=17.3, xwidth=1.5, ywidth=1.5,
+        xlabel="Right Ascension", ylabel="Declination", xgrid_density=8, ygrid_density=5):
     """ return a plot of the star formation history of the SMC at a particular age.
     In this case, the plot should be curvelinear, instead of flattened.
 
@@ -681,6 +682,10 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
         If supplied, plots contours around the distribution of these inputs
     ra, dec : float (optional)
         If supplied, plot a red star at these coordinates (degrees)
+    xcenter, ycenter : float (optional)
+        If supplied, center the x,y-axis on these coordinates
+    xwidth, ywidth : float (optional)
+        If supplied, determines the scale of the plot
     xlabel, ylabel : string (optional)
         X-axis, y-axis label
     xgrid_density, ygrid_density : int (optional)
@@ -698,7 +703,8 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
     from mpl_toolkits.axisartist import SubplotHost
     from mpl_toolkits.axisartist import GridHelperCurveLinear
 
-    def curvelinear_test2(fig, rect=111, xlabel=xlabel, ylabel=ylabel, xgrid_density=8, ygrid_density=5):
+    def curvelinear_test2(fig, rect=111, xcenter=0.0, ycenter=17.3, xwidth=1.5, ywidth=1.5,
+            xlabel=xlabel, ylabel=ylabel, xgrid_density=8, ygrid_density=5):
         """
         polar projection, but in a rectangular box.
         """
@@ -745,8 +751,10 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
         grid_helper = ax1.get_grid_helper()
 
         # These move the grid
-        ax1.set_xlim(-1.5, 1.4) # moves the origin left-right in ax1
-        ax1.set_ylim(15.8, 18.8) # moves the origin up-down
+        ax1.set_xlim(xcenter-xwidth, xcenter+xwidth) # moves the origin left-right in ax1
+        ax1.set_ylim(ycenter-ywidth, ycenter+ywidth) # moves the origin up-down
+        # ax1.set_xlim(-1.5, 1.4)
+        # ax1.set_ylim(15.8, 18.8)
 
         if xlabel is not None:
             ax1.set_xlabel(xlabel)
@@ -770,7 +778,8 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
 
     # tr.transform_point((x, 0)) is always (0,0)
             # => (theta, r) in but (r, theta) out...
-    ax1, tr = curvelinear_test2(fig, rect, xlabel=xlabel, ylabel=ylabel,
+    ax1, tr = curvelinear_test2(fig, rect, xcenter=xcenter, ycenter=ycenter, 
+                    xwidth=xwidth, ywidth=ywidth, xlabel=xlabel, ylabel=ylabel,
                     xgrid_density=xgrid_density, ygrid_density=ygrid_density)
 
     # Load star formation histories
