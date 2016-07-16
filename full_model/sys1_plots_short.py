@@ -19,8 +19,8 @@ import density_contour
 # System 1 test parameters
 M1_true = 13.0
 M2_true = 10.0
-A_true = 100.0
-ecc_true = 0.3
+A_true = 150.0
+ecc_true = 0.7
 v_k_true = 250.0
 theta_true = 2.9
 phi_true = 0.9
@@ -31,7 +31,7 @@ t_b_true = 22.0
 
 
 # Load pickled data
-sampler = pickle.load( open( "../data/sys1_MCMC_sampler.obj", "rb" ) )
+sampler = pickle.load( open( "../data/sys1_MCMC_multiburn_sampler.obj", "rb" ) )
 # init_params = pickle.load( open( "../data/sys1_pop_synth_init_conds.obj", "rb" ) )
 # HMXB = pickle.load( open( "../data/sys1_pop_synth_HMXB.obj", "rb" ) )
 
@@ -64,6 +64,26 @@ sampler = pickle.load( open( "../data/sys1_MCMC_sampler.obj", "rb" ) )
 # plt.savefig('../figures/sys1_likelihoods.pdf')
 
 
+
+############## Corner pyplot ###################
+plt.rc('font', size=18)
+
+truths = [M1_true, M2_true, A_true, ecc_true, v_k_true, theta_true, phi_true, ra_true, dec_true, t_b_true]
+labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
+hist2d_kwargs = {"plot_datapoints" : False}
+fig = corner.corner(sampler.flatchain, labels=labels, truths=truths, **hist2d_kwargs)
+
+ax2 = plt.subplot2grid((5,5), (0,3), colspan=2, rowspan=2)
+ra_out = sampler.flatchain.T[7]
+dec_out = sampler.flatchain.T[8]
+ra_obs = 13.5
+dec_obs = -72.63
+sf_history.get_SMC_plot_polar(22, ra_dist=ra_out, dec_dist=dec_out, ra=ra_obs, dec=dec_obs)
+
+plt.savefig('../figures/sys1_corner_multiburn_test.pdf')
+plt.rc('font', size=10)
+
+
 # Corner plot
 # plt.rc('font', size=18)
 # labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
@@ -81,12 +101,12 @@ sampler = pickle.load( open( "../data/sys1_MCMC_sampler.obj", "rb" ) )
 
 
 # Birth location distribution
-plt.figure(figsize=(8,8))
-ra_out = sampler.flatchain.T[7]
-dec_out = sampler.flatchain.T[8]
-sf_history.get_SMC_plot_polar(t_b_true, ra_dist=ra_out, dec_dist=dec_out, ra=ra_true, dec=dec_true)
-
-plt.savefig('../figures/sys1_dist_birth_location.pdf')
+# plt.figure(figsize=(8,8))
+# ra_out = sampler.flatchain.T[7]
+# dec_out = sampler.flatchain.T[8]
+# sf_history.get_SMC_plot_polar(t_b_true, ra_dist=ra_out, dec_dist=dec_out, ra=ra_true, dec=dec_true)
+#
+# plt.savefig('../figures/sys1_dist_birth_location.pdf')
 
 
 
