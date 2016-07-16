@@ -5,7 +5,7 @@ import scipy.optimize as so
 def find_confidence_interval(x, pdf, confidence_level):
     return pdf[pdf > x].sum() - confidence_level
 
-def density_contour(xdata, ydata, nbins_x, nbins_y, ax=None, **contour_kwargs):
+def density_contour(xdata, ydata, nbins_x, nbins_y, ax=None, sigma=False, **contour_kwargs):
     """ Create a density contour plot.
     Parameters
     ----------
@@ -17,6 +17,8 @@ def density_contour(xdata, ydata, nbins_x, nbins_y, ax=None, **contour_kwargs):
         Number of bins along y dimension
     ax : matplotlib.Axes (optional)
         If supplied, plot the contour to this axis. Otherwise, open a new figure
+    sigma : bool
+	Use 1, 2, and 3-sigma confidence levels as contours, quantiles otherwise
     contour_kwargs : dict
         kwargs to be passed to pyplot.contour()
     """
@@ -27,10 +29,17 @@ def density_contour(xdata, ydata, nbins_x, nbins_y, ax=None, **contour_kwargs):
 
     pdf = (H*(x_bin_sizes*y_bin_sizes))
 
-    one_sigma = so.brentq(find_confidence_interval, 0., 1., args=(pdf, 0.68))
-    two_sigma = so.brentq(find_confidence_interval, 0., 1., args=(pdf, 0.95))
-    three_sigma = so.brentq(find_confidence_interval, 0., 1., args=(pdf, 0.99))
-    levels = [one_sigma, two_sigma, three_sigma]
+    if sigma:
+       one_sigma = so.brentq(find_confidence_interval, 0., 1., args=(pdf, 0.68))
+       two_sigma = so.brentq(find_confidence_interval, 0., 1., args=(pdf, 0.95))
+       three_sigma = so.brentq(find_confidence_interval, 0., 1., args=(pdf, 0.99))
+       levels = [one_sigma, two_sigma, three_sigma]
+    else:
+       one_quarter = so.brentq(find_confidence_interval, 0., 1., args=(pdf, 0.25))
+       two_quarter = so.brentq(find_confidence_interval, 0., 1., args=(pdf, 0.50))
+       three_quarter = so.brentq(find_confidence_interval, 0., 1., args=(pdf, 0.75))
+       levels = [one_quarter, two_quarter, three_quarter]
+
 
     X, Y = 0.5*(xedges[1:]+xedges[:-1]), 0.5*(yedges[1:]+yedges[:-1])
     Z = pdf.T

@@ -68,7 +68,7 @@ start_time = time.time()
 
 sampler1, sampler2, sampler3, sampler4, sampler = stats.run_emcee_2(M2_obs, P_obs, ecc_obs, ra_obs, dec_obs, \
     M2_d_err=M2_d_err, P_orb_obs_err=P_orb_obs_err, ecc_obs_err=ecc_obs_err, \
-    nburn=10000, nsteps=20000)
+    nburn=10000, nsteps=50000)
 
 print "Simulation took", time.time()-start_time, "seconds"
 
