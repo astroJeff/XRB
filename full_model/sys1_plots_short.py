@@ -80,7 +80,7 @@ ra_obs = 13.5
 dec_obs = -72.63
 sf_history.get_SMC_plot_polar(22, fig_in=fig, rect=333, ra_dist=ra_out, dec_dist=dec_out, ra=ra_obs, dec=dec_obs, xwidth=0.5, ywidth=0.5, xgrid_density=6)
 
-plt.tight_layout()
+#plt.tight_layout()
 
 plt.savefig('../figures/sys1_corner_multiburn.pdf')
 plt.rc('font', size=10)

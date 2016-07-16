@@ -78,9 +78,9 @@ ra_out = sampler.flatchain.T[7]
 dec_out = sampler.flatchain.T[8]
 ra_obs = 15.9
 dec_obs = -72.25
-sf_history.get_SMC_plot_polar(50, fig_in=fig, rect=333, ra_dist=ra_out, dec_dist=dec_out, ra=ra_obs, dec=dec_obs, xwidth=0.5, ywidth=0.5, xgrid_density=6)
+sf_history.get_SMC_plot_polar(50, fig_in=fig, rect=333, ra_dist=ra_out, dec_dist=dec_out, ra=ra_obs, dec=dec_obs, xcenter=-0.7, ycenter=17.8, xwidth=0.5, ywidth=0.5, xgrid_density=6)
 
-plt.tight_layout()
+#plt.tight_layout()
 plt.savefig('../figures/sys2_corner_multiburn.pdf')
 
 
