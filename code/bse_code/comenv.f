@@ -38,6 +38,9 @@
 *
 * Common envelope evolution - entered only when KW1 = 2, 3, 4, 5, 6, 8 or 9.
 *
+
+      write(*,*) "Entered a common envelope"
+      
 * For simplicity energies are divided by -G.
 *
       TWOPI = 2.D0*ACOS(-1.D0)

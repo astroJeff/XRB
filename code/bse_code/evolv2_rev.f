@@ -433,6 +433,8 @@
          sqome2 = SQRT(omecc2)
 *
 * TESTING
+         write(*,*) "Wind:", tphys, mass(1), mass(2),
+     &            kstar(1), kstar(2)
          djorb = ((dmr(1)+q(1)*dmt(1))*mass(2)*mass(2) +
      &            (dmr(2)+q(2)*dmt(2))*mass(1)*mass(1))*
      &           sep*sep*sqome2*oorb/(mass(1)+mass(2))**2
@@ -1251,6 +1253,7 @@
 *
          m1ce = mass(j1)
          m2ce = mass(j2)
+         write(*,*) "Common envelope 3"
          CALL comenv(mass0(j1),mass(j1),massc(j1),aj(j1),jspin(j1),
      &               kstar(j1),mass0(j2),mass(j2),massc(j2),aj(j2),
      &               jspin(j2),kstar(j2),zpars,ecc,sep,jorb,coel,
@@ -1657,6 +1660,8 @@
 * Calculate orbital angular momentum change due to system mass loss.
 *
 * TESTING
+         write(*,*) "RLOF:", tphys, mass(1), mass(2),
+     &            kstar(1), kstar(2)
          djorb = ((dmr(1)+q(1)*dmt(1))*mass(2)*mass(2) +
      &            (dmr(2)+q(2)*dmt(2))*mass(1)*mass(1))/
      &           (mass(1)+mass(2))**2
@@ -2146,12 +2151,14 @@
       bpp(jp,10) = 5.0
 *
       if(kstar(j1).ge.2.and.kstar(j1).le.9.and.kstar(j1).ne.7)then
+         write(*,*) "Common envelope 1:", rad(1), rol(1), rad(2), sep
          CALL comenv(mass0(j1),mass(j1),massc(j1),aj(j1),jspin(j1),
      &               kstar(j1),mass0(j2),mass(j2),massc(j2),aj(j2),
      &               jspin(j2),kstar(j2),zpars,ecc,sep,jorb,coel,
      &               vk,theta_in,phi_in)
          com = .true.
       elseif(kstar(j2).ge.2.and.kstar(j2).le.9.and.kstar(j2).ne.7)then
+         write(*,*) "Common envelope 2"
          CALL comenv(mass0(j2),mass(j2),massc(j2),aj(j2),jspin(j2),
      &               kstar(j2),mass0(j1),mass(j1),massc(j1),aj(j1),
      &               jspin(j1),kstar(j1),zpars,ecc,sep,jorb,coel,
