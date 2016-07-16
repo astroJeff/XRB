@@ -73,14 +73,16 @@ labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", 
 hist2d_kwargs = {"plot_datapoints" : False}
 fig = corner.corner(sampler.flatchain, labels=labels, truths=truths, **hist2d_kwargs)
 
-ax2 = plt.subplot2grid((5,5), (0,3), colspan=2, rowspan=2)
+#ax2 = plt.subplot2grid((5,5), (0,3), colspan=2, rowspan=2)
 ra_out = sampler.flatchain.T[7]
 dec_out = sampler.flatchain.T[8]
 ra_obs = 13.5
 dec_obs = -72.63
-sf_history.get_SMC_plot_polar(22, ax=ax2, ra_dist=ra_out, dec_dist=dec_out, ra=ra_obs, dec=dec_obs)
+sf_history.get_SMC_plot_polar(22, fig_in=fig, rect=333, ra_dist=ra_out, dec_dist=dec_out, ra=ra_obs, dec=dec_obs, xwidth=0.5, ywidth=0.5, xgrid_density=6)
 
-plt.savefig('../figures/sys1_corner_multiburn_test.pdf')
+plt.tight_layout()
+
+plt.savefig('../figures/sys1_corner_multiburn.pdf')
 plt.rc('font', size=10)
 
 
