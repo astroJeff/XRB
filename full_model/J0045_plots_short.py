@@ -24,7 +24,7 @@ dec_J0045 = coor_J0045.dec.degree
 
 
 # Load pickled data
-sampler = pickle.load( open( "../data/J0045_MCMC_sampler.obj", "rb" ) )
+sampler = pickle.load( open( "../data/J0045_MCMC_multiburn_sampler.obj", "rb" ) )
 #init_params_J0045 = pickle.load( open( "../data/J0045_pop_synth_init_conds.obj", "rb" ) )
 #HMXB_J0045 = pickle.load( open( "../data/J0045_pop_synth_HMXB.obj", "rb" ) )
 
@@ -56,11 +56,19 @@ sampler = pickle.load( open( "../data/J0045_MCMC_sampler.obj", "rb" ) )
 
 
 # Corner plot
-#labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
-#fig = corner.corner(sampler.flatchain, labels=labels)
-#plt.rc('font', size=18)
-#plt.savefig('../figures/J0045_corner.pdf')
-#plt.rc('font', size=10)
+plt.rc('font', size=18)
+
+labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
+fig = corner.corner(sampler.flatchain, labels=labels, **hist2d_kwargs)
+
+ra_out = sampler.flatchain.T[7]
+dec_out = sampler.flatchain.T[8]
+sf_history.get_SMC_plot_polar(50, fig_in=fig, rect=333, ra_dist=ra_out, dec_dist=dec_out, ra=ra_J0045, dec=dec_J0045, xwidth=1.0, ywidth=1.0, xgrid_density=6)
+
+plt.tight_layout()
+
+plt.savefig('../figures/J0045_corner_multiburn.pdf')
+plt.rc('font', size=10)
 
 
 # # Chains plot
@@ -93,11 +101,11 @@ sampler = pickle.load( open( "../data/J0045_MCMC_sampler.obj", "rb" ) )
 #plt.savefig('../figures/J0045_dist_birth_location.pdf')
 
 # Better birth distribution plot
-plt.figure(figsize=(8,8))
-ra_out = sampler.flatchain.T[7]
-dec_out = sampler.flatchain.T[8]
-sf_history.get_SMC_plot_polar(50, ra_dist=ra_out, dec_dist=dec_out, ra=ra_J0045, dec=dec_J0045)
-plt.savefig('../figures/J0045_dist_birth_location.pdf')
+# plt.figure(figsize=(8,8))
+# ra_out = sampler.flatchain.T[7]
+# dec_out = sampler.flatchain.T[8]
+# sf_history.get_SMC_plot_polar(50, ra_dist=ra_out, dec_dist=dec_out, ra=ra_J0045, dec=dec_J0045)
+# plt.savefig('../figures/J0045_dist_birth_location.pdf')
 
 
 
