@@ -524,17 +524,19 @@ Since $C_{\theta}$ depends on the $t$, we must generate random samples in $t$ fi
 
 
 
-
-\subsection{Likelihood Function} \label{sec:likelihood_indiv}
-%\subsubsection{Position Probability: $P( \alpha, \delta \given \alpha_i, \delta_i, t_i, M_{1,i}, v_{\rm sys} )$} \label{sec:ra_dec}
-
 \subsection{Binary Parameter Likelihood}
 
-Our method can adapt to any observations of individual stellar parameters.
+Given a birth time and a particular initial binary parameters, this term provides the probability that a binary with a particular $P'_{\rm orb}$, $e'$, and $M'_2$ will be formed. For HMXBs, determining this term relies first on the evolution through three separate evolutionary transitions described in Section \ref{sec:binary_evolve}. This provides the term $P(P_{\rm orb}, e, M_2, v_{\rm sys} \given M_{1,i}, M_{2,i}, a_i, e_i, \vec{v}_k, t_i)$ in Equation \ref{eq:marginalized}. 
 
-For HMXBs, we use three separate observables: $M'_2, P_{\rm obs},$ and $e$.
+Then we need to compare with observations of the system. We will assume the HMXBs in our population each have three separate observables: $M'_2$, $P_{\rm obs}$, and $e$, and that these each have Gaussian uncertainties with known standard deviations:
+\begin{eqnarray}
+P(e' \given e) &=& \mathcal{N}(e' ; e, \sigma_e) \\
+P(P_{\rm orb}' \given P_{\rm orb}) &=& \mathcal{N}(P_{\rm orb}' ; P_{\rm orb}, \sigma_{P_{\rm orb}}) \\
+P(M'_2 \given M_2) &=& \mathcal{N}(M'_2; M_2, \sigma_{M_2}).
+\end{eqnarray}
 
-Define Gaussian distributions for these three. 
+Our method can adapt to any observation of individual stellar parameters included in our model; we need only compare the evolved binary parameters to the observations.
+
 
 \subsection{Position Likelihood}
 The first term provides the probability that, given a system's birth time, position, systemic velocity, and initial primary mass, the system would be observed at its current position. Since HMXBs are generally short lived, this probability is non-zero for only a small region around any given HMXB's observed position. To solve the positional component of Equation \ref{eq:marginalized}, we first marginalize over $\omega$ the angle between the line of sight vector to the birth location and the systemic velocity vector:
@@ -606,11 +608,6 @@ and
 \end{equation}
 
 
-\subsubsection{Binary Probability: $P(L_x, M_2, v_{\rm sys} \given M_{1,i}, M_{2,i}, a_i, e_i, \vec{v}_k, t_i)$}
-
-Given a birth time and a particular initial binary parameters, this term provides the probability that a binary with a particular $L_x$, $M_2$, and $v_k$ will be formed. For HMXBs, determining this term relies on the evolution through three separate evolutionary transitions. 
-
-
 
 
 \section{Results: Population of HMXBs} \label{sec:results_population}
@@ -666,11 +663,11 @@ By taking the posterior distribution of model parameters and evolving the binari
 
 \section{Results: Individual HMXBs} \label{sec:results_individual}
 
-To test the ability of our model to constrain the initial binary parameters for an arbitrary HMXB, we first create a mock system with a set of initial conditions. We choose initial conditions for this synthetic system such that it will form an X-ray bright binary after a specified time, and we choose a birth location that has a high degree of star formation at the specified time. We then apply our forward evolution equations provided in Section \ref{sec:binary_evolve} to evolve the system through stable mass transfer, SN, and the X-ray luminous phase. Finally, we ``observe" the system and record the output $\alpha$, $\delta$, $M'_2$, $P'_{\rm orb}$, and $e'$. 
+To test the ability of our model to constrain the initial binary parameters for an arbitrary HMXB, we first create two separate mock systems with different sets of initial conditions (model parameter values). We choose values for these synthetic systems such that they will form X-ray bright binaries today given their birth times, and we choose birth locations with high degrees of star formation at the specified birth time. We then apply our forward evolution equations provided in Section \ref{sec:binary_evolve} to evolve the systems through stable mass transfer, SN, and the X-ray luminous phase. Finally, we ``observe" the systems and record the output $\alpha$, $\delta$, $M'_2$, $P'_{\rm orb}$, and $e'$.\footnote{To get the current position, we need to choose a random direction for the systemic velocity to move each system.} 
 
-We apply a random Gaussian deviation of 1 \Msun, 1 day, and 0.05 to $M'_2$, $P'_{\rm orb}$, and $e'$, respectively, to simulate observations of these parameters. These observations of these five mock-observed quantities are the inputs for our statistical method outlined in Section \ref{sec:stats_individual}. This involves initializing the chains, which we describe in detail in Section \ref{sec:initializing}. After initializing, we run {\tt emcee} for four separate ``burn-in" stages of 10,000 steps. We then run our simulation for 50,000 steps to gain sufficient statistics. 
+We apply a random Gaussian deviation of 1 \Msun, 1 day, and 0.05 to $M'_2$, $P'_{\rm orb}$, and $e'$, respectively, to simulate observations of these parameters. These five mock-observed quantities are the inputs for our statistical method outlined in Section \ref{sec:stats_individual}. This involves initializing the chains, which we describe in detail in Section \ref{sec:initializing}. After initializing, we run {\tt emcee} for four separate ``burn-in" stages of 10,000 steps. We then run our simulation for 50,000 steps to gain sufficient statistics. 
 
-Below, we describe how we first run our model on two separate test binaries, and then apply our model to the HMXB PSR J0045$-$7319.
+Below, we describe how we first run our model on the two separate test binaries, and then apply our model to the HMXB PSR J0045$-$7319.
 
 
 \begin{table}
@@ -697,18 +694,18 @@ Test 2 & 9 & 4 & 500 & 0.5 & 100 & 2.7 & 1.2 & 15.8 & -72.1 & 50 \\
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=0.95\columnwidth]{../figures/sys1_corner_multiburn.pdf}
-\caption{Posterior probability distributions and their covariances when applied to test case 1. The true input values are indicated by the blue lines in each plot. Our model successfully reproduces all of these parameters. Structure in the distributions for $\theta_k$ and $\phi_k$ are to match the observed $P_{\rm orb}$ and $e$. }
+\caption{Posterior probability distributions and their covariances when applied to test case 1. The true input values are indicated by the blue lines in each plot. Our model successfully reproduces all of these parameters. Structure in the distributions for $\theta_k$ and $\phi_k$ are to match the observed $P_{\rm orb}$ and $e$. The top right panel compares the star formation rate (color contours) at 22 Myr, the input age of the system, with the posterior distribution of birth positions (black contours). The distribution roughly follows the region of high star formation. }
 \label{fig:test1_corner}
 \end{center}
 \end{figure}
 
 The values of the 10 input parameters that define our first test case are provided in the first row of Table \ref{tab:mock_data}. This binary is relatively younger and more massive than the average in the HMXB distribution shown in Figure \ref{fig:population_corner}. We provide the present-day ``observations" of this mock system, the parameters on which we run our model, in the second column of Table \ref{tab:observations}.
 
-Figure \ref{fig:test1_corner} shows our posterior probability distributions and their covariances when we run our model on these input parameters. Blue horizontal and vertical lines indicate the true values; each of these lines falls in a high probability portion of the parameter space, indicating our model can successfully recover the input model parameters.
+The bottom left panels in figure \ref{fig:test1_corner} shows our posterior probability distributions and their covariances when we run our model on these input parameters. Blue horizontal and vertical lines indicate the true values; each of these lines falls in a high probability portion of the parameter space, indicating our model can successfully recover the input model parameters. 
 
-Structure in the posterior distributions for $\theta_k$ and $\phi_k$ are to match the current observed $P_{\rm orb}$ and $e$. The posterior distributions for $M_1$ and $M_2$, and therefore $t$, are determined primarily by the current companion mass.
+Some of the covariances between parameters can be easily understood. The current orbital shape is strongly affected by the SN kick. Therefore, structure in the posterior distributions for $v_k$, $\theta_k$, and $\phi_k$ are to match the current observed $P_{\rm orb}$ and $e$. The posterior distributions for $M_1$ and $M_2$, and therefore $t$, are determined primarily by the current companion mass. Since we assume the system circularizes due to the first mass transfer phase at the periapse separation, there is a large covariance between $a$ and $e$.
 
-In Figure \ref{fig:test1_SFR} {\bf (still to be added correctly)}, we compare the position posterior distribution to the star formation history around $\alpha_i$ and $\delta_i$ at two separate ages. The posterior distribution well matches the region of star formation history at the true age of 22 Myr. This indicates that the output distributions are indeed sensitive to the spatially resolved star formation histories, and our numerical method is able to well probe the multidimensional parameter space.
+In the top right panel of Figure \ref{fig:test1_corner}, we compare the position posterior distribution to the star formation history around $\alpha_i$ and $\delta_i$ at two separate ages. The posterior distribution well matches the region of star formation history at the true age of 22 Myr. This indicates that the output distributions are indeed sensitive to the spatially resolved star formation histories, and our numerical method is able to well probe the multidimensional parameter space.
 
 \begin{table}
 \label{tab:observations}
@@ -718,11 +715,11 @@ In Figure \ref{fig:test1_SFR} {\bf (still to be added correctly)}, we compare th
 \toprule
 Parameter & Test 1 & Test 2 & J0045$-$7319 \\
 \midrule
-$\alpha$ &  &  & 00:45:35.26 \\
-$\delta$ &  &  & $-$17:19:03.32 \\
-$P_{\rm orb}$ &  &  & 51.169$\pm$1.0 days \\
-$e$ &  &  & 0.808$\pm$0.05 \\
-$M_2$ &  &  & 8.8$\pm$1.8 \Msun \\
+$\alpha$ & 00:54:00 & 01:03:36 & 00:45:35.26 \\
+$\delta$ & $-$72:37:48 & $-$72:15:00 & $-$73:19:03.32 \\
+$P_{\rm orb}$ (days) & 50.55$\pm$1.0 & 616.52$\pm$1.0 & 51.169$\pm$1.0 \\
+$e$ & 0.467$\pm$0.05 & 0.305$\pm$0.05 & 0.808$\pm$0.05 \\
+$M_2$ (\Msun) & 19.2$\pm$1.0 & 10.7$\pm$1.0 & 8.8$\pm$1.8 \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -734,7 +731,7 @@ $M_2$ &  &  & 8.8$\pm$1.8 \Msun \\
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=0.95\columnwidth]{../figures/sys2_corner_multiburn.pdf}
-\caption{Posterior probability distributions and their covariances when applied to test case 2. As in Figure \ref{fig:test1_corner}, the true input values are indicated by the blue lines in each plot. Our model again successfully reproduces all of these parameters. }
+\caption{Posterior probability distributions and their covariances when applied to test case 2. As in Figure \ref{fig:test1_corner}, the true input values are indicated by the blue lines in each plot. Our model again successfully reproduces all of these parameters. As in Figure \ref{fig:test1_corner} the top right panel compares the star formation rate (color contours) with the posterior distribution of birth positions (black contours). Again, the posterior birth position distribution roughly follows the region of high star formation.}
 \label{fig:test2_corner}
 \end{center}
 \end{figure}
@@ -743,16 +740,17 @@ The values of the 10 input parameters that define our second test case are provi
 
 We provide the posterior distribution of our model parameters (along with the true inputs distributions in blue) in Figure \ref{fig:test2_corner}. With the exception of $a$ and $e$, our model is able to successfully recover the input parameters; since the prior probability strongly weights small $a$, the posterior distribution leans toward smaller initial separations. We suggest that this demonstrates the effect of setting strong priors on the parameters. Since we chose these initial binary parameters somewhat arbitrarily, our choice of $a$ was far in the wing of the distribution for $a$. Setting a weaker prior probability on $a$ would likely allow the model a better chance of recovering the true $a$.
 
+Certain covariances between model parameters are seen in both test cases, for instance between $M_1$ and $t$, however the exact form of these covariances must be calculated. Furthermore certain covariances, most notably the kick velocity parameters, look vastly different between the two test cases. This comparison shows that the exact form of the covariances between model parameters are strongly dependent upon each system's parameters. 
+
 
 \subsection{PSR J0045$-$7319}
 
 
-We provide the relevant observed parameters for the well-studied SMC HMXB PSR J0045$-$7319 in the fourth column of Table \ref{tab:observations}. The NS in this binary is observed as a pulsar, allowing an extremely precise measurement of $P_{\rm orb}$ and $e$. However, most HMXBs lack such precise measurements, if they exist at all. Since we currently wish to demonstrate the ability of our method to derive constraints for typical HMXBs in the SMC and elsewhere rather than actually provide astrophysical constraints for this particular system, we adopt uncertainties on these values of 1 day and 0.05 on $P_{\rm orb}$ and $e$, respectively. These are typical for other HMXBs in the SMC. 
+We provide the relevant observed parameters for the well-studied SMC HMXB PSR J0045$-$7319 in the fourth column of Table \ref{tab:observations}. The NS in this binary is observed as a pulsar, allowing an extremely precise measurement of $P_{\rm orb}$ and $e$. However, most HMXBs lack such precise measurements, if they exist at all. Since we currently wish to demonstrate the ability of our method to derive constraints for typical HMXBs in the SMC and elsewhere rather than actually provide astrophysical constraints for this particular system, we adopt uncertainties on these values of 1 day and 0.05 on $P_{\rm orb}$ and $e$, respectively. These uncertainties are typical for other HMXBs in the SMC. 
 
-While $P_{\rm orb}$ and $e$ are well constrained, the value of $M_2$ is still debated. A strict comparison to isochrones on a color-magnitude diagram for the SMC would give a mass of {\bf XXX}, however {\bf (authors here)} have shown that the donors in Be X-ray binaries have altered colors. Clearly the correct photometric models with which to compare should include effects from the high rotation and mass loss characteristic of Be stars. We therefore adopt a companion mass of 8.8$\pm$1.8 \Msun derived by \citet{bell95}.
+While $P_{\rm orb}$ and $e$ are well constrained, the value of $M_2$ is still debated. A strict comparison to isochrones on a color-magnitude diagram for the SMC would give a mass of {\bf XXX}, however {\bf (authors here)} have shown that the donors in Be X-ray binaries have altered colors. Clearly the correct photometric models with which to compare should include effects from the high rotation and mass loss characteristic of Be stars. We therefore adopt a companion mass of 8.8$\pm$1.8 \Msun\ derived by \citet{bell95}.
 
-
-We again run our MCMC sampler with four separate burn-ins stages for 10,000 steps each, as was done previously in the two test cases, and check the chains to see if they have converged. We then throw these chains away and run the MCMC sampler for 50,000 steps. Autocorrelation lengths are $\approx$100 and acceptance fractions are typically 3-5\%. 
+We again run our MCMC sampler with four separate burn-ins stages for 10,000 steps each, as was done previously in the two test cases, and we check the chains to see if they have converged. We then throw these chains away and run the MCMC sampler for 50,000 steps. Autocorrelation lengths are $\approx$100 and acceptance fractions are typically 3-5\%. 
 
 The posterior distributions of model parameters are shown in Figure \ref{fig:J0045_corner}. That these models produce well defined regions in posterior parameter space indicates that the walkers have explored the parameter space. As with the previous test cases, the structure in posterior distributions of $v_k$, $\theta_k$, and $\phi_k$ are all the result of attempts to match the observed $P_{\rm orb}$ and $e$. 
 
@@ -760,20 +758,12 @@ The posterior distributions of model parameters are shown in Figure \ref{fig:J00
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=0.95\columnwidth]{../figures/J0045_corner_multiburn.pdf}
-\caption{Posterior probability distributions and their covariances when applied to the SMC HMXB J0045$-$7319.}
+\caption{Posterior probability distributions and their covariances when applied to the SMC HMXB J0045$-$7319. The top right panel shows the posterior probability distributions for the birth position (black lined contours) compared with the star formation rate (color contours) 50 Myr ago at the peak posterior probability for the birth of J0045$-$7319 as indicated by our model. The current position of the system (red star) is in a region of low star formation rate, and our model is able to identify that the system was formed elsewhere. The region toward the bottom right {\bf (southeast?)} with a probability of being formed, but with very little star formation at 50 Myr, does indeed have some star formation at a slightly older age of 60 Myr.}
 \label{fig:J0045_corner}
 \end{center}
 \end{figure}
 
-The covariance between $\alpha_i$ and $\delta_i$ in Figure \ref{fig:J0045_corner} demonstrates the birth position distribution for J0045$-$7319. We compare this distribution (black lines) to the star formation rate (color contours) 50 Myr ago in Figure \ref{fig:J0045_birth_dist}. Interestingly, the system (red star) lies in a region with little star formation at its most likely birth age; the system was likely born in a place far from its current location. That the birth position roughly matches the star formation rate indicates our model successfully includes the star formation history when deriving the birth parameters. Although the region at the bottom right with a significant birth probability has very little star formation at 50 Myr, at a somewhat older age of 60 Myr, the star formation rate increases.
-
-\begin{figure}[h!]
-\begin{center}
-\includegraphics[width=0.65\columnwidth]{../figures/J0045_dist_birth_location.pdf}
-\caption{Posterior probability distributions for the birth position (black lined contours) compared with the star formation rate (color contours) 50 Myr ago at the peak posterior probability for the birth of J0045$-$7319 as indicated by our model. The current position of the system (red star) is in a region of low star formation rate, and our model is able to identify that the system was formed elsewhere. The region toward the bottom right {\bf (southeast?)} with a probability of being formed, but with very little star formation at 50 Myr, does indeed have some star formation at a slightly older age of 60 Myr.}
-\label{fig:J0045_birth_dist}
-\end{center}
-\end{figure}
+The covariance between $\alpha_i$ and $\delta_i$ in Figure \ref{fig:J0045_corner} demonstrates the birth position distribution for J0045$-$7319. We compare this distribution (black lines) to the star formation rate (color contours) 50 Myr ago in the top right panel of Figure \ref{fig:J0045_corner}. Interestingly, the system (red star) lies in a region with little star formation at its most likely birth age; the system was likely born in a place far from its current location. That the birth position roughly matches the star formation rate indicates our model successfully includes the star formation history when deriving the birth parameters. Although the region at the bottom right with a significant birth probability has very little star formation at 50 Myr, the star formation rate is higher at a somewhat older age of 60 Myr.
 
 
 
@@ -781,27 +771,35 @@ The covariance between $\alpha_i$ and $\delta_i$ in Figure \ref{fig:J0045_corner
 
 \section{Discussion}
 
-By including the spatially-resolved star formation history of the SMC as a prior on the HMXBs formed there, our model naturally identifies the age and birth position for both HMXB populations as a whole and individual systems. To match individual systems, we simultaneously include the observed $P_{\rm orb}$, $e$, and $M_2$ as well as their uncertainties. Since the resulting posterior distribution of our model parameters are generated based on the posterior probability, our model naturally fits for all the observables. 
+Previous theoretical work compared the projected separation between the birth and current positions of HMXBs \citet{sepinsky05} and the correlation between this projected separation and binary parameters such as $L_x$ \citet{zuo10,zuo15} using traditional population synthesis. These works were able to reproduce general trends in the observations: first, that HMXB tend to be found near star forming regions, and second, that HMXBs with higher $L_x$ tend to be found closer to star forming regions than systems with lower $L_x$. Yet, these works all focused on the population of HMXBs. Determining the correlation between spatially-resolved star formation histories and binary parameters for {\t individual} systems is too computationally expensive for traditional methods.
 
-Previous work to compare the projected separation between the birth and current positions of HMXBs \citet{sepinsky05} and the correlation between this projected separation and binary parameters such as $L_x$ \citet{zuo10,zuo15} focused only on populations of systems. These works all used traditional population synthesis. We developed this method because traditional population synthesis is too computationally expensive to determine the correlation between spatially-resolved star formation histories and binary parameters for {\t individual} systems.
+By including the spatially-resolved star formation history of the SMC as a prior, our model naturally identifies the age and birth position for both HMXB populations as a whole and individual HMXB systems. To match individual systems, we simultaneously include the observed $P_{\rm orb}$, $e$, and $M_2$ as well as their uncertainties. Since the resulting posterior distribution of our model parameters are generated based on the posterior probability, our model naturally fits for all the observables. 
 
-A common problem with traditional population synthesis is that unique or rare systems may have been formed in relatively low probability regions of the parameter space, and it is both difficult to synthesize a statistically substantial number of systems and to know if those systems have fully represented the parameter space. By moving through the parameter space based on the {\it posterior} probability, rather than making random draws from the prior probabilities, our MCMC model is able to efficiently generate a statistically significant distribution of models. Moreover, by checking the chains for convergence our MCMC model provides a method by which both to determine if the entire parameter space has been explored. Through our results in Sections \ref{sec:results_population} and \ref{sec:results_individual}, we suggest our model is, indeed, able to successfully explore the parameter space forming both HMXB populations and individual systems, respectively.
+Our model avoids some of the common problems with traditional population synthesis. Unique or rare systems may have been formed in relatively low probability regions of the parameter space, and using traditional population synthesis, it is both difficult to synthesize a statistically substantial number of systems and to know if those systems have fully represented the parameter space. Likewise, it can be expensive to generate enough statistics to successfully model short-lived systems. By moving through the parameter space based on the {\it posterior} probability, rather than making random draws from the prior probabilities, our MCMC model is able to efficiently generate a statistically significant distribution of posterior samples. Moreover, by checking the chains for convergence our MCMC model provides a method by which both to determine if the entire parameter space has been explored. Our results in Sections \ref{sec:results_population} and \ref{sec:results_individual}, suggest that our model is able to successfully explore the parameter space forming both HMXB populations and individual systems, respectively.
 
-This method has the potential to become a very powerful tool for the study of binary populations. It can flexibly include different constraints from observations, without loss of efficiency.\footnote{However, in principle a smaller region of viable parameter space may require a longer burn-in.} If the efficiency is maintained with more complex and modern binary evolution prescriptions, this method will allow for the fast comparison between different models; the effects of both the assumed prior distributions and the physical prescriptions in the process can both be tested. The efficiency gain also allows for the fast inclusion of updates to the physics.
+This method has the potential to become a powerful tool for the study of binary populations. Its gain in efficiency allows for faster inclusion of updates to binary evolution physics and a faster comparison between models. The effects of both the assumed prior distributions and the physical prescriptions in the process can both be tested. Furthermore, since the walkers move through parameter space based on the posterior probability, this method can flexibly include different constraints from observations, without loss of efficiency.\footnote{However, in principle a smaller region of viable parameter space may require a longer burn-in.} The method does not need to be fine tuned based on a sample with heterogeneous observations.
 
+The exact gain in efficiency depends on the problem at hand and the binary evolution code used. Traditional methods will be less efficient when the binary population is rare or short-lived and therefore the region of relevant parameter space is smaller. However, our method suffers from inefficiencies as well: each step is not an independent sample, and the set of posterior samples is reduced by a factor of the autocorrelation length to obtain the set of independent posterior samples. For the cases we find here, autocorrelation lengths are typically $\approx$100. The relative efficiency of our MCMC method compared with traditional population synthesis therefore depends on the problem at hand. Furthermore, each system must be calculated independently with our method, while with traditional population synthesis, the entire population need only be run once; the same synthetic population can be independently compared to all the observed systems.
 
-{\bf Brief discussion of benchmarking} - pop synth is extremely inefficient for individual systems. Andrews et al (2015) and Fragos et al (2015).
+The potential applications for this method are numerous, as are the potential pitfalls. Careful attention needs to be paid to ensure the prior probabilities are properly described, as for binary evolution, the priors are often strong. Careful attention needs to be paid to the posterior chains to make sure they have converged. Finally, such MCMC methods can have problems moving across sharp boundaries in parameter space. This translates to having a binary evolution code that flexibly includes multiple evolutionary channels. We avoid this problem here by only including one evolutionary channel, however how the walkers transition between two different evolutionary channels will need to be well understood in the future. 
 
+Since we ultimately want to employ this model to derive astrophysical constraints on individual systems, other evolutionary scenarios forming HMXBs will need to be included. Furthermore, the binary evolution prescriptions, particularly those describing thermal-timescale mass transfer will need to be improved. 
 
-{\bf Potential pitfalls.} Combining multiple evolutionary channels - could take some work. Fitting objects with very narrow regions with non-zero likelihood. Standard pop synth is embarrassingly parallelizable - this is non-trivial to parallelize. Efficient for specific systems or small populations.
-
-
-{\bf Ideas for improvement and future steps.} Simultaneous modeling - $10n$ model parameters. Expanding and improving the binary evolution. We want to derive astrophysical constraints on binary evolution and specific systems in the future. Model selection. Generalize to other galaxies.
-
-
-
+Our model can be expanded in a number of ways. First, we would like to expand this model to the LMC and other nearby galaxies with well-characterized HMXB populations and star formation histories. Second, this model can potentially be applied to the problem of model selection, which would allow the population of HMXBs in the SMC to constrain binary evolution prescriptions. Finally, we would like to expand our model to simultaneously model the entire population of HMXBs. This would require hundreds of model parameters, and a method other than MCMC would likely be required. Such a model would allow for certain binary evolution parameters, such as the kick velocity distribution and the mass transfer efficiency, to become hyperparameters for the model. 
 
 \section{Conclusions}
+
+\begin{itemize}
+\item We describe a statistical method that interprets population synthesis as a model parameter problem.\\
+\item Our method uses the spatially resolved star-formation history of a region as a prior on the birth location and time of a system. \\
+\item We describe the adaptation of this model to derive astrophysical constraints on individual systems. \\
+\item We use interpolations of the SSE tracks to define our single stellar evolution code. \\
+\item We use a simplified binary evolution track to describe one evolutionary channel for the formation of HMXBs. \\
+\item Our code uses an MCMC method to solve the model parameter problem we describe. \\
+\item We generate a population of HMXBs in the SMC using our method. \\
+\item Our model recovers the input parameters for two mock systems. \\
+\item We apply our model to observations of the SMC HMXB J0045$-$7319.
+\end{itemize}
 
 
 \acknowledgements
