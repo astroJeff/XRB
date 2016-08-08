@@ -778,7 +778,7 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
 
     # tr.transform_point((x, 0)) is always (0,0)
             # => (theta, r) in but (r, theta) out...
-    ax1, tr = curvelinear_test2(fig, rect, xcenter=xcenter, ycenter=ycenter, 
+    ax1, tr = curvelinear_test2(fig, rect, xcenter=xcenter, ycenter=ycenter,
                     xwidth=xwidth, ywidth=ywidth, xlabel=xlabel, ylabel=ylabel,
                     xgrid_density=xgrid_density, ygrid_density=ygrid_density)
 
@@ -795,7 +795,11 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
     out_test = tr.transform(zip(smc_coor["ra"], smc_coor["dec"]))
 
     # Plot star formation histories on adjusted coordinates
-    smc_plot = plt.tricontourf(out_test[:,0], out_test[:,1], sfr)
+    color_map = 'Blues'
+    ax = plt.gca() # TEST 1
+    cmap = plt.cm.get_cmap(color_map)
+    smc_plot = ax.set_axis_bgcolor(cmap(0.07)) # TEST 1
+    smc_plot = plt.tricontourf(out_test[:,0], out_test[:,1], sfr, cmap=color_map)
     smc_plot = plt.title(str(int(age)) + ' Myr')
 
     # Plot a star at the coordinate position, if supplied
