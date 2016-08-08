@@ -666,7 +666,8 @@ def get_SMC_plot(age, ax=None):
 
 def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_dist=None,
         ra=None, dec=None, xcenter=0.0, ycenter=17.3, xwidth=1.5, ywidth=1.5,
-        xlabel="Right Ascension", ylabel="Declination", xgrid_density=8, ygrid_density=5):
+        xlabel="Right Ascension", ylabel="Declination", xgrid_density=8, ygrid_density=5,
+        color_map='Blues'):
     """ return a plot of the star formation history of the SMC at a particular age.
     In this case, the plot should be curvelinear, instead of flattened.
 
@@ -690,6 +691,8 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
         X-axis, y-axis label
     xgrid_density, ygrid_density : int (optional)
         Density of RA, Dec grid axes
+    color_map : string (optional)
+        One of the color map options from plt.cmap
 
     Returns
     -------
@@ -795,12 +798,14 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
     out_test = tr.transform(zip(smc_coor["ra"], smc_coor["dec"]))
 
     # Plot star formation histories on adjusted coordinates
-    color_map = 'Blues'
-    ax = plt.gca() # TEST 1
-    cmap = plt.cm.get_cmap(color_map)
-    smc_plot = ax.set_axis_bgcolor(cmap(0.07)) # TEST 1
-    smc_plot = plt.tricontourf(out_test[:,0], out_test[:,1], sfr, cmap=color_map)
+    # Plot color contours with linear spacing
+    levels = np.arange(1.0e8, 1.0e9, 1.0e8)
+    smc_plot = plt.tricontourf(out_test[:,0], out_test[:,1], sfr, cmap=color_map, levels=levels, extend='max')
+    # Plot color contours with logarithmic spacing
+    # levels = np.linspace(7.0, 10.0, 10)
+    # smc_plot = plt.tricontourf(out_test[:,0], out_test[:,1], np.log10(sfr), cmap=color_map, levels=levels, extend='max')
     smc_plot = plt.title(str(int(age)) + ' Myr')
+    # smc_plot = plt.colorbar()
 
     # Plot a star at the coordinate position, if supplied
     if ra is not None and dec is not None:
