@@ -126,7 +126,7 @@ def ln_priors(y):
     # Get star formation history
     sf_history.load_sf_history()
     sfh = sf_history.get_SFH(ra_b, dec_b, t_b, sf_history.smc_coor, sf_history.smc_sfh)
-    if sfh == 0.0: return -np.inf
+    if sfh <= 0.0: return -np.inf
 
     # P(alpha, delta)
     # Closest point must be within survey. We estimate using the
@@ -536,7 +536,8 @@ def ln_priors_population(y):
 
     # Get star formation history
     sfh = sf_history.get_SFH(ra_b, dec_b, t_b, sf_history.smc_coor, sf_history.smc_sfh)
-    if sfh == 0.0: return -np.inf
+    if sfh <= 0.0: return -np.inf
+    lp += np.log(sfh)
 
     # P(alpha, delta)
     # Closest point must be within survey. We estimate using the
