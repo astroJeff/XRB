@@ -799,7 +799,8 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
 
     # Plot star formation histories on adjusted coordinates
     # Plot color contours with linear spacing
-    levels = np.arange(1.0e8, 1.0e9, 1.0e8)
+    #levels = np.arange(1.0e8, 1.0e9, 1.0e8)
+    levels = np.linspace(1.0e7, 1.0e9, 10)
     smc_plot = plt.tricontourf(out_test[:,0], out_test[:,1], sfr, cmap=color_map, levels=levels, extend='max')
     # Plot color contours with logarithmic spacing
     # levels = np.linspace(7.0, 10.0, 10)
@@ -823,8 +824,8 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
         coor_dist_polar = tr.transform(zip(ra_dist, dec_dist))
 
         # Create 2D histogram
-        nbins_x = 25
-        nbins_y = 25
+        nbins_x = 50
+        nbins_y = 50
         H, xedges, yedges = np.histogram2d(coor_dist_polar[:,0], coor_dist_polar[:,1], bins=(nbins_x,nbins_y), normed=True)
         x_bin_sizes = (xedges[1:] - xedges[:-1]).reshape((1,nbins_x))
         y_bin_sizes = (yedges[1:] - yedges[:-1]).reshape((nbins_y,1))
@@ -840,5 +841,6 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
 
         # Plot contours
         contour = plt.contour(X, Y, Z, levels=levels[::-1], origin="lower", colors=['k'])
+        #contour = plt.contour(X, Y, Z, levels=levels[::-1], origin="lower", colors=['r','g','b'])
 
     return smc_plot

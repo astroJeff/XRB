@@ -16,7 +16,7 @@ import constants as c
 
 
 
-def func_MT_forward(M_1_in, M_2_in, A_in, ecc_in):
+def func_MT_forward(M_1_in, M_2_in, A_in, ecc_in, beta=1.0):
     """ Evolve a binary through thermal timescale mass transfer.
     It is assumed that the binary (instantaneously) circularizes
     at the pericenter distance.
@@ -31,6 +31,8 @@ def func_MT_forward(M_1_in, M_2_in, A_in, ecc_in):
         Orbital separation (any unit)
     ecc_in : float
         Eccentricity (unitless)
+    beta : float
+        Mass transfer efficiency
 
     Returns
     -------
@@ -43,30 +45,91 @@ def func_MT_forward(M_1_in, M_2_in, A_in, ecc_in):
     """
 
     M_1_out = load_sse.func_sse_he_mass(M_1_in)
-    M_2_out = M_1_in + M_2_in - M_1_out
-    A_out = A_in * (1.0-ecc_in) * (M_1_in*M_2_in/M_1_out/M_2_out)**2
+    M_2_out = M_2_in + beta * (M_1_in - M_1_out)
+
+
+    # Mass is lost with specific angular momentum of donor (M1)
+    alpha = (M_2_out / (M_1_out + M_2_out))**2
+
+
+    # Old formula for conservative MT: A_out = A_in * (1.0-ecc_in) * (M_1_in*M_2_in/M_1_out/M_2_out)**2
+    # Allowing for non-conservative MT (also works for conservative MT)
+    C_1 = 2.0 * alpha * (1.0-beta) - 2.0
+    C_2 = -2.0 * alpha / beta * (1.0 - beta) - 2.0
+    A_out = A_in * (1.0-ecc_in) * (M_1_out+M_2_out)/(M_1_in+M_2_in) * (M_1_out/M_1_in)**C_1 * (M_2_out/M_2_in)**C_2
+
+    ##################################
+    # NOTE: Technically, the above equation only works for a fixed alpha. If
+    # Alpha is indeed varying as mass is lost, then the above equation needs
+    # to be adjusted. This is probably solved elsewhere in the literature.
+    ##################################
 
     # Make sure systems don't overfill their Roche lobes
 #    r_1_max = load_sse.func_sse_r_MS_max(M_1_out)
-    r_1_roche = func_Roche_radius(M_1_in, M_2_in, A_in*(1.0-ecc_in))
+#    r_1_roche = func_Roche_radius(M_1_in, M_2_in, A_in*(1.0-ecc_in))
 #    r_2_max = load_sse.func_sse_r_MS_max(M_2_out)
 #    r_2_roche = func_Roche_radius(M_2_in, M_1_in, A_in)
 
-    # Get the k-type when the primary overfills its Roche lobe
-    if isinstance(M_1_in, np.ndarray):
-        k_RLOF = load_sse.func_sse_get_k_from_r(M_1_in, r_1_roche)
-    else:
-        k_RLOF = load_sse.func_sse_get_k_from_r(np.asarray([M_1_in]), np.asarray([r_1_roche]))
+
+    ##### TESTING #####
+    # # Get the k-type when the primary overfills its Roche lobe
+    # if isinstance(M_1_in, np.ndarray):
+    #     k_RLOF = load_sse.func_sse_get_k_from_r(M_1_in, r_1_roche)
+    # else:
+    #     k_RLOF = load_sse.func_sse_get_k_from_r(np.asarray([M_1_in]), np.asarray([r_1_roche]))
+    #
+    #
+    # # Only systems with k_RLOF = 2, 4 survive
+    # if isinstance(A_out, np.ndarray):
+    #     idx = np.intersect1d(np.where(k_RLOF!=2), np.where(k_RLOF!=4))
+    #     A_out[idx] = -1.0
+    # else:
+    #     if (k_RLOF != 2) & (k_RLOF != 4): A_out = -1.0
+    ##### TESTING #####
+
+    # Post-MT, Pre-SN evolution
+    M2_He_in = M_2_out
+    M2_He_out = M2_He_in
+    M1_He_in = M_1_out
+    M1_He_out = load_sse.func_sse_he_star_final(M_1_out)
+    A_He_in = A_out
+    A_He_out = A_He_in * (M1_He_in + M2_He_in) / (M1_He_out + M2_He_out)
 
 
-    # Only systems with k_RLOF = 2, 4 survive
-    if isinstance(A_out, np.ndarray):
-        idx = np.intersect1d(np.where(k_RLOF!=2), np.where(k_RLOF!=4))
-        A_out[idx] = -1.0
-    else:
-        if (k_RLOF != 2) & (k_RLOF != 4): A_out = -1.0
+#    return M_1_out, M_2_out, A_out
+    return M1_He_out, M2_He_out, A_He_out
+
+
+def func_common_envelope(M1_in, M2_in, A_in, ecc_in, alpha_CE=1.0, lambda_struc=1.0):
+    """ Calculate orbital evolution due to a common envelope. We use the envelope
+    binding energy approximation from De Marco et al. (2011). This will hopefully
+    be updated soon to account for actual stellar structure models, which will
+    include internal energy as well. Obviously reality is much more complex.
+
+
+
+    """
+
+    # M_1 is determined as the core of the primary
+    M_1_out = load_sse.func_sse_he_mass(M_1_in)
+    # M_2 accretes nothing
+    M_2_out = M_2_in
+
+    # r_1_roche is at its roche radius when the primary overfills its Roche lobe, entering instability
+    r_1_roche = func_Roche_radius(M_1_in, M_2_in, A_in*(1.0-ecc_in))
+
+    # Envelope mass
+    M_env = M_1_in - M_1_out
+
+    # alpha-lambda prescription
+    E_binding = -c.G * M_env * (M_env/2.0 + M_1_out) / (lambda_struc * r_1_roche)
+    E_orb_in = -c.G * M_1_in * M_2_in / (2.0 * A_in)
+    E_orb_out = E_orb_in + (1.0/alpha_CE) * E_binding
+
+    A_out = -c.G * M_1_out * M_2_out / (2.0 * E_orb_out)
 
     return M_1_out, M_2_out, A_out
+
 
 
 def func_Roche_radius(M1, M2, A):

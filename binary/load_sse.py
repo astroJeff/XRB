@@ -17,6 +17,7 @@ func_sse_he_mass = None
 func_sse_ms_time = None
 func_sse_k_type = None
 func_sse_k_from_r = None
+func_sse_he_star_final = None
 
 
 def load_sse():
@@ -249,10 +250,13 @@ def read_he_star_data():
         He star mass of a star of input mass
     func_sse_ms_time : interp1d
         Main sequence lifetime of a star of input mass
+    func_sse_he_star_final : interp1d
+        final mass for an initial mass He star
     """
 
     global func_sse_he_mass
     global func_sse_ms_time
+    global func_sse_he_star_final
 
     names = ["mass","he_mass","t_ms"]
     f = "../data/sse_data/He_star.dat"
@@ -261,6 +265,13 @@ def read_he_star_data():
 
     func_sse_he_mass = interp1d(sse_he_star["mass"], sse_he_star["he_mass"], bounds_error=False, fill_value=0.001)
     func_sse_ms_time = interp1d(sse_he_star["mass"], sse_he_star["t_ms"], bounds_error=False, fill_value=-1.0e10)
+
+
+    names = ["He_mass_initial", "He_mass_final"]
+    f = "../data/sse_data/He_star_initial_final_z0.008.dat"
+
+    sse_he_star_final = np.genfromtxt(os.path.abspath(f), names=names)
+    func_sse_he_star_final = interp1d(sse_he_star_final["He_mass_initial"], sse_he_star_final["He_mass_final"], bounds_error=False, fill_value=1.0)
 
 
 
