@@ -95,10 +95,15 @@ def load_sf_history(z=0.008):
     if smc_coor is None: load_smc_coor()
     if smc_sfh is None: load_smc_sfh(z)
 
-    if ra_min is None: min(smc_coor['ra'])-0.2
-    if ra_max is None: max(smc_coor['ra'])+0.2
-    if dec_min is None: min(smc_coor['dec'])-0.2
-    if dec_max is None: max(smc_coor['dec'])+0.2
+
+    global ra_min
+    global ra_max
+    global dec_min
+    global dec_max
+    if ra_min is None: ra_min = min(smc_coor['ra'])-0.2
+    if ra_max is None: ra_max = max(smc_coor['ra'])+0.2
+    if dec_min is None: dec_min = min(smc_coor['dec'])-0.2
+    if dec_max is None: dec_max = max(smc_coor['dec'])+0.2
 
 def get_SFH(ra, dec, t_b, coor, sfh):
     """ Returns the star formation rate in Msun/Myr for a sky position and age
@@ -135,7 +140,7 @@ def get_SFH(ra, dec, t_b, coor, sfh):
 
         SFR = np.zeros(len(ra))
         for i in np.arange(len(indices)):
-            
+
             # If outside the SMC, set to zero
             if ra[i]<ra_min or ra[i]>ra_max or dec[i]<dec_min or dec[i]>dec_max:
                 SFR[i] = 0
