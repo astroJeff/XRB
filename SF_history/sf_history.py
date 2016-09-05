@@ -10,6 +10,10 @@ lmc_sfh = None
 lmc_coor = None
 smc_sfh = None
 smc_coor = None
+ra_max = None
+ra_min = None
+dec_max = None
+dec_min = None
 
 
 
@@ -91,6 +95,10 @@ def load_sf_history(z=0.008):
     if smc_coor is None: load_smc_coor()
     if smc_sfh is None: load_smc_sfh(z)
 
+    if ra_min is None: min(smc_coor['ra'])-0.2
+    if ra_max is None: max(smc_coor['ra'])+0.2
+    if dec_min is None: min(smc_coor['dec'])-0.2
+    if dec_max is None: max(smc_coor['dec'])+0.2
 
 def get_SFH(ra, dec, t_b, coor, sfh):
     """ Returns the star formation rate in Msun/Myr for a sky position and age
@@ -127,12 +135,13 @@ def get_SFH(ra, dec, t_b, coor, sfh):
 
         SFR = np.zeros(len(ra))
         for i in np.arange(len(indices)):
-            SFR[i] = sfh[indices[i]](np.log10(t_b[i]*1.0e6))
-
+            
             # If outside the SMC, set to zero
-            if ra[i]<min(smc_coor['ra'])-0.2 or ra[i]>max(smc_coor['ra'])+0.2 \
-                or dec[i]<min(smc_coor['dec'])-0.2 or dec[i]>max(smc_coor['dec'])+0.2:
-                SFR[i] = 0.0
+            if ra[i]<ra_min or ra[i]>ra_max or dec[i]<dec_min or dec[i]>dec_max:
+                SFR[i] = 0
+            else:
+                SFR[i] = sfh[indices[i]](np.log10(t_b[i]*1.0e6))
+
 
         return SFR
 
@@ -145,8 +154,7 @@ def get_SFH(ra, dec, t_b, coor, sfh):
         dist = np.sqrt((ra1-ra2)**2*np.cos(dec1)*np.cos(dec2) + (dec1-dec2)**2)
 
         # If outside the SMC, set to zero
-        if ra<min(smc_coor['ra'])-0.2 or ra>max(smc_coor['ra'])+0.2 \
-            or dec<min(smc_coor['dec'])-0.2 or dec>max(smc_coor['dec'])+0.2:
+        if ra<ra_min or ra>ra_max or dec<dec_min or dec>dec_max:
             return 0.0
         else:
             index = np.argmin(dist)
