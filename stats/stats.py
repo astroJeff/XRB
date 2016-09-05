@@ -129,12 +129,7 @@ def ln_priors(y):
     if sfh <= 0.0: return -np.inf
 
     # P(alpha, delta)
-    # Closest point must be within survey. We estimate using the
-    # field of view of the CCD in the survey: 24' x 24' which is
-    # 0.283 degrees from center to corner. We round up to 0.3
-    # Area probability depends only on declination
-    dist_closest = sf_history.get_dist_closest(ra_b, dec_b, sf_history.smc_coor)
-    if dist_closest > 0.3: return -np.inf
+    # From spherical geometric effect, we need to care about cos(declination)
     lp += np.log(np.cos(deg_to_rad(dec_b)) / 2.0)
 
     ##################################################################
@@ -540,12 +535,7 @@ def ln_priors_population(y):
     lp += np.log(sfh)
 
     # P(alpha, delta)
-    # Closest point must be within survey. We estimate using the
-    # field of view of the CCD in the survey: 24' x 24' which is
-    # 0.283 degrees from center to corner. We round up to 0.3
-    # Area probability depends only on declination
-    dist_closest = sf_history.get_dist_closest(ra_b, dec_b, sf_history.smc_coor)
-    if dist_closest > 0.3: return -np.inf
+    # From spherical geometric effect, scale by cos(declination)
     lp += np.log(np.cos(deg_to_rad(dec_b)) / 2.0)
 
     M1_b, M2_b, A_b = binary_evolve.func_MT_forward(M1, M2, A, ecc)

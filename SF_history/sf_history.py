@@ -129,6 +129,11 @@ def get_SFH(ra, dec, t_b, coor, sfh):
         for i in np.arange(len(indices)):
             SFR[i] = sfh[indices[i]](np.log10(t_b[i]*1.0e6))
 
+            # If outside the SMC, set to zero
+            if ra[i]<min(smc_coor['ra'])-0.2828 or ra[i]>max(smc_coor['ra'])+0.2828 \
+                or dec[i]<min(smc_coor['dec'])-0.2828 or dec[i]>max(smc_coor['dec'])+0.2828:
+                SFR[i] = 0.0
+
         return SFR
 
     else:
@@ -138,9 +143,14 @@ def get_SFH(ra, dec, t_b, coor, sfh):
         dec2 = deg_to_rad(coor["dec"])
 
         dist = np.sqrt((ra1-ra2)**2*np.cos(dec1)*np.cos(dec2) + (dec1-dec2)**2)
-        index = np.argmin(dist)
 
-        return sfh[index](np.log10(t_b*1.0e6))
+        # If outside the SMC, set to zero
+        if ra<min(smc_coor['ra'])-0.2828 or ra>max(smc_coor['ra'])+0.2828 \
+            or dec<min(smc_coor['dec'])-0.2828 or dec>max(smc_coor['dec'])+0.2828:
+            return 0.0
+        else:
+            index = np.argmin(dist)
+            return sfh[index](np.log10(t_b*1.0e6))
 
 
 
@@ -790,12 +800,31 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
     if smc_sfh is None: load_smc_sfh()
 
     sfr = np.array([])
-    for i in np.arange(len(smc_coor)):
-        sfr = np.append(sfr, get_SFH(smc_coor["ra"][i], \
-                        smc_coor["dec"][i], age, smc_coor, smc_sfh))
+
+
+
+    # CREATING OUR OWN, LARGER GRID FOR STAR FORMATION CONTOURS
+    x_tmp = np.linspace(min(smc_coor['ra'])-1.0, max(smc_coor['ra'])+1.0, 30)
+    y_tmp = np.linspace(min(smc_coor['dec'])-1.0, max(smc_coor['dec'])+1.0, 30)
+
+    XX, YY = np.meshgrid(x_tmp, y_tmp)
+
+    for i in np.arange(len(XX.flatten())):
+        sfr = np.append(sfr, get_SFH(XX.flatten()[i], \
+                        YY.flatten()[i], age, smc_coor, smc_sfh))
+    out_test = tr.transform(zip(XX.flatten(), YY.flatten()))
+
+    # USING smc_coor AS THE POINTS FOR STAR FORMATION CONTOURS
+    # for i in np.arange(len(smc_coor)):
+    #     sfr = np.append(sfr, get_SFH(smc_coor["ra"][i], \
+    #                     smc_coor["dec"][i], age, smc_coor, smc_sfh))
 
     # Apply transformation to smc_coor ra and dec
-    out_test = tr.transform(zip(smc_coor["ra"], smc_coor["dec"]))
+    # out_test = tr.transform(zip(smc_coor["ra"], smc_coor["dec"]))
+
+
+
+
 
     # Plot star formation histories on adjusted coordinates
     # Plot color contours with linear spacing
