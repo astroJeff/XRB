@@ -130,8 +130,8 @@ def get_SFH(ra, dec, t_b, coor, sfh):
             SFR[i] = sfh[indices[i]](np.log10(t_b[i]*1.0e6))
 
             # If outside the SMC, set to zero
-            if ra[i]<min(smc_coor['ra'])-0.2828 or ra[i]>max(smc_coor['ra'])+0.2828 \
-                or dec[i]<min(smc_coor['dec'])-0.2828 or dec[i]>max(smc_coor['dec'])+0.2828:
+            if ra[i]<min(smc_coor['ra'])-0.2 or ra[i]>max(smc_coor['ra'])+0.2 \
+                or dec[i]<min(smc_coor['dec'])-0.2 or dec[i]>max(smc_coor['dec'])+0.2:
                 SFR[i] = 0.0
 
         return SFR
@@ -145,8 +145,8 @@ def get_SFH(ra, dec, t_b, coor, sfh):
         dist = np.sqrt((ra1-ra2)**2*np.cos(dec1)*np.cos(dec2) + (dec1-dec2)**2)
 
         # If outside the SMC, set to zero
-        if ra<min(smc_coor['ra'])-0.2828 or ra>max(smc_coor['ra'])+0.2828 \
-            or dec<min(smc_coor['dec'])-0.2828 or dec>max(smc_coor['dec'])+0.2828:
+        if ra<min(smc_coor['ra'])-0.2 or ra>max(smc_coor['ra'])+0.2 \
+            or dec<min(smc_coor['dec'])-0.2 or dec>max(smc_coor['dec'])+0.2:
             return 0.0
         else:
             index = np.argmin(dist)
