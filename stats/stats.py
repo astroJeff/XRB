@@ -14,7 +14,6 @@ sys.path.append('../constants')
 import constants as c
 sys.path.append('../SF_history')
 import sf_history
-from sf_history import deg_to_rad, rad_to_deg
 
 
 nwalkers = 80
@@ -56,8 +55,8 @@ def get_stars_formed(ra, dec, t_min, t_max, v_sys, dist, N_size=512):
     ran_y = uniform.rvs(size = N_size)
     ran_theta = np.sqrt(ran_y / (c_2 * np.pi))
 
-    ran_ra = rad_to_deg(ran_theta) * np.cos(ran_phi) / np.cos(deg_to_rad(dec)) + ra
-    ran_dec = rad_to_deg(ran_theta) * np.sin(ran_phi) + dec
+    ran_ra = c.rad_to_deg * ran_theta * np.cos(ran_phi) / np.cos(c.deg_to_rad * dec) + ra
+    ran_dec = c.rad_to_deg * ran_theta * np.sin(ran_phi) + dec
 
     # Specific star formation rate (Msun/Myr/steradian)
     SFR = sf_history.get_SFH(ran_ra, ran_dec, ran_t_b/(c.yr_to_sec*1.0e6), sf_history.smc_coor, sf_history.smc_sfh)
@@ -99,6 +98,10 @@ def ln_priors(y):
     if q < 0.3 or q > 1.0: return -np.inf
     lp += np.log( (1.0 / M1 ) )
 
+    # P(ecc)
+    if ecc < 0.0 or ecc > 1.0: return -np.inf
+    lp += np.log(2.0 * ecc)
+
     # P(A)
     if A*(1.0-ecc) < c.min_A or A*(1.0+ecc) > c.max_A: return -np.inf
     norm_const = np.log(c.max_A) - np.log(c.min_A)
@@ -106,10 +109,6 @@ def ln_priors(y):
     # A must avoid RLOF at ZAMS, by a factor of 2
     r_1_roche = binary_evolve.func_Roche_radius(M1, M2, A*(1.0-ecc))
     if 2.0 * load_sse.func_sse_r_ZAMS(M1) > r_1_roche: return -np.inf
-
-    # P(ecc)
-    if ecc < 0.0 or ecc > 1.0: return -np.inf
-    lp += np.log(2.0 * ecc)
 
     # P(v_k)
     if v_k < 0.0: return -np.inf
@@ -130,7 +129,7 @@ def ln_priors(y):
 
     # P(alpha, delta)
     # From spherical geometric effect, we need to care about cos(declination)
-    lp += np.log(np.cos(deg_to_rad(dec_b)) / 2.0)
+    lp += np.log(np.cos(c.deg_to_rad * dec_b) / 2.0)
 
     ##################################################################
     # We add an additional prior that scales the RA and Dec by the
@@ -299,12 +298,12 @@ def ln_posterior(x, args):
     ll += coeff_ecc + argument_ecc
 
     ######## Under Construction #######
-    theta_proj = get_theta_proj(deg_to_rad(ra), deg_to_rad(dec), deg_to_rad(ra_b), deg_to_rad(dec_b))  # Projected travel distance
+    theta_proj = get_theta_proj(c.deg_to_rad*ra, c.deg_to_rad*dec, c.deg_to_rad*ra_b, c.deg_to_rad*dec_b)  # Projected travel distance
     t_sn = (t_b - load_sse.func_sse_tmax(M1)) * 1.0e6 * c.yr_to_sec  # The time since the primary's core collapse
     tmp = (v_sys * t_sn) / c.dist_SMC  # Unitless
     conds = [theta_proj>tmp, theta_proj<=tmp]  # Define conditional
     funcs = [lambda theta_proj: -np.inf, lambda theta_proj: np.log(np.tan(np.arcsin(theta_proj/tmp))/tmp)]
-    J_coor = np.abs(get_J_coor(deg_to_rad(ra), deg_to_rad(dec), deg_to_rad(ra_b), deg_to_rad(dec_b))) # Jacobian for coordinate change
+    J_coor = np.abs(get_J_coor(c.deg_to_rad*ra, c.deg_to_rad*dec, c.deg_to_rad*ra_b, c.deg_to_rad*dec_b)) # Jacobian for coordinate change
     P_omega = 1.0 / (2.0 * np.pi)
     ll += np.piecewise(theta_proj, conds, funcs) + np.log(P_omega) + np.log(1.0 / J_coor)
 
@@ -505,6 +504,10 @@ def ln_priors_population(y):
     if q < 0.3 or q > 1.0: return -np.inf
     lp += np.log( (1.0 / M1 ) )
 
+    # P(ecc)
+    if ecc < 0.0 or ecc > 1.0: return -np.inf
+    lp += np.log(2.0 * ecc)
+
     # P(A)
     if A*(1.0-ecc) < c.min_A or A*(1.0+ecc) > c.max_A: return -np.inf
     norm_const = np.log(c.max_A) - np.log(c.min_A)
@@ -512,10 +515,6 @@ def ln_priors_population(y):
     # A must avoid RLOF at ZAMS, by a factor of 2
     r_1_roche = binary_evolve.func_Roche_radius(M1, M2, A*(1.0-ecc))
     if 2.0 * load_sse.func_sse_r_ZAMS(M1) > r_1_roche: return -np.inf
-
-    # P(ecc)
-    if ecc < 0.0 or ecc > 1.0: return -np.inf
-    lp += np.log(2.0 * ecc)
 
     # P(v_k)
     if v_k < 0.0: return -np.inf
@@ -536,7 +535,7 @@ def ln_priors_population(y):
 
     # P(alpha, delta)
     # From spherical geometric effect, scale by cos(declination)
-    lp += np.log(np.cos(deg_to_rad(dec_b)) / 2.0)
+    lp += np.log(np.cos(c.deg_to_rad*dec_b) / 2.0)
 
     M1_b, M2_b, A_b = binary_evolve.func_MT_forward(M1, M2, A, ecc)
     A_c, v_sys, ecc = binary_evolve.func_SN_forward(M1_b, M2_b, A_b, v_k, theta, phi)

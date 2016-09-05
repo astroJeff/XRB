@@ -10,7 +10,10 @@ pc_to_cm = 3.086e18 # parsec to cm
 pc_to_km = 3.086e13 # parsec to km
 yr_to_sec = 31557600.0 # Sec in yr
 day_to_sec = 3600.0*24.0 # Sec in day
+deg_to_rad = 0.0174532925199 # Degrees to radians
+rad_to_deg = 57.2957795131 # Radians to degrees
 asec_to_rad = 4.84814e-6 # Arcsec to radians
+
 
 M_0 = 0.073 # in Msun
 xi = 0.704

@@ -5,7 +5,6 @@ sys.path.append('../constants')
 import constants as c
 sys.path.append('../SF_history')
 import sf_history
-from sf_history import deg_to_rad, rad_to_deg
 sys.path.append('../binary')
 import load_sse
 import binary_evolve
@@ -278,8 +277,8 @@ def get_new_ra_dec(ra, dec, theta_proj, pos_ang):
     delta_dec = theta_proj * np.cos(pos_ang)
     delta_ra = theta_proj * np.sin(pos_ang) / np.cos(deg_to_rad(dec))
 
-    ra_out = ra + rad_to_deg(delta_ra)
-    dec_out = dec + rad_to_deg(delta_dec)
+    ra_out = ra + c.rad_to_deg * delta_ra
+    dec_out = dec + c.rad_to_deg * delta_dec
 
     return ra_out, dec_out
 
@@ -567,7 +566,7 @@ def run_pop_synth(input_sys, N_sys=10000, t_low=15.0, t_high=60.0, delta_t=1):
                 h = HMXB_t[i]
                 p = init_params_t[i]
 
-                angle = rad_to_deg(sf_history.get_theta_proj_degree(ra_sys, dec_sys, h["ra"], h["dec"]))
+                angle = c.rad_to_deg * sf_history.get_theta_proj_degree(ra_sys, dec_sys, h["ra"], h["dec"])
                 theta_sep = np.append(theta_sep, angle)
 
                 if angle < 0.2 \
