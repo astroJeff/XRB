@@ -424,6 +424,8 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
         if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
     # TESTING END
 
+    print "Burn-in 1 finished."
+    print "Starting burn-in 2..."
 
     # Burn-in 2
     sampler.reset()
@@ -437,6 +439,8 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
         if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
     # TESTING END
 
+    print "Burn-in 2 finished."
+    print "Starting burn-in 3..."
 
     # Burn-in 3
     sampler.reset()
@@ -450,23 +454,22 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
         if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
     # TESTING END
 
+    print "Burn-in 3 finished."
+    print "Starting burn-in 4..."
 
     # Burn-in 4
     sampler.reset()
     pos,prob,state = sampler.run_mcmc(pos, N=nburn)
     sampler4 = copy.copy(sampler)
 
-    # TESTING BEGIN - Get limiting ln_prob for worst 8 chains
-    prob_lim = (np.sort(prob)[7] + np.sort(prob)[8])/2.0
-    index_best = np.argmax(prob)
-    for i in np.arange(len(prob)):
-        if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
-    # TESTING END
-
+    print "Burn-in 4 finished."
+    print "Starting production run..."
 
     # Full run
     sampler.reset()
     pos,prob,state = sampler.run_mcmc(pos, N=nsteps)
+
+    print "Finished production run"
 
     return sampler1, sampler2, sampler3, sampler4, sampler
 
