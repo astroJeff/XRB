@@ -693,7 +693,7 @@ def get_SMC_plot(age, ax=None):
 
 
 def get_SMC_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dist=None,
-        ra=None, dec=None, xcenter=0.0, ycenter=17.3, xwidth=1.5, ywidth=1.5,
+        dist_bins=25, ra=None, dec=None, xcenter=0.0, ycenter=17.3, xwidth=1.5, ywidth=1.5,
         xlabel="Right Ascension", ylabel="Declination", xgrid_density=8, ygrid_density=5,
         color_map='Blues'):
     """ return a plot of the star formation history of the SMC at a particular age.
@@ -711,6 +711,8 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dis
         If supplied, plot goes inside gridspec object provided
     ra_dist, dec_dist : array (optional)
         If supplied, plots contours around the distribution of these inputs
+    dist_bins : int (optional)
+        Number of bins for ra_dist-dec_dist contours
     ra, dec : float (optional)
         If supplied, plot a red star at these coordinates (degrees)
     xcenter, ycenter : float (optional)
@@ -771,7 +773,7 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dis
 
         # ax1 = SubplotHost(fig, rect, grid_helper=grid_helper)
         if gs is None:
-            ax1 = SubplotHost(fig, grid_helper=grid_helper)
+            ax1 = SubplotHost(fig, 111, grid_helper=grid_helper)
         else:
             ax1 = SubplotHost(fig, gs, grid_helper=grid_helper)
 
@@ -878,8 +880,8 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dis
         coor_dist_polar = tr.transform(zip(ra_dist, dec_dist))
 
         # Create 2D histogram
-        nbins_x = 25
-        nbins_y = 25
+        nbins_x = dist_bins
+        nbins_y = dist_bins
         H, xedges, yedges = np.histogram2d(coor_dist_polar[:,0], coor_dist_polar[:,1], bins=(nbins_x,nbins_y), normed=True)
         x_bin_sizes = (xedges[1:] - xedges[:-1]).reshape((1,nbins_x))
         y_bin_sizes = (yedges[1:] - yedges[:-1]).reshape((nbins_y,1))
