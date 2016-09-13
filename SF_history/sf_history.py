@@ -814,8 +814,9 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
                     xgrid_density=xgrid_density, ygrid_density=ygrid_density)
 
     # Load star formation histories
-    if smc_coor is None: load_smc_coor()
-    if smc_sfh is None: load_smc_sfh()
+    load_sf_history()
+    # if smc_coor is None: load_smc_coor()
+    # if smc_sfh is None: load_smc_sfh()
 
     sfr = np.array([])
 
