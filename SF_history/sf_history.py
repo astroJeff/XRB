@@ -692,7 +692,7 @@ def get_SMC_plot(age, ax=None):
     return smc_plot
 
 
-def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_dist=None,
+def get_SMC_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dist=None,
         ra=None, dec=None, xcenter=0.0, ycenter=17.3, xwidth=1.5, ywidth=1.5,
         xlabel="Right Ascension", ylabel="Declination", xgrid_density=8, ygrid_density=5,
         color_map='Blues'):
@@ -707,6 +707,8 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
         If supplied, plot the contour to this axis. Otherwise, open a new figure
     rect : int
         Subplot number
+    gs : gridspec object (optional)
+        If supplied, plot goes inside gridspec object provided
     ra_dist, dec_dist : array (optional)
         If supplied, plots contours around the distribution of these inputs
     ra, dec : float (optional)
@@ -728,13 +730,14 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
         Contour plot of the star formation history
     """
 
-    import  mpl_toolkits.axisartist.angle_helper as angle_helper
+    import mpl_toolkits.axisartist.angle_helper as angle_helper
     from matplotlib.projections import PolarAxes
     from matplotlib.transforms import Affine2D
     from mpl_toolkits.axisartist import SubplotHost
     from mpl_toolkits.axisartist import GridHelperCurveLinear
+    import matplotlib.gridspec as gridspec
 
-    def curvelinear_test2(fig, rect=111, xcenter=0.0, ycenter=17.3, xwidth=1.5, ywidth=1.5,
+    def curvelinear_test2(fig, gs=None, xcenter=0.0, ycenter=17.3, xwidth=1.5, ywidth=1.5,
             xlabel=xlabel, ylabel=ylabel, xgrid_density=8, ygrid_density=5):
         """
         polar projection, but in a rectangular box.
@@ -766,7 +769,13 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
                                             tick_formatter2=tick_formatter2
                                             )
 
-        ax1 = SubplotHost(fig, rect, grid_helper=grid_helper)
+        # ax1 = SubplotHost(fig, rect, grid_helper=grid_helper)
+        if gs is None:
+            ax1 = SubplotHost(fig, grid_helper=grid_helper)
+        else:
+            ax1 = SubplotHost(fig, gs, grid_helper=grid_helper)
+
+
 
         # make ticklabels of right and top axis visible.
         ax1.axis["right"].major_ticklabels.set_visible(False)
@@ -776,6 +785,7 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
         # let right and bottom axis show ticklabels for 1st coordinate (angle)
         ax1.axis["right"].get_helper().nth_coord_ticks=0
         ax1.axis["bottom"].get_helper().nth_coord_ticks=0
+
 
         fig.add_subplot(ax1)
 
@@ -797,6 +807,7 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
         #ax1.grid(linestyle='--', which='x') # either keyword applies to both
         #ax1.grid(linestyle=':', which='y')  # sets of gridlines
 
+
         return ax1,tr
 
 
@@ -809,7 +820,7 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
 
     # tr.transform_point((x, 0)) is always (0,0)
             # => (theta, r) in but (r, theta) out...
-    ax1, tr = curvelinear_test2(fig, rect, xcenter=xcenter, ycenter=ycenter,
+    ax1, tr = curvelinear_test2(fig, gs, xcenter=xcenter, ycenter=ycenter,
                     xwidth=xwidth, ywidth=ywidth, xlabel=xlabel, ylabel=ylabel,
                     xgrid_density=xgrid_density, ygrid_density=ygrid_density)
 
@@ -856,11 +867,6 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
     smc_plot = plt.title(str(int(age)) + ' Myr')
     # smc_plot = plt.colorbar()
 
-    # Plot a star at the coordinate position, if supplied
-    if ra is not None and dec is not None:
-        coor_pol1, coor_pol2 = tr.transform(zip(np.array([ra, ra]), np.array([dec, dec])))
-        smc_plot = plt.scatter(coor_pol1[0], coor_pol1[1], color='r', s=50, marker="*")
-
     # Plot the contours defining the distributions of ra_dist and dec_dist
     if ra_dist is not None and dec_dist is not None:
 
@@ -872,8 +878,8 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
         coor_dist_polar = tr.transform(zip(ra_dist, dec_dist))
 
         # Create 2D histogram
-        nbins_x = 50
-        nbins_y = 50
+        nbins_x = 25
+        nbins_y = 25
         H, xedges, yedges = np.histogram2d(coor_dist_polar[:,0], coor_dist_polar[:,1], bins=(nbins_x,nbins_y), normed=True)
         x_bin_sizes = (xedges[1:] - xedges[:-1]).reshape((1,nbins_x))
         y_bin_sizes = (yedges[1:] - yedges[:-1]).reshape((nbins_y,1))
@@ -891,4 +897,15 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, rect=111, ra_dist=None, dec_di
         contour = plt.contour(X, Y, Z, levels=levels[::-1], origin="lower", colors=['k'])
         #contour = plt.contour(X, Y, Z, levels=levels[::-1], origin="lower", colors=['r','g','b'])
 
-    return smc_plot
+        # To change linewidths
+        zc = contour.collections
+        plt.setp(zc, linewidth=1.5)
+
+    # Plot a star at the coordinate position, if supplied
+    if ra is not None and dec is not None:
+        coor_pol1, coor_pol2 = tr.transform(zip(np.array([ra, ra]), np.array([dec, dec])))
+        smc_plot = plt.scatter(coor_pol1[0], coor_pol1[1], color='r', s=100, marker="*")
+
+
+
+    return smc_plot, ax1

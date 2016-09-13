@@ -3,6 +3,8 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
+import matplotlib.gridspec as gridspec
 import corner
 import pickle
 from astropy.coordinates import SkyCoord
@@ -66,19 +68,69 @@ sampler = pickle.load( open( "../data/sys1_MCMC_multiburn_sampler.obj", "rb" ) )
 
 
 ############## Corner pyplot ###################
-plt.rc('font', size=18)
+fontProperties = {'family':'serif', 'serif':['Times New Roman'], 'weight':'normal', 'size':12}
+ticks_font = font_manager.FontProperties(family='Times New Roman', style='normal', \
+                                         weight='normal', stretch='normal', size=12)
+plt.rc('font', **fontProperties)
 
+fig, ax = plt.subplots(10,10, figsize=(10,10))
+
+
+labels = [r"$M_1\ (M_{\odot})$", r"$M_2\ (M_{\odot})$", r"$a\ (R_{\odot})$", r"$e$", r"$v_k\ ({\rm km}\ {\rm s}^{-1})$", \
+          r"$\theta_k\ ({\rm rad.})$", r"$\phi_k\ ({\rm rad.})$", r"$\alpha_{\rm b}\ ({\rm deg.})$", \
+          r"$\delta_{\rm b}\ ({\rm deg.}) $", r"$t_{\rm b}\ ({\rm Myr})$"]
 truths = [M1_true, M2_true, A_true, ecc_true, v_k_true, theta_true, phi_true, ra_true, dec_true, t_b_true]
-labels = [r"$M_1$", r"$M_2$", r"$A$", r"$e$", r"$v_k$", r"$\theta$", r"$\phi$", r"$\alpha_{\rm b}$", r"$\delta_{\rm b}$", r"$t_{\rm b}$"]
 hist2d_kwargs = {"plot_datapoints" : False}
-fig = corner.corner(sampler.flatchain, labels=labels, truths=truths, **hist2d_kwargs)
+fig = corner.corner(sampler.flatchain, fig=fig, labels=labels, truths=truths, max_n_ticks=4, **hist2d_kwargs)
+
+
 
 #ax2 = plt.subplot2grid((5,5), (0,3), colspan=2, rowspan=2)
 ra_out = sampler.flatchain.T[7]
 dec_out = sampler.flatchain.T[8]
 ra_obs = 13.5
 dec_obs = -72.63
-sf_history.get_SMC_plot_polar(22, fig_in=fig, rect=333, ra_dist=ra_out, dec_dist=dec_out, ra=ra_obs, dec=dec_obs, xwidth=0.5, ywidth=0.5, xgrid_density=6)
+gs = gridspec.GridSpec(2, 2,
+                       width_ratios=[3,2],
+                       height_ratios=[2,3]
+                       )
+sf_history.get_SMC_plot_polar(22, fig_in=fig, gs=gs[1], ra_dist=ra_out, dec_dist=dec_out, ra=ra_obs, dec=dec_obs, xwidth=0.5, ywidth=0.5, xgrid_density=6)
+
+
+
+# Shift axis labels
+for i in np.arange(10):
+    ax[i,0].yaxis.set_label_coords(-0.5, 0.5)
+    ax[9,i].xaxis.set_label_coords(0.5, -0.5)
+
+# Set declination ticks
+ax[9,8].set_xticks([-72.9, -72.7, -72.5])
+ax[9,8].set_xticklabels(["-72.9", "-72.7", "-72.5"])
+for i in np.arange(8):
+    ax[8,i].set_yticks([-72.9, -72.7, -72.5])
+ax[8,0].set_yticklabels(["-72.9", "-72.7", "-72.5"])
+
+# Set theta ticks
+for i in np.arange(5)+5:
+    ax[i,5].set_xticks([np.pi/2., 3.*np.pi/4., np.pi])
+ax[9,5].set_xticklabels([r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$', r'$\pi$'])
+for i in np.arange(4):
+    ax[5,i].set_yticks([np.pi/2., 3.*np.pi/4., np.pi])
+ax[5,0].set_yticklabels([r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$', r'$\pi$'])
+
+
+# Set phi ticks
+for i in np.arange(4)+6:
+    ax[i,6].set_xticks([np.pi/2., np.pi, 3.*np.pi/2.])
+ax[9,6].set_xticklabels([r'$\frac{\pi}{2}$', r'$\pi$', r'$\frac{3\pi}{2}$'])
+for i in np.arange(6):
+    ax[6,i].set_yticks([np.pi/2., np.pi, 3.*np.pi/2.])
+ax[6,0].set_yticklabels([r'$\frac{\pi}{2}$', r'$\pi$', r'$\frac{3\pi}{2}$'])
+
+
+
+
+plt.subplots_adjust(bottom=0.07, left=0.07, top=0.97)
 
 #plt.tight_layout()
 
