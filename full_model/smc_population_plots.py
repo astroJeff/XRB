@@ -56,9 +56,10 @@ plt.rc('font', **fontProperties)
 # Corner plot
 
 fig, ax = plt.subplots(10,10, figsize=(10,10))
-labels = [r"$M_1\ (M_{\odot})$", r"$M_2\ (M_{\odot})$", r"$a\ (R_{\odot})$", r"$e$", r"$v_k\ ({\rm km}\ {\rm s}^{-1})$", \
-          r"$\theta_k\ ({\rm rad.})$", r"$\phi_k\ ({\rm rad.})$", r"$\alpha_{\rm b}\ ({\rm deg.})$", \
-          r"$\delta_{\rm b}\ ({\rm deg.}) $", r"$t_{\rm b}\ ({\rm Myr})$"]
+labels = [r"$M_{\rm 1, i}\ (M_{\odot})$", r"$M_{\rm 2, i}\ (M_{\odot})$", r"$a_{\rm i}\ (R_{\odot})$", \
+          r"$e_{\rm i}$", r"$v_{\rm k, i}\ ({\rm km}\ {\rm s}^{-1})$", r"$\theta_{\rm k}\ ({\rm rad.})$", \
+          r"$\phi_{\rm k}\ ({\rm rad.})$", r"$\alpha_{\rm i}\ ({\rm deg.})$", \
+          r"$\delta_{\rm i}\ ({\rm deg.}) $", r"$t_{\rm i}\ ({\rm Myr})$"]
 plt_range = ([7,24], [2.5,15], [0,1500], [0,1], [0,450], [np.pi/4.,np.pi], [0,2.0*np.pi], [6,21], [-76,-70], [0,70])
 hist2d_kwargs = {"plot_datapoints" : False}
 fig = corner.corner(sampler.flatchain, fig=fig, labels=labels, range=plt_range, bins=40, max_n_ticks=4, **hist2d_kwargs)
@@ -144,39 +145,39 @@ plt.savefig('../figures/smc_population_corner.pdf')
 
 
 
-# # HMXB Orbital period vs. eccentricity
-# fig, ax = plt.subplots(3, 1, figsize=(6,8))
-# plt.rc('font', size=14)
-# plt_range = ([0, 4], [0,1])
-# corner.hist2d(np.log10(HMXB[2]), HMXB[3], ax=ax[0], bins=40, range=plt_range, plot_datapoints=False)
-# ax[0].set_xlabel(r"${\rm log}\ P_{\rm orb}\ {\rm (days)}$", size=16)
-# ax[0].set_ylabel(r"$e$", size=16)
-# ax[0].set_xticks([0,1,2,3,4])
-# ax[0].set_yticks([0,0.25,0.5,0.75,1.0])
-#
-# plt_range = ([8, 24], [0,80])
-# corner.hist2d(HMXB[4], HMXB[5], ax=ax[1], bins=40, range=plt_range, plot_datapoints=False)
-# ax[1].set_xlabel(r"$M_2\ ({\rm M}_{\odot})$", size=16)
-# ax[1].set_ylabel(r"$v_{\rm sys}\ {\rm (km\ s}^{-1})$", size=16)
-# ax[1].set_xticks([8,12,16,20,24])
-# ax[1].set_yticks([0,20, 40, 60, 80])
-#
-#
-# # Get flight time from birth time and M1 lifetime
-# load_sse.load_sse()
-# t_flight = sampler.flatchain.T[9] - load_sse.func_sse_tmax(sampler.flatchain.T[0])
-# plt_range = ([0,55], [0,25])
-# contour_kwargs = {'colors':'r', 'linestyles':'dashed'}
-# corner.hist2d(t_flight, HMXB[7], ax=ax[2], bins=40, range=plt_range, plot_density=False,
-# 		plot_datapoints=False, contour_kwargs=contour_kwargs)
-# corner.hist2d(sampler.flatchain.T[9], HMXB[7], ax=ax[2], bins=40, range=plt_range,
-# 		plot_density=False, plot_datapoints=False)
-# ax[2].set_xlabel(r"$t\ {\rm (Myr)}$", size=16)
-# ax[2].set_ylabel(r"$\theta\ {\rm (amin)}$", size=16)
-#
-# plt.tight_layout()
-#
-# plt.savefig('../figures/smc_population_HMXB.pdf')
+# HMXB Orbital period vs. eccentricity
+fig, ax = plt.subplots(3, 1, figsize=(6,8))
+plt.rc('font', size=14)
+plt_range = ([0, 4], [0,1])
+corner.hist2d(np.log10(HMXB[2]), HMXB[3], ax=ax[0], bins=40, range=plt_range, plot_datapoints=False)
+ax[0].set_xlabel(r"${\rm log}\ P_{\rm orb}\ {\rm (days)}$", size=16)
+ax[0].set_ylabel(r"$e$", size=16)
+ax[0].set_xticks([0,1,2,3,4])
+ax[0].set_yticks([0,0.25,0.5,0.75,1.0])
+
+plt_range = ([8, 24], [0,80])
+corner.hist2d(HMXB[4], HMXB[5], ax=ax[1], bins=40, range=plt_range, plot_datapoints=False)
+ax[1].set_xlabel(r"$M_2\ ({\rm M}_{\odot})$", size=16)
+ax[1].set_ylabel(r"$v_{\rm sys}\ {\rm (km\ s}^{-1})$", size=16)
+ax[1].set_xticks([8,12,16,20,24])
+ax[1].set_yticks([0,20, 40, 60, 80])
+
+
+# Get flight time from birth time and M1 lifetime
+load_sse.load_sse()
+t_flight = sampler.flatchain.T[9] - load_sse.func_sse_tmax(sampler.flatchain.T[0])
+plt_range = ([0,55], [0,25])
+contour_kwargs = {'colors':'r', 'linestyles':'dashed'}
+corner.hist2d(t_flight, HMXB[7], ax=ax[2], bins=40, range=plt_range, plot_density=False,
+		plot_datapoints=False, contour_kwargs=contour_kwargs)
+corner.hist2d(sampler.flatchain.T[9], HMXB[7], ax=ax[2], bins=40, range=plt_range,
+		plot_density=False, plot_datapoints=False)
+ax[2].set_xlabel(r"$t_{\rm i}\ {\rm (Myr)}$", size=16)
+ax[2].set_ylabel(r"$\theta\ {\rm (amin)}$", size=16)
+
+plt.tight_layout()
+
+plt.savefig('../figures/smc_population_HMXB.pdf')
 
 
 
