@@ -2,6 +2,8 @@
 
 import sys
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
 import matplotlib.gridspec as gridspec
@@ -66,9 +68,10 @@ plt.rc('font', **fontProperties)
 fig, ax = plt.subplots(10,10, figsize=(10,10))
 
 
-labels = [r"$M_1\ (M_{\odot})$", r"$M_2\ (M_{\odot})$", r"$a\ (R_{\odot})$", r"$e$", r"$v_k\ ({\rm km}\ {\rm s}^{-1})$", \
-          r"$\theta_k\ ({\rm rad.})$", r"$\phi_k\ ({\rm rad.})$", r"$\alpha_{\rm b}\ ({\rm deg.})$", \
-          r"$\delta_{\rm b}\ ({\rm deg.}) $", r"$t_{\rm b}\ ({\rm Myr})$"]
+labels = [r"$M_{\rm 1, i}\ (M_{\odot})$", r"$M_{\rm 2, i}\ (M_{\odot})$", r"$a_{\rm i}\ (R_{\odot})$", \
+          r"$e_{\rm i}$", r"$v_{\rm k, i}\ ({\rm km}\ {\rm s}^{-1})$", r"$\theta_{\rm k}\ ({\rm rad.})$", \
+          r"$\phi_{\rm k}\ ({\rm rad.})$", r"$\alpha_{\rm i}\ ({\rm deg.})$", \
+          r"$\delta_{\rm i}\ ({\rm deg.}) $", r"$t_{\rm i}\ ({\rm Myr})$"]
 hist2d_kwargs = {"plot_datapoints" : False}
 fig = corner.corner(sampler.flatchain, fig=fig, labels=labels, max_n_ticks=4, **hist2d_kwargs)
 
