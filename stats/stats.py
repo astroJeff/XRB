@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 from scipy.stats import maxwell, norm, uniform, powerlaw, truncnorm
 import emcee
+from emcee.utils import MPIPool
+
 sys.path.append('../binary')
 import load_sse
 import binary_evolve
@@ -377,7 +379,8 @@ def run_emcee(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
 
 
 def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
-    P_orb_obs_err=1.0, ecc_obs_err=0.05, nburn=1000, nsteps=1000, threads=1):
+    P_orb_obs_err=1.0, ecc_obs_err=0.05, nburn=1000, nsteps=1000,
+    threads=1, mpi=False):
     """ Run the emcee function
 
     Parameters
@@ -394,6 +397,8 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
         Observed declination
     threads : int
         Number of threads to use for parallelization
+    mpi : bool
+        If true, use MPIPool for parallelization
 
     Returns
     -------
@@ -409,10 +414,18 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
 
     # Define sampler
     args = [[M2_d, M2_d_err, P_orb_obs, P_orb_obs_err, ecc_obs, ecc_obs_err, ra, dec]]
-    if threads == 1:
-        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=ln_posterior, args=args)
-    else:
+
+    if mpi == True:
+        pool = MPIPool()
+        if not pool.is_master():
+            pool.wait()
+            sys.exit(0)
+        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=ln_posterior, args=args, pool=pool)
+
+    elif threads != 1:
         sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=ln_posterior, args=args, threads=threads)
+    else:
+        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=ln_posterior, args=args)
 
     # Assign initial values
     p0 = np.zeros((nwalkers,10))
@@ -475,6 +488,9 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
     pos,prob,state = sampler.run_mcmc(pos, N=nsteps)
 
     print "Finished production run"
+
+    if mpi is True: pool.close()
+
 
     return sampler1, sampler2, sampler3, sampler4, sampler
 
