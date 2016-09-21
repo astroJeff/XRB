@@ -210,7 +210,7 @@ def get_dtheta_ddelta(alpha, delta, alpha_b, delta_b):
     """ Calculate the coordinate transformation derivative dtheta/ddelta """
 
     theta_proj = get_theta_proj(alpha, delta, alpha_b, delta_b)
-    return - 1.0/(2.0*theta_proj) * (np.cos(delta_b)*np.sin(delta)*(alpha_b-alpha)**2 + 2.0*(delta_b-delta))
+    return 1.0/(2.0*theta_proj) * (-np.cos(delta_b)*np.sin(delta)*(alpha_b-alpha)**2 + 2.0*(delta_b-delta))
 
 def get_domega_dalpha(alpha, delta, alpha_b, delta_b):
     """ Calculate the coordinate transformation derivative domega/dalpha """
@@ -305,7 +305,7 @@ def ln_posterior(x, args):
     funcs = [lambda theta_proj: -np.inf, lambda theta_proj: np.log(np.tan(np.arcsin(theta_proj/tmp))/tmp)]
     J_coor = np.abs(get_J_coor(c.deg_to_rad*ra, c.deg_to_rad*dec, c.deg_to_rad*ra_b, c.deg_to_rad*dec_b)) # Jacobian for coordinate change
     P_omega = 1.0 / (2.0 * np.pi)
-    ll += np.piecewise(theta_proj, conds, funcs) + np.log(P_omega) + np.log(1.0 / J_coor)
+    ll += np.piecewise(theta_proj, conds, funcs) + np.log(P_omega) + np.log(J_coor)
 
 #    print rad_to_dec(theta_proj)*3600.0, tmp, t_sn, v_sys, v_sys*t_sn, \
 #        np.arcsin(theta_proj/tmp), np.tan(np.arcsin(theta_proj/tmp)), np.piecewise(theta_proj, conds, funcs), \
