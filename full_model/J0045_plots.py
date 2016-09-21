@@ -25,8 +25,8 @@ dec_J0045 = coor_J0045.dec.degree
 
 # Load pickled data
 sampler = pickle.load( open( "../data/J0045_MCMC_sampler.obj", "rb" ) )
-init_params_J0045 = pickle.load( open( "../data/J0045_pop_synth_init_conds.obj", "rb" ) )
-HMXB_J0045 = pickle.load( open( "../data/J0045_pop_synth_HMXB.obj", "rb" ) )
+#init_params_J0045 = pickle.load( open( "../data/J0045_pop_synth_init_conds.obj", "rb" ) )
+#HMXB_J0045 = pickle.load( open( "../data/J0045_pop_synth_HMXB.obj", "rb" ) )
 
 
 # Specific distribution plots
