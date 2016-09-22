@@ -106,11 +106,11 @@ for i in np.arange(10):
     ax[9,i].xaxis.set_label_coords(0.5, -0.5)
 
 # Set declination ticks
-ax[9,8].set_xticks([-73.5, -73.0, -72.5])
-ax[9,8].set_xticklabels(["-73.5", "-73.0", "-72.5"])
+ax[9,8].set_xticks([-73.5, -73.0])
+ax[9,8].set_xticklabels(["-73.5", "-73.0"])
 for i in np.arange(8):
-    ax[8,i].set_yticks([-73.5, -73.0, -72.5])
-ax[8,0].set_yticklabels(["-73.5", "-73.0", "-72.5"])
+    ax[8,i].set_yticks([-73.5, -73.0])
+ax[8,0].set_yticklabels(["-73.5", "-73.0"])
 
 # Set theta ticks
 for i in np.arange(5)+5:
