@@ -59,7 +59,7 @@ chains = np.array([sampler1, sampler2, sampler3, sampler4, sampler])
 
 
 ymin = [7.5, 2.0, 50.0, 0.0, 0.0, 1.5, 0.0, 14.8, -72.6, 20]
-ymax = [13.0, 8.0, 700.0, 1.0, 400.0, 3.2, 2.5, 16.6, -71.8, 75.0]
+ymax = [13.0, 8.0, 700.0, 1.0, 400.0, 3.2, 2.0*np.pi, 16.6, -71.8, 75.0]
 
 labels = [r"$M_{\rm 1, i}\ (M_{\odot})$", r"$M_{\rm 2, i}\ (M_{\odot})$", r"$a_{\rm i}\ (R_{\odot})$", \
           r"$e_{\rm i}$", r"$v_{\rm k, i}\ ({\rm km}\ {\rm s}^{-1})$", r"$\theta_{\rm k}\ ({\rm rad.})$", \
