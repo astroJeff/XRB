@@ -59,7 +59,7 @@ chains = np.array([sampler1, sampler2, sampler3, sampler4, sampler])
 
 
 ymin = [7.5, 2.0, 50.0, 0.0, 0.0, 1.5, 0.0, 14.8, -72.6, 20]
-ymax = [13.0, 8.0, 700.0, 1.0, 400.0, 3.2, 2.0*np.pi, 16.6, -71.8, 75.0]
+ymax = [13.0, 8.0, 700.0, 1.0, 400.0, 3.2, np.pi, 16.6, -71.8, 75.0]
 
 labels = [r"$M_{\rm 1, i}\ (M_{\odot})$", r"$M_{\rm 2, i}\ (M_{\odot})$", r"$a_{\rm i}\ (R_{\odot})$", \
           r"$e_{\rm i}$", r"$v_{\rm k, i}\ ({\rm km}\ {\rm s}^{-1})$", r"$\theta_{\rm k}\ ({\rm rad.})$", \
@@ -102,7 +102,7 @@ for i in np.arange(10):
         if i == 3: ax[i,j].set_yticks([0.25, 0.5, 0.75])
         if i == 4: ax[i,j].set_yticks([100, 200, 300])
         if i == 5: ax[i,j].set_yticks([np.pi/2., 3.0/4.0*np.pi, np.pi])
-        if i == 6: ax[i,j].set_yticks([1.0/4.0*np.pi, np.pi/2.])
+        if i == 6: ax[i,j].set_yticks([1.0/4.0*np.pi, np.pi/2., 3.0/4.0*np.pi])
         if i == 7: ax[i,j].set_yticks([15., 16.])
         if i == 8: ax[i,j].set_yticks([-72, -72.2, -72.4])
         if i == 9: ax[i,j].set_yticks([20, 40, 60])
@@ -122,7 +122,7 @@ ax[2,0].set_yticklabels([200, 400, 600])
 ax[3,0].set_yticklabels([0.25, 0.5, 0.75])
 ax[4,0].set_yticklabels([100, 200, 300])
 ax[5,0].set_yticklabels([r'$\pi/2$', r'$3 \pi/4$', r'$\pi$'])
-ax[6,0].set_yticklabels([r'$\pi/4$', r'$\pi/2$'])
+ax[6,0].set_yticklabels([r'$\pi/4$', r'$\pi/2$', r'$3\pi/4$'])
 ax[7,0].set_yticklabels([15., 16.])
 ax[8,0].set_yticklabels([-72.0, -72.2, -72.4])
 ax[9,0].set_yticklabels([20, 40, 60])

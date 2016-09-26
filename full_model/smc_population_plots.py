@@ -11,8 +11,8 @@ from astropy.coordinates import SkyCoord
 from astropy import units as u
 
 sys.path.append('../SF_history')
+sys.path.append('../src')
 import sf_history
-sys.path.append('../stats')
 import stats
 sys.path.append('../notebooks')
 import density_contour
@@ -21,7 +21,6 @@ import pop_synth
 sys.path.append('../binary')
 import binary_evolve
 import load_sse
-sys.path.append('../constants')
 import constants as c
 
 

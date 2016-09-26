@@ -12,7 +12,6 @@ sys.path.append('../binary')
 import load_sse
 import binary_evolve
 from binary_evolve import A_to_P, P_to_A
-sys.path.append('../constants')
 import constants as c
 sys.path.append('../SF_history')
 import sf_history

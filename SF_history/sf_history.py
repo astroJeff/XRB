@@ -6,7 +6,7 @@ from astropy import units as u
 from scipy.interpolate import interp1d
 import scipy.optimize as so
 import sys
-sys.path.append('../constants')
+sys.path.append('../src')
 import constants as c
 
 lmc_sfh = None
