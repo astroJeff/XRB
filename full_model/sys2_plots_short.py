@@ -104,27 +104,31 @@ for i in np.arange(10):
     ax[9,i].xaxis.set_label_coords(0.5, -0.5)
 
 # Set declination ticks
-ax[9,8].set_xticks([-72.2, -72.0])
-ax[9,8].set_xticklabels(["-72.2", "-72.0"])
+ax[9,8].set_xticks([-72.4, -72.2, -72.0])
+ax[9,8].set_xticklabels(["-72.4", "-72.2", "-72.0"])
 for i in np.arange(8):
-    ax[8,i].set_yticks([-72.2, -72.0])
-ax[8,0].set_yticklabels(["-72.2", "-72.0"])
+    ax[8,i].set_yticks([-72.4, -72.2, -72.0])
+ax[8,0].set_yticklabels(["-72.4", "-72.2", "-72.0"])
 
 # Set theta ticks
 for i in np.arange(5)+5:
     ax[i,5].set_xticks([np.pi/2., 3.*np.pi/4., np.pi])
+    ax[i,5].set_xlim(1.4, np.pi)
 ax[9,5].set_xticklabels([r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$', r'$\pi$'])
 for i in np.arange(4):
     ax[5,i].set_yticks([np.pi/2., 3.*np.pi/4., np.pi])
+    ax[5,i].set_ylim(1.4, np.pi)
 ax[5,0].set_yticklabels([r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$', r'$\pi$'])
 
 
 # Set phi ticks
 for i in np.arange(4)+6:
     ax[i,6].set_xticks([np.pi/4., np.pi/2., 3.*np.pi/4.])
+    ax[i,6].set_xlim(0.0, np.pi)
 ax[9,6].set_xticklabels([r'$\frac{\pi}{4}$', r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$'])
 for i in np.arange(6):
     ax[6,i].set_yticks([np.pi/4., np.pi/2., 3.*np.pi/4.])
+    ax[6,i].set_ylim(0.0, np.pi)
 ax[6,0].set_yticklabels([r'$\frac{\pi}{4}$', r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$'])
 
 
