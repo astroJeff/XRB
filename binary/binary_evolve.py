@@ -16,6 +16,21 @@ import constants as c
 
 
 
+# Start moving toward creating a "binary" class
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def func_MT_forward(M_1_in, M_2_in, A_in, ecc_in, beta=1.0):
     """ Evolve a binary through thermal timescale mass transfer.
     It is assumed that the binary (instantaneously) circularizes
