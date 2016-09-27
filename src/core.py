@@ -3,29 +3,33 @@ import time     # for time()
 import math     # for sqrt()
 
 
-# default values for function parameters
+# DEFAULT VALUES
 
-_DEFAULT_TIMEIT_THRESHOLD = 0.1
-_DEFAULT_TIME_RESOLUTION_REPS = 1000
+_DEF_TIME_IT_THRESHOLD = 0.01
+_DEF_TIME_IT_RUNS = 30
+_DEF_TIME_RESOLUTION_REPS = 1000
 
 
-# inclusion of the parent directories of the modules to the system path
+# IMPORT ALL USEFUL MODULES
 
 sys.path = ['../constants', \
             '../SF_history', \
             '../binary', \
-            '../stats', \
             '../notebooks', \
-            '../pop_synth' \
+            '../pop_synth', \
+            '..'
            ] + sys.path
 
-
-# import some common modules
-
+import stats
 import constants
+import sf_history
+import pop_synth
+import density_contour
+import binary_evolve
+import load_sse
 
 
-# timing functions
+# TIMING FUNCTIONS
 
 _core_timeref = time.time() # set with current time during module initialization
 
@@ -44,35 +48,52 @@ def toc():
     return time.time() - _core_timeref
 
 
-def time_it(expr, threshold = _DEFAULT_TIMEIT_THRESHOLD):
+def time_it(expr, threshold = _DEF_TIME_IT_THRESHOLD, runs = _DEF_TIME_IT_RUNS):
     """ Returns the execution time of an expression. If the result is smaller
         than a threshold, it repeats until the total duration is larger and
-        returns the average.
+        returns the average. The total process is repeated 'runs' times so that
+        the average and standard error of the execution to be returned.
 
         Parameters
         ----------
         expr:       string
                     python expression to be timed, e.g. a function call
 
-        threshold:  float
-                    threshold for total duration
+        threshold:  float >= 0
+                    threshold for total duration of each run
+
+        runs:       integer > 0
+                    number of runs
 
         Returns
         -------
-        duration:   float
-                    the execution time (or the average) of 'expr'
+        mean:       float
+                    average execution time of 'expr'
+
+        std:        float
+                    standard error of execution time
     """
-    calls = 0                   # count how many timings were used
-    duration = 0                # total duration
-    tic()                       # start clock
-    while duration < threshold:
-        exec(expr)              # execute expression
-        calls += 1
-        duration = toc()
-    return duration / calls     # return the average
+
+    assert threshold >= 0
+    assert runs > 0
+
+    results = []                            # stores the outcome of each run
+    for run in range(runs):
+        calls = 0                           # count how many timings took place
+        duration = 0                        # total duration
+        tic()                               # start clock
+        while duration < threshold:
+            exec(expr)                      # execute expression
+            calls += 1
+            duration = toc()
+        results.append(duration / calls)    # return the average
+
+    mean = sum(results) / runs
+    std = math.sqrt(sum([(x - mean) ** 2 for x in results]) / (runs - 1.0))
+    return mean, std
 
 
-def time_resolution(reps = _DEFAULT_TIME_RESOLUTION_REPS, report = False):
+def time_resolution(reps = _DEF_TIME_RESOLUTION_REPS, report = False):
     """ Discovers the timing resolution of tic() and toc() through experiments
 
     Parameters
@@ -135,19 +156,24 @@ def time_resolution(reps = _DEFAULT_TIME_RESOLUTION_REPS, report = False):
     return median, mean, std, ci
 
 
-# benchmark code
+# BENCHMARK CODE (execute module)
 
 if __name__ == "__main__":
     """ Report values computed by module and benchmark results """
 
     print "CORE.PY BENCHMARK"
 
+    # report paths
     print "\n[PATHS]"
     print "\n".join(sys.path)
 
+    # discover tic() - toc() resolution
     print "\n[TIME RESOLUTION]"
     median = time_resolution(report = True)
 
+    # perform a complexity experiment as an example
     print "\n[CREATION OF LIST SCALES LIKE THAT...]"
-    for n in [1000, 10000, 100000, 1000000]:
-        print "For N = %10d, %1.4e" % (n, time_it("[x for x in range(" + str(n) + ")]"))
+    print "{0:<13}{1:^13}{2:>13}".format('N', 'average', 'std.err. (%)')
+    for n in [10, 100, 1000, 10000, 100000]:
+        m, s = time_it("[x for x in range(" + str(n) + ")]", threshold = 0.01, runs = 30)
+        print "{0:<13d}{1:^13.2e}{2:>13.1f}".format(n, m, s / m * 100)
