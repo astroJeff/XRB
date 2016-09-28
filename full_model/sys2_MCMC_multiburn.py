@@ -1,6 +1,8 @@
 # Run test system 1
-
 import sys
+sys.path.append("../")
+from src.core import *
+
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pickle
@@ -10,12 +12,9 @@ import matplotlib.pyplot as plt
 import emcee
 import corner
 
-sys.path.append('../stats')
-import stats
-sys.path.append('../pop_synth')
-import pop_synth
-sys.path.append('../binary')
-import binary_evolve
+from src import stats
+from pop_synth import pop_synth
+from binary import binary_evolve
 
 
 
@@ -68,10 +67,9 @@ start_time = time.time()
 
 sampler1, sampler2, sampler3, sampler4, sampler = stats.run_emcee_2(M2_obs, P_obs, ecc_obs, ra_obs, dec_obs, \
     M2_d_err=M2_d_err, P_orb_obs_err=P_orb_obs_err, ecc_obs_err=ecc_obs_err, \
-    nburn=10000, nsteps=50000)
+    nwalkers=640, nburn=100, nsteps=500)
 
 print "Simulation took", time.time()-start_time, "seconds"
-
 
 
 
@@ -95,6 +93,7 @@ print "Acceptance fraction", sampler4.acceptance_fraction
 print "Production run:"
 print "Autocorrelation lengths", sampler.acor
 print "Acceptance fraction", sampler.acceptance_fraction
+
 
 # Save samples
 pickle.dump( sampler1, open( "../data/sys2_MCMC_multiburn_burn1.obj", "wb" ) )

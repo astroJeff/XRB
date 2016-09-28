@@ -1,9 +1,8 @@
 from src.core import *
 from scipy.stats import maxwell, norm, uniform, powerlaw, truncnorm
-import sf_history
-import load_sse
-import binary_evolve
-from binary_evolve import A_to_P, P_to_A
+from SF_history import sf_history
+from binary import binary_evolve, load_sse
+from binary.binary_evolve import A_to_P, P_to_A
 
 
 # Define random deviate functions

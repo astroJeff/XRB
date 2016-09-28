@@ -8,7 +8,7 @@ from matplotlib import font_manager
 import emcee
 import matplotlib.gridspec as gridspec
 
-sys.path.append('../stats')
+sys.path.append('../src')
 import stats
 
 

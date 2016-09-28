@@ -1,13 +1,14 @@
+import sys
+sys.path.append("../")
 from src.core import *
 
 # SMC Population
-import sys
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pickle
 import time
-import stats
-import load_sse
+from src import stats
+from binary import load_sse
 
 # Record time
 start_time = time.time()
