@@ -1,11 +1,6 @@
-import sys
-import numpy as np
+from src.core import *
 from scipy.stats import maxwell, norm, uniform, powerlaw, truncnorm
-sys.path.append('../constants')
-import constants as c
-sys.path.append('../SF_history')
 import sf_history
-sys.path.append('../binary')
 import load_sse
 import binary_evolve
 from binary_evolve import A_to_P, P_to_A

@@ -1,13 +1,11 @@
+from src.core import *
+
 import os
-import numpy as np
 import matplotlib.pyplot as plt
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 from scipy.interpolate import interp1d
 import scipy.optimize as so
-import sys
-sys.path.append('../src')
-import constants as c
 
 lmc_sfh = None
 lmc_coor = None

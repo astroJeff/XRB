@@ -1,6 +1,6 @@
+from src.core import *
 import os
 import glob
-import numpy as np
 from scipy.interpolate import interp1d
 
 

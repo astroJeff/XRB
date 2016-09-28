@@ -1,4 +1,4 @@
-import numpy as np
+from src.core import *
 import matplotlib.pyplot as plt
 import scipy.optimize as so
 
@@ -55,4 +55,3 @@ def test_density_contour():
     norm = np.random.normal(10., 15., size=(12540035, 2))
     density_contour(norm[:,0], norm[:,1], 100, 100)
     plt.show()
-

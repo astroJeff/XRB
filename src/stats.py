@@ -1,19 +1,15 @@
+from src.core import *
 import sys
-import os
 import copy
-import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 from scipy.stats import maxwell, norm, uniform, powerlaw, truncnorm
 import emcee
 from emcee.utils import MPIPool
 
-sys.path.append('../binary')
 import load_sse
 import binary_evolve
 from binary_evolve import A_to_P, P_to_A
-import constants as c
-sys.path.append('../SF_history')
 import sf_history
 
 

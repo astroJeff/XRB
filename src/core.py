@@ -1,8 +1,3 @@
-import sys      # for sys.path
-import time     # for time()
-import math     # for sqrt()
-
-
 # DEFAULT VALUES
 
 _DEF_TIME_IT_THRESHOLD = 0.01
@@ -10,23 +5,25 @@ _DEF_TIME_IT_RUNS = 30
 _DEF_TIME_RESOLUTION_REPS = 1000
 
 
-# IMPORT ALL USEFUL MODULES
+# IMPORT ALL USEFUL PATHS AND MODULES
 
-sys.path = ['../constants', \
-            '../SF_history', \
-            '../binary', \
-            '../notebooks', \
-            '../pop_synth', \
-            '..'
-           ] + sys.path
+import sys              # for sys.path & used by other modules in the package
+import time             # for time.time()
+import os               # used by other modules in the package
+import numpy as np      # used by other modules in the package
+
+sys.path = ['./SF_history', './binary', './notebooks', './pop_synth', './src'] \
+           + sys.path
+
+import constants as c   # used by other modules in the package
 
 import stats
-import constants
-import sf_history
-import pop_synth
-import density_contour
-import binary_evolve
-import load_sse
+#from binary import load_sse
+#from binary import binary_evolve
+#from notebooks import density_contour
+#from pop_synth import pop_synth
+#from SF_history import sf_history
+#from src import constants as c
 
 
 # TIMING FUNCTIONS
@@ -89,7 +86,8 @@ def time_it(expr, threshold = _DEF_TIME_IT_THRESHOLD, runs = _DEF_TIME_IT_RUNS):
         results.append(duration / calls)    # return the average
 
     mean = sum(results) / runs
-    std = math.sqrt(sum([(x - mean) ** 2 for x in results]) / (runs - 1.0))
+    #std = math.sqrt(sum([(x - mean) ** 2 for x in results]) / (runs - 1.0))
+    std = np.std(results)
     return mean, std
 
 
@@ -145,7 +143,8 @@ def time_resolution(reps = _DEF_TIME_RESOLUTION_REPS, report = False):
     index = reps / 20
     ci = [results[index - 1], results[reps - index]]
     mean = sum(results) / reps
-    std = math.sqrt(sum([(x-mean)**2 for x in results]) / (reps * (reps - 1.0)))
+    #std = math.sqrt(sum([(x-mean)**2 for x in results]) / (reps * (reps - 1.0)))
+    std = np.std(results) / np.sqrt(reps)
 
     if report:
         print "median   =", median
@@ -155,12 +154,10 @@ def time_resolution(reps = _DEF_TIME_RESOLUTION_REPS, report = False):
 
     return median, mean, std, ci
 
-
 # BENCHMARK CODE (execute module)
 
 if __name__ == "__main__":
-    """ Report values computed by module and benchmark results """
-
+#    """ Report values computed by module and benchmark results """
     print "CORE.PY BENCHMARK"
 
     # report paths
@@ -175,5 +172,5 @@ if __name__ == "__main__":
     print "\n[CREATION OF LIST SCALES LIKE THAT...]"
     print "{0:<13}{1:^13}{2:>13}".format('N', 'average', 'std.err. (%)')
     for n in [10, 100, 1000, 10000, 100000]:
-        m, s = time_it("[x for x in range(" + str(n) + ")]", threshold = 0.01, runs = 30)
+        m, s = time_it("[x for x in range(" + str(n) + ")]", threshold = 0.01, runs = 100)
         print "{0:<13d}{1:^13.2e}{2:>13.1f}".format(n, m, s / m * 100)

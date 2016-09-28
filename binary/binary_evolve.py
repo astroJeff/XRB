@@ -1,11 +1,7 @@
-import sys
-import os
-import numpy as np
+from src.core import *
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 import load_sse
-sys.path.append('../src')
-import constants as c
 
 
 
