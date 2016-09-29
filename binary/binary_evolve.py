@@ -1,4 +1,5 @@
 from src.core import *
+
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 import load_sse
@@ -9,21 +10,6 @@ import load_sse
 # To Do: Check for thermal timescale MT criterion
 # To Do: What happens when companion's lifetime falls between primary's MS lifetime and stellar lifetime?
 # To Do: Remove RLOF systems
-
-
-
-# Start moving toward creating a "binary" class
-
-
-
-
-
-
-
-
-
-
-
 
 
 

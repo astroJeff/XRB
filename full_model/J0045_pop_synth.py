@@ -1,15 +1,11 @@
 # Run J0045-7319
-
-import sys
-sys.path.append("../")
 from src.core import *
 
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pickle
-import time
 
-from pop_synth import pop_synth
+import pop_synth
 
 
 

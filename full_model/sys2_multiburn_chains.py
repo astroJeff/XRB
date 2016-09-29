@@ -1,17 +1,14 @@
-import sys
-sys.path.append("../")
+import matplotlib
+matplotlib.use('Agg')
 from src.core import *
 
 import pickle
-import matplotlib
-matplotlib.use('Agg')
-import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
 import emcee
 import matplotlib.gridspec as gridspec
 
-from src import stats
+import stats
 
 
 print "Loading data..."
@@ -87,16 +84,16 @@ for i in np.arange(10):
         if j != 4:
             ax[i,j].set_xticks([0])
 
-            if i == 9:
-                if j == 0: ax[i,j].set_xticklabels([0])
-                if j == 1: ax[i,j].set_xticklabels([10000])
-                if j == 2: ax[i,j].set_xticklabels([20000])
-                if j == 3: ax[i,j].set_xticklabels([30000])
+#            if i == 9:
+#                if j == 0: ax[i,j].set_xticklabels([0])
+#                if j == 1: ax[i,j].set_xticklabels([10000])
+#                if j == 2: ax[i,j].set_xticklabels([20000])
+#                if j == 3: ax[i,j].set_xticklabels([30000])
 
 
-        if j == 4:
-            ax[i,j].set_xticks([0, 10000, 20000, 30000, 40000, 50000])
-            if i == 9: ax[i,j].set_xticklabels([40000, 50000, 60000, 70000, 80000, 90000])
+#        if j == 4:
+#            ax[i,j].set_xticks([0, 10000, 20000, 30000, 40000, 50000])
+#            if i == 9: ax[i,j].set_xticklabels([40000, 50000, 60000, 70000, 80000, 90000])
 
         if i == 0: ax[i,j].set_yticks([8,10,12])
         if i == 1: ax[i,j].set_yticks([4, 6])

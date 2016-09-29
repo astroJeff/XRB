@@ -1,5 +1,4 @@
 from src.core import *
-import os
 import glob
 from scipy.interpolate import interp1d
 
@@ -50,7 +49,7 @@ def read_sse_data():
     """
     names = ["time","type","mass","mdot","radius"]
 
-    f_list = glob.glob("../data/sse_data/mdot_*.dat")
+    f_list = glob.glob("data/sse_data/mdot_*.dat")
 
     f_list = np.sort(f_list)
 
@@ -259,7 +258,7 @@ def read_he_star_data():
     global func_sse_he_star_final
 
     names = ["mass","he_mass","t_ms"]
-    f = "../data/sse_data/He_star.dat"
+    f = "data/sse_data/He_star.dat"
 
     sse_he_star = np.genfromtxt(os.path.abspath(f), usecols=(0,1,2), names=names)
 
@@ -268,7 +267,7 @@ def read_he_star_data():
 
 
     names = ["He_mass_initial", "He_mass_final"]
-    f = "../data/sse_data/He_star_initial_final_z0.008.dat"
+    f = "data/sse_data/He_star_initial_final_z0.008.dat"
 
     sse_he_star_final = np.genfromtxt(os.path.abspath(f), names=names)
     func_sse_he_star_final = interp1d(sse_he_star_final["He_mass_initial"], sse_he_star_final["He_mass_final"], bounds_error=False, fill_value=1.0)

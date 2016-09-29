@@ -1,21 +1,16 @@
 # Run test system 1
-
-import sys
-sys.path.append("../")
 from src.core import *
 
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pickle
-import time
-import numpy as np
 import matplotlib.pyplot as plt
 import emcee
 import corner
 
-from src import stats
-from pop_synth import pop_synth
-from binary import binary_evolve
+import stats
+import pop_synth
+import binary_evolve
 
 
 

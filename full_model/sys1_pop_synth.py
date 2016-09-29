@@ -1,16 +1,12 @@
 # Run J0045-7319
-
-import sys
-sys.path.append("../")
 from src.core import *
 
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pickle
-import time
 
-from src import pop_synth
-from binary import binary_evolve
+import pop_synth
+import binary_evolve
 
 
 

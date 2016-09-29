@@ -1,10 +1,6 @@
 # Create plots from saved pickles of J0045-7319 simulations
-
-import sys
-sys.path.append("../")
 from src.core import *
 
-import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -15,8 +11,8 @@ import pickle
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 
-from SF_history import sf_history
-from src import stats
+import sf_history
+import stats
 
 
 # J0045-7319 coordinates

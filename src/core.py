@@ -17,7 +17,12 @@ sys.path = ['./SF_history', './binary', './notebooks', './pop_synth', './src'] \
 
 import constants as c   # used by other modules in the package
 
-import stats
+# For plotting
+import matplotlib
+matplotlib.use('Agg')
+
+
+#import stats
 #from binary import load_sse
 #from binary import binary_evolve
 #from notebooks import density_contour

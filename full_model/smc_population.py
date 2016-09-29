@@ -1,15 +1,11 @@
 # SMC Population
-
-import sys
-sys.path.append("../")
 from src.core import *
 
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pickle
-import time
 
-from src import stats
+import stats
 
 # Record time
 start_time = time.time()

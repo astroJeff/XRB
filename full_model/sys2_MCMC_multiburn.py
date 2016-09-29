@@ -1,20 +1,16 @@
 # Run test system 1
-import sys
-sys.path.append("../")
 from src.core import *
 
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pickle
-import time
-import numpy as np
 import matplotlib.pyplot as plt
 import emcee
 import corner
 
-from src import stats
-from pop_synth import pop_synth
-from binary import binary_evolve
+import stats
+import pop_synth
+import binary_evolve
 
 
 
@@ -67,7 +63,7 @@ start_time = time.time()
 
 sampler1, sampler2, sampler3, sampler4, sampler = stats.run_emcee_2(M2_obs, P_obs, ecc_obs, ra_obs, dec_obs, \
     M2_d_err=M2_d_err, P_orb_obs_err=P_orb_obs_err, ecc_obs_err=ecc_obs_err, \
-    nwalkers=640, nburn=100, nsteps=500)
+    nwalkers=640, nburn=2, nsteps=2)
 
 print "Simulation took", time.time()-start_time, "seconds"
 
@@ -192,6 +188,3 @@ for i in range(sampler1.dim):
 fig.subplots_adjust(hspace=0, wspace=0)
 plt.yticks(fontsize = 8)
 plt.savefig('../figures/sys2_chain_multiburn.pdf')
-
-
-

@@ -1,6 +1,5 @@
 from src.core import *
 
-import os
 import matplotlib.pyplot as plt
 from astropy.coordinates import SkyCoord
 from astropy import units as u
