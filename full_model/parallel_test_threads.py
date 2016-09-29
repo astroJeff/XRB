@@ -1,6 +1,9 @@
 # Run test system 1
 
 import sys
+sys.path.append("../")
+from src.core import *
+
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pickle
@@ -10,12 +13,9 @@ import matplotlib.pyplot as plt
 import emcee
 import corner
 
-sys.path.append('../stats')
-import stats
-sys.path.append('../pop_synth')
-import pop_synth
-sys.path.append('../binary')
-import binary_evolve
+from src import stats
+from pop_synth import pop_synth
+from binary import binary_evolve
 
 
 

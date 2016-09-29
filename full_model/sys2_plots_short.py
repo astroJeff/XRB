@@ -1,6 +1,9 @@
 # Create plots from saved pickles of J0045-7319 simulations
 
 import sys
+sys.path.append("../")
+from src.core import *
+
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -12,12 +15,8 @@ import pickle
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 
-sys.path.append('../SF_history')
-import sf_history
-sys.path.append('../stats')
-import stats
-sys.path.append('../notebooks')
-import density_contour
+from SF_history import sf_history
+from src import stats
 
 
 # System 1 test parameters

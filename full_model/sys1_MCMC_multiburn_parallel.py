@@ -1,6 +1,8 @@
 # Run test system 1
-
 import sys
+sys.path.append("../")
+from src.core import *
+
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pickle
@@ -12,15 +14,10 @@ from emcee.utils import MPIPool
 import corner
 import copy
 
-sys.path.append('../stats')
-import stats
-sys.path.append('../pop_synth')
-import pop_synth
-sys.path.append('../binary')
-import binary_evolve
-import load_sse
-sys.path.append('../SF_history')
-import sf_history
+from src import stats
+from pop_synth import pop_synth
+from binary import binary_evolve
+
 
 
 

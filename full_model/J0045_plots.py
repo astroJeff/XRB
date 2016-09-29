@@ -1,6 +1,9 @@
 # Create plots from saved pickles of J0045-7319 simulations
 
 import sys
+sys.path.append("../")
+from src.core import *
+
 import numpy as np
 import matplotlib.pyplot as plt
 import corner
@@ -8,12 +11,8 @@ import pickle
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 
-sys.path.append('../SF_history')
-import sf_history
-sys.path.append('../stats')
-import stats
-sys.path.append('../notebooks')
-import density_contour
+from SF_history import sf_history
+from src import stats
 
 
 # J0045-7319 coordinates
@@ -94,7 +93,7 @@ plt.savefig('../figures/J0045_chains.pdf')
 
 # Better birth distribution plot
 plt.figure(figsize=(8,8))
-ra_out = sampler.flatchain.T[7] 
+ra_out = sampler.flatchain.T[7]
 dec_out = sampler.flatchain.T[8]
 sf_history.get_SMC_plot_polar(50, ra_dist=ra_out, dec_dist=dec_out, ra=ra_J0045, dec=dec_J0045)
 plt.savefig('../figures/J0045_dist_birth_location.pdf')

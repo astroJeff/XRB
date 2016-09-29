@@ -1,6 +1,9 @@
 # Create plots from saved pickles of SMC HMXB simulations
 
 import sys
+sys.path.append("../")
+from src.core import *
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -10,18 +13,10 @@ import pickle
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 
-sys.path.append('../SF_history')
-sys.path.append('../src')
-import sf_history
-import stats
-sys.path.append('../notebooks')
-import density_contour
-sys.path.append('../pop_synth')
-import pop_synth
-sys.path.append('../binary')
-import binary_evolve
-import load_sse
-import constants as c
+from SF_history import sf_history
+from src import stats, constants as c
+from pop_synth import pop_synth
+from binary import binary_evolve, load_sse
 
 
 print "Loading data"

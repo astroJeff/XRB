@@ -1,4 +1,7 @@
 import sys
+sys.path.append("../")
+from src.core import *
+
 import pickle
 import matplotlib
 matplotlib.use('Agg')
@@ -8,8 +11,7 @@ from matplotlib import font_manager
 import emcee
 import matplotlib.gridspec as gridspec
 
-sys.path.append('../src')
-import stats
+from src import stats
 
 
 print "Loading data..."
