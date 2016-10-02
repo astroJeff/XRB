@@ -114,8 +114,8 @@ def ln_priors(y):
     lp += np.log(np.sin(theta) / 2.0)
 
     # P(phi)
-    if phi < 0.0 or phi > 2.0*np.pi: return -np.inf
-    lp += -np.log( 2.0*np.pi )
+    if phi < 0.0 or phi > np.pi: return -np.inf
+    lp += -np.log( np.pi )
 
     # Get star formation history
     sf_history.load_sf_history()
@@ -543,8 +543,8 @@ def ln_priors_population(y):
     lp += np.log(np.sin(theta) / 2.0)
 
     # P(phi)
-    if phi < 0.0 or phi > 2.0*np.pi: return -np.inf
-    lp += -np.log( 2.0*np.pi )
+    if phi < 0.0 or phi > np.pi: return -np.inf
+    lp += -np.log( np.pi )
 
     # Get star formation history
     sfh = sf_history.get_SFH(ra_b, dec_b, t_b, sf_history.smc_coor, sf_history.smc_sfh)
@@ -668,7 +668,7 @@ def set_walkers(initial_masses, args, nwalkers=32):
     p0[:,3] = np.random.uniform(0.0, 0.99, size=nwalkers) # ecc
     p0[:,4] = 300.0 * np.random.uniform(size=nwalkers) # v_k
     p0[:,5] = np.random.normal(0.8*np.pi, 0.2, size=nwalkers) # theta
-    p0[:,6] = 2.0*np.pi*np.random.uniform(size=nwalkers) # phi
+    p0[:,6] = np.pi*np.random.uniform(size=nwalkers) # phi
     p0[:,7] = np.random.normal(ra, 0.1, size=nwalkers) # ra
     p0[:,8] = np.random.normal(dec, 0.1, size=nwalkers) # dec
     p0[:,9] = initial_masses.T[2] # t_b
@@ -682,7 +682,7 @@ def set_walkers(initial_masses, args, nwalkers=32):
             p0[i,3] = np.random.uniform(0.0, 0.99) # ecc
             p0[i,4] = 300.0* np.random.normal() # v_k
             p0[i,5] = np.random.normal(0.8*np.pi, 0.2) # theta
-            p0[i,6] = 2.0*np.pi*np.random.uniform(size=1) # phi
+            p0[i,6] = np.pi*np.random.uniform(size=1) # phi
             p0[i,7] = np.random.normal(ra, 0.1) # ra
             p0[i,8] = np.random.normal(dec, 0.1) # dec
 #            p0[:,8] = np.random.normal(1.2 * func_sse_tmax(initial_masses.T[0]), 1.0, size=nwalkers) # t_b

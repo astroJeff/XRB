@@ -1,5 +1,5 @@
 code/mesa/
-data/J0045_old/
+data/*old/
 documents/draft/
 code/sse_code
 documents/XRB_modeling.aux
@@ -37,6 +37,12 @@ code/bse_code/evolve.dat
 code/bse_code/fort.99
 code/bse_code/*.pdf
 data/lmc_data/proposed_regions.txt
+xrb/binary/*.pyc
+xrb/notebooks/*.pyc
+xrb/pop_synth/*.pyc
+xrb/SF_history/*.pyc
+xrb/src/*.pyc
+xrb/*.pyc
 binary/load_sse.pyc
 binary/binary_evolve.pyc
 constants/constants.pyc
@@ -44,7 +50,12 @@ stats/stats.pyc
 notebooks/density_contour.pyc
 pop_synth/pop_synth.pyc
 data/*.obj
+data/*.p
 full_model/*.out
 full_model/*.sbatch
 full_model/test*
+full_model
+scripts
+stats
+src
 documents/*.key
