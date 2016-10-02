@@ -48,7 +48,7 @@ binary/binary_evolve.pyc
 constants/constants.pyc
 stats/stats.pyc
 notebooks/density_contour.pyc
-pop_synth/pop_synth.pyc
+pop_synth/*.pyc
 data/*.obj
 data/*.p
 full_model/*.out

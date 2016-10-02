@@ -1,5 +1,5 @@
 # Run test system 1
-from src.core import *
+from xrb.src.core import *
 set_data_path("../data")
 
 from astropy.coordinates import SkyCoord
@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import emcee
 import corner
 
-from xrb.core import stats
+from xrb.src import stats
 from xrb.pop_synth import pop_synth
 from xrb.binary import binary_evolve
 
