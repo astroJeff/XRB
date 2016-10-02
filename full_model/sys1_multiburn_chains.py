@@ -1,4 +1,5 @@
 from src.core import *
+set_data_path("../data")
 
 import pickle
 import matplotlib
@@ -8,15 +9,15 @@ from matplotlib import font_manager
 import emcee
 import matplotlib.gridspec as gridspec
 
-import stats
+from xrb.core import stats
 
 
 print "Loading data..."
-sampler1 = pickle.load( open( "../data/sys1_MCMC_multiburn_burn1.obj", "rb" ) )
-sampler2 = pickle.load( open( "../data/sys1_MCMC_multiburn_burn2.obj", "rb" ) )
-sampler3 = pickle.load( open( "../data/sys1_MCMC_multiburn_burn3.obj", "rb" ) )
-sampler4 = pickle.load( open( "../data/sys1_MCMC_multiburn_burn4.obj", "rb" ) )
-sampler = pickle.load( open( "../data/sys1_MCMC_multiburn_sampler.obj", "rb" ) )
+sampler1 = pickle.load( open( INDATA("sys1_MCMC_multiburn_burn1.obj"), "rb" ) )
+sampler2 = pickle.load( open( INDATA("sys1_MCMC_multiburn_burn2.obj"), "rb" ) )
+sampler3 = pickle.load( open( INDATA("sys1_MCMC_multiburn_burn3.obj"), "rb" ) )
+sampler4 = pickle.load( open( INDATA("sys1_MCMC_multiburn_burn4.obj"), "rb" ) )
+sampler = pickle.load( open( INDATA("sys1_MCMC_multiburn_sampler.obj"), "rb" ) )
 print "Finished loading data."
 
 

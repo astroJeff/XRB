@@ -1,8 +1,6 @@
 # Create plots from saved pickles of J0045-7319 simulations
-import matplotlib
-matplotlib.use('Agg')
-
 from src.core import *
+set_data_path("../data")
 
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
@@ -12,8 +10,8 @@ import pickle
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 
-import sf_history
-import stats
+from xrb.SF_history import sf_history
+from xrb.core import stats
 
 
 # System 1 test parameters
@@ -31,9 +29,9 @@ t_b_true = 50.0
 
 
 # Load pickled data
-sampler = pickle.load( open( "../data/sys2_MCMC_multiburn_sampler.obj", "rb" ) )
-#init_params = pickle.load( open( "../data/sys2_pop_synth_init_conds.obj", "rb" ) )
-#HMXB = pickle.load( open( "../data/sys2_pop_synth_HMXB.obj", "rb" ) )
+sampler = pickle.load( open( INDATA("sys2_MCMC_multiburn_sampler.obj"), "rb" ) )
+#init_params = pickle.load( open( INDATA("sys2_pop_synth_init_conds.obj"), "rb" ) )
+#HMXB = pickle.load( open( INDATA("sys2_pop_synth_HMXB.obj"), "rb" ) )
 
 
 

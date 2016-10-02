@@ -1,5 +1,4 @@
-from src.core import *
-import sys
+from xrb.src.core import *
 import copy
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
@@ -7,9 +6,9 @@ from scipy.stats import maxwell, norm, uniform, powerlaw, truncnorm
 import emcee
 from emcee.utils import MPIPool
 
-from binary import load_sse, binary_evolve
-from binary.binary_evolve import A_to_P, P_to_A
-from SF_history import sf_history
+from xrb.binary import load_sse, binary_evolve
+from xrb.binary.binary_evolve import A_to_P, P_to_A
+from xrb.SF_history import sf_history
 
 
 nwalkers = 80
@@ -373,7 +372,7 @@ def run_emcee(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
 
 
 def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
-    P_orb_obs_err=1.0, ecc_obs_err=0.05, nwalkers=80, nburn=1000, 
+    P_orb_obs_err=1.0, ecc_obs_err=0.05, nwalkers=80, nburn=1000,
     nsteps=1000,
     threads=1, mpi=False):
     """ Run the emcee function

@@ -10,9 +10,9 @@ from emcee.utils import MPIPool
 import corner
 import copy
 
-import stats
-import pop_synth
-import binary_evolve
+from xrb.core import stats
+from xrb.pop_synth import pop_synth
+from xrb.binary import binary_evolve
 
 
 

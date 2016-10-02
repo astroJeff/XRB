@@ -8,7 +8,7 @@ from matplotlib import font_manager
 import emcee
 import matplotlib.gridspec as gridspec
 
-import stats
+from xrb.core import stats
 
 
 print "Loading data..."

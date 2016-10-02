@@ -1,4 +1,4 @@
-from src.core import *
+from xrb.src.core import *
 import matplotlib.pyplot as plt
 import scipy.optimize as so
 

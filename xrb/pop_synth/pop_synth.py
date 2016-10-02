@@ -1,9 +1,9 @@
-from src.core import *
+from xrb.src.core import *
 from scipy.stats import maxwell, norm, uniform, powerlaw, truncnorm
-import sf_history
-import binary_evolve
-import load_sse
-from binary_evolve import A_to_P, P_to_A
+from xrb.SF_history import sf_history
+from xrb.binary import binary_evolve
+from xrb.binary import load_sse
+from xrb.binary.binary_evolve import A_to_P, P_to_A
 
 
 # Define random deviate functions

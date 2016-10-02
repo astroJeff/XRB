@@ -1,11 +1,12 @@
 # SMC Population
 from src.core import *
+set_data_path("../data")
 
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pickle
 
-import stats
+from xrb.core import stats
 
 # Record time
 start_time = time.time()
@@ -20,4 +21,4 @@ print "Autocorrelation lengths", sampler.acor
 print "Acceptance fraction", sampler.acceptance_fraction
 
 
-#pickle.dump( sampler, open( "../data/SMC_MCMC_sampler.obj", "wb" ) )
+#pickle.dump( sampler, open( INDATA("SMC_MCMC_sampler.obj"), "wb" ) )

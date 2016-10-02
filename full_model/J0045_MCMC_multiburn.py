@@ -1,5 +1,6 @@
 # Run test system 1
 from src.core import *
+set_data_path("../data")
 
 from astropy.coordinates import SkyCoord
 from astropy import units as u
@@ -8,9 +9,9 @@ import matplotlib.pyplot as plt
 import emcee
 import corner
 
-import stats
-import pop_synth
-import binary_evolve
+from xrb.core import stats
+from xrb.pop_synth import pop_synth
+from xrb.binary import binary_evolve
 
 
 
@@ -62,11 +63,11 @@ print "Autocorrelation lengths", sampler.acor
 print "Acceptance fraction", sampler.acceptance_fraction
 
 # Save samples
-pickle.dump( sampler1, open( "../data/J0045_MCMC_multiburn_burn1.obj", "wb" ) )
-pickle.dump( sampler2, open( "../data/J0045_MCMC_multiburn_burn2.obj", "wb" ) )
-pickle.dump( sampler3, open( "../data/J0045_MCMC_multiburn_burn3.obj", "wb" ) )
-pickle.dump( sampler4, open( "../data/J0045_MCMC_multiburn_burn4.obj", "wb" ) )
-pickle.dump( sampler, open( "../data/J0045_MCMC_multiburn_sampler.obj", "wb" ) )
+pickle.dump( sampler1, open( INDATA("J0045_MCMC_multiburn_burn1.obj"), "wb" ) )
+pickle.dump( sampler2, open( INDATA("J0045_MCMC_multiburn_burn2.obj"), "wb" ) )
+pickle.dump( sampler3, open( INDATA("J0045_MCMC_multiburn_burn3.obj"), "wb" ) )
+pickle.dump( sampler4, open( INDATA("J0045_MCMC_multiburn_burn4.obj"), "wb" ) )
+pickle.dump( sampler, open( INDATA("J0045_MCMC_multiburn_sampler.obj"), "wb" ) )
 
 
 

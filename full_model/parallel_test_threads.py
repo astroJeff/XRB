@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 import emcee
 import corner
 
-import stats
-import pop_synth
-import binary_evolve
+from xrb.core import stats
+from xrb.pop_synth import pop_synth
+from xrb.binary import binary_evolve
 
 
 

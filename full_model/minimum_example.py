@@ -1,6 +1,7 @@
-from src.core import *
+from xrb.src.core import *
+set_data_path("../data")
 import emcee
-import stats
+from xrb.src import stats
 
 # Record time
 start_time = time.time()

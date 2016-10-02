@@ -1,5 +1,6 @@
 # Create plots from saved pickles of SMC HMXB simulations
 from src.core import *
+set_data_path("../data")
 
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -9,19 +10,18 @@ import pickle
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 
-import sf_history
-import stats
-import pop_synth
-import binary_evolve
-import load_sse
+from xrb.SF_history import sf_history
+from xrb.core import stats
+from xrb.pop_synth import pop_synth
+from xrb.binary import binary_evolve, load_sse
 
 
 
 print "Loading data"
 
 # Load sampler using pickle
-sampler = pickle.load( open( "../data/SMC_MCMC_sampler.obj", "rb" ) )
-HMXB = pickle.load( open("../data/SMC_MCMC_HMXB.obj", "rb" ) )
+sampler = pickle.load( open( INDATA("SMC_MCMC_sampler.obj"), "rb" ) )
+HMXB = pickle.load( open(INDATA("SMC_MCMC_HMXB.obj"), "rb" ) )
 
 
 print "Finished loading data"
@@ -129,7 +129,7 @@ plt.savefig('../figures/smc_population_corner.pdf')
 #
 # # Save current HMXB parameters as an object
 # HMXB = np.array([HMXB_ra, HMXB_dec, HMXB_Porb, HMXB_ecc, HMXB_M2, HMXB_vsys, HMXB_Lx, HMXB_theta])
-# pickle.dump( HMXB, open( "../data/SMC_MCMC_HMXB.obj", "wb" ) )
+# pickle.dump( HMXB, open( INDATA("SMC_MCMC_HMXB.obj"), "wb" ) )
 
 
 

@@ -1,5 +1,6 @@
 # Create plots from saved pickles of J0045-7319 simulations
 from src.core import *
+set_data_path("../data")
 
 import matplotlib.pyplot as plt
 import corner
@@ -7,8 +8,8 @@ import pickle
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 
-import sf_history
-import stats
+from xrb.SF_history import sf_history
+from xrb.core import stats
 
 
 # J0045-7319 coordinates
@@ -19,9 +20,9 @@ dec_J0045 = coor_J0045.dec.degree
 
 
 # Load pickled data
-sampler = pickle.load( open( "../data/J0045_MCMC_sampler.obj", "rb" ) )
-#init_params_J0045 = pickle.load( open( "../data/J0045_pop_synth_init_conds.obj", "rb" ) )
-#HMXB_J0045 = pickle.load( open( "../data/J0045_pop_synth_HMXB.obj", "rb" ) )
+sampler = pickle.load( open( INDATA("J0045_MCMC_sampler.obj"), "rb" ) )
+#init_params_J0045 = pickle.load( open( INDATA("J0045_pop_synth_init_conds.obj"), "rb" ) )
+#HMXB_J0045 = pickle.load( open( INDATA("J0045_pop_synth_HMXB.obj"), "rb" ) )
 
 
 # Specific distribution plots

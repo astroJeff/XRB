@@ -1,8 +1,8 @@
-from src.core import *
+from xrb.src.core import *
 
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
-import load_sse
+from xrb.binary import load_sse
 
 
 

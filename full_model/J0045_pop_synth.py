@@ -1,11 +1,12 @@
 # Run J0045-7319
 from src.core import *
+set_data_path("../data")
 
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pickle
 
-import pop_synth
+from xrb.pop_synth import pop_synth
 
 
 
@@ -25,5 +26,5 @@ HMXB_J0045, init_params_J0045 = pop_synth.run_pop_synth(J0045, N_sys=1000000)
 
 print "Population Synthesis ran 2000000 binaries in", time.time()-start_time, "seconds"
 
-pickle.dump( init_params_J0045, open( "../data/J0045_pop_synth_init_conds.obj", "wb" ) )
-pickle.dump( HMXB_J0045, open( "../data/J0045_pop_synth_HMXB.obj", "wb" ) )
+pickle.dump( init_params_J0045, open( INDATA("J0045_pop_synth_init_conds.obj"), "wb" ) )
+pickle.dump( HMXB_J0045, open( INDATA("J0045_pop_synth_HMXB.obj"), "wb" ) )

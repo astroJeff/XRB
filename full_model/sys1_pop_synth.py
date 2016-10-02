@@ -5,8 +5,8 @@ from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pickle
 
-import pop_synth
-import binary_evolve
+from xrb.pop_synth import pop_synth
+from xrb.binary import binary_evolve
 
 
 

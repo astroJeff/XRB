@@ -5,30 +5,34 @@ _DEF_TIME_IT_RUNS = 30
 _DEF_TIME_RESOLUTION_REPS = 1000
 
 
-# IMPORT ALL USEFUL PATHS AND MODULES
+# IMPORT MODULES TO BE USED BY CORE OR OTHER MODULES IN THE PACKAGE
 
 import sys              # for sys.path & used by other modules in the package
 import time             # for time.time()
 import os               # used by other modules in the package
 import numpy as np      # used by other modules in the package
-
-sys.path = ['./SF_history', './binary', './notebooks', './pop_synth', './src'] \
-           + sys.path
-
 import constants as c   # used by other modules in the package
 
-# For plotting
+# FOR PLOTTING
 import matplotlib
 matplotlib.use('Agg')
 
 
-#import stats
-#from binary import load_sse
-#from binary import binary_evolve
-#from notebooks import density_contour
-#from pop_synth import pop_synth
-#from SF_history import sf_history
-#from src import constants as c
+# LOCATION OF DATA FILES
+
+""" any script using 'xrb' package can set the data path and use it to find
+    specific files residing it, using the following functions
+"""
+
+import __builtin__      # allows to create an inter-module variable
+
+def set_data_path(path):
+    """ user can set the location of data files """
+    __builtin__.XRB_DATA_PATH = os.path.abspath(path)
+
+def INDATA(filepath):
+    """ returns the absolute path of a data file """
+    return os.path.join(XRB_DATA_PATH, filepath)
 
 
 # TIMING FUNCTIONS
@@ -159,10 +163,11 @@ def time_resolution(reps = _DEF_TIME_RESOLUTION_REPS, report = False):
 
     return median, mean, std, ci
 
+
 # BENCHMARK CODE (execute module)
 
 if __name__ == "__main__":
-#    """ Report values computed by module and benchmark results """
+    """ Report values computed by module and benchmark results """
     print "CORE.PY BENCHMARK"
 
     # report paths

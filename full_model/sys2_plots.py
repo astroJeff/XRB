@@ -8,8 +8,8 @@ import pickle
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 
-import sf_history
-import stats
+from xrb.SF_history import sf_history
+from xrb.core import stats
 
 
 # System 1 test parameters
