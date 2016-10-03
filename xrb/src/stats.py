@@ -433,7 +433,8 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
     prob_lim = (np.sort(prob)[7] + np.sort(prob)[8])/2.0
     index_best = np.argmax(prob)
     for i in np.arange(len(prob)):
-        if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+        if sampler1.acceptance_fraction[i] == 0.0: pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+        # if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
     # TESTING END
 
     print "Burn-in 1 finished."
@@ -448,7 +449,8 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
     prob_lim = (np.sort(prob)[7] + np.sort(prob)[8])/2.0
     index_best = np.argmax(prob)
     for i in np.arange(len(prob)):
-        if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+        if sampler2.acceptance_fraction[i] == 0.0: pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+        # if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
     # TESTING END
 
     print "Burn-in 2 finished."
@@ -463,7 +465,8 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
     prob_lim = (np.sort(prob)[7] + np.sort(prob)[8])/2.0
     index_best = np.argmax(prob)
     for i in np.arange(len(prob)):
-        if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+        if sampler3.acceptance_fraction[i] == 0.0: pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+        # if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
     # TESTING END
 
     print "Burn-in 3 finished."
@@ -605,7 +608,7 @@ def ln_posterior_population(x):
 
     return ll + lp
 
-def run_emcee_population(nburn=10000, nsteps=100000):
+def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80):
     """ Run emcee on the entire X-ray binary population
 
     Parameters

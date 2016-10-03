@@ -42,7 +42,7 @@ xrb/notebooks/*.pyc
 xrb/pop_synth/*.pyc
 xrb/SF_history/*.pyc
 xrb/src/*.pyc
-xrb/*.pyc
+xrb/__init__.pyc
 binary/load_sse.pyc
 binary/binary_evolve.pyc
 constants/constants.pyc
@@ -57,5 +57,4 @@ full_model/test*
 full_model
 scripts
 stats
-src
 documents/*.key
