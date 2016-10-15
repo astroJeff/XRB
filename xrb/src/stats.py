@@ -429,12 +429,12 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
     pos,prob,state = sampler.run_mcmc(p0, N=nburn)
     sampler1 = copy.copy(sampler)
 
-    # TESTING BEGIN - Get limiting ln_prob for worst 8 chains
-    prob_lim = (np.sort(prob)[7] + np.sort(prob)[8])/2.0
+    # TESTING BEGIN - Get limiting ln_prob for worst 10 chains
+    prob_lim = (np.sort(prob)[9] + np.sort(prob)[10])/2.0
     index_best = np.argmax(prob)
     for i in np.arange(len(prob)):
-        if sampler1.acceptance_fraction[i] == 0.0: pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
-        # if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+        # if sampler1.acceptance_fraction[i] == 0.0: pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+        if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
     # TESTING END
 
     print "Burn-in 1 finished."
@@ -445,12 +445,12 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
     pos,prob,state = sampler.run_mcmc(pos, N=nburn)
     sampler2 = copy.copy(sampler)
 
-    # TESTING BEGIN - Get limiting ln_prob for worst 8 chains
-    prob_lim = (np.sort(prob)[7] + np.sort(prob)[8])/2.0
+    # TESTING BEGIN - Get limiting ln_prob for worst 10 chains
+    prob_lim = (np.sort(prob)[9] + np.sort(prob)[10])/2.0
     index_best = np.argmax(prob)
     for i in np.arange(len(prob)):
-        if sampler2.acceptance_fraction[i] == 0.0: pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
-        # if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+        # if sampler2.acceptance_fraction[i] == 0.0: pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+        if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
     # TESTING END
 
     print "Burn-in 2 finished."
@@ -461,12 +461,12 @@ def run_emcee_2(M2_d, P_orb_obs, ecc_obs, ra, dec, M2_d_err=1.0,
     pos,prob,state = sampler.run_mcmc(pos, N=nburn)
     sampler3 = copy.copy(sampler)
 
-    # TESTING BEGIN - Get limiting ln_prob for worst 8 chains
-    prob_lim = (np.sort(prob)[7] + np.sort(prob)[8])/2.0
+    # TESTING BEGIN - Get limiting ln_prob for worst 10 chains
+    prob_lim = (np.sort(prob)[9] + np.sort(prob)[10])/2.0
     index_best = np.argmax(prob)
     for i in np.arange(len(prob)):
-        if sampler3.acceptance_fraction[i] == 0.0: pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
-        # if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+        # if sampler3.acceptance_fraction[i] == 0.0: pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
+        if prob[i] < prob_lim:  pos[i] = np.copy(pos[index_best]) + np.random.normal(0.0, 0.005, size=10)
     # TESTING END
 
     print "Burn-in 3 finished."
