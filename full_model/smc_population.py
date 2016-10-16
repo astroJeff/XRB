@@ -11,7 +11,8 @@ from xrb.src import stats
 # Record time
 start_time = time.time()
 
-sampler = stats.run_emcee_population(nburn=10000, nsteps=50000)
+sampler = stats.run_emcee_population(nburn=10000, nsteps=50000, nwalkers=320)
+
 
 print "Simulation took", time.time()-start_time, "seconds"
 
