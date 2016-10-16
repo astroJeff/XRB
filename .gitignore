@@ -54,7 +54,6 @@ data/*.p
 full_model/*.out
 full_model/*.sbatch
 full_model/test*
-full_model
 scripts
 stats
 documents/*.key
