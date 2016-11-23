@@ -1,8 +1,7 @@
 from xrb.src.core import *
 from scipy.stats import maxwell, norm, uniform, powerlaw, truncnorm
 from xrb.SF_history import sf_history
-from xrb.binary import binary_evolve
-from xrb.binary import load_sse
+from xrb.binary import binary_evolve, load_sse
 from xrb.binary.binary_evolve import A_to_P, P_to_A
 
 
@@ -192,7 +191,7 @@ def get_random_positions(N, t_b, ra_in=-1.0, dec_in=-1.0):
 
         if ra_in == -1:
             SF_regions[1,i] = sf_history.smc_sfh[i](np.log10(t_b*1.0e6))
-        elif sf_history.get_theta_proj_degree(sf_history.smc_coor["ra"][i], sf_history.smc_coor["dec"][i], ra_in, dec_in) < deg_to_rad(3.0):
+        elif sf_history.get_theta_proj_degree(sf_history.smc_coor["ra"][i], sf_history.smc_coor["dec"][i], ra_in, dec_in) < c.deg_to_rad * 3.0:
             SF_regions[1,i] = sf_history.smc_sfh[i](np.log10(t_b*1.0e6))
         else:
             SF_regions[1,i] = 0.0
@@ -238,7 +237,7 @@ def get_random_positions(N, t_b, ra_in=-1.0, dec_in=-1.0):
 #        if str(smc_coor["region"][indices[i]]).find("_") != -1:
 #            width[i] = 6.0 / 60.0
 
-    tmp_delta_ra = width * (2.0 * uniform.rvs(size=len(indices)) - 1.0) / np.cos(deg_to_rad(dec_out)) * 2.0
+    tmp_delta_ra = width * (2.0 * uniform.rvs(size=len(indices)) - 1.0) / np.cos(c.deg_to_rad * dec_out) * 2.0
     tmp_delta_dec = width * (2.0 * uniform.rvs(size=len(indices)) - 1.0)
 
     ra_out = ra_out + tmp_delta_ra
@@ -270,7 +269,7 @@ def get_new_ra_dec(ra, dec, theta_proj, pos_ang):
     """
 
     delta_dec = theta_proj * np.cos(pos_ang)
-    delta_ra = theta_proj * np.sin(pos_ang) / np.cos(deg_to_rad(dec))
+    delta_ra = theta_proj * np.sin(pos_ang) / np.cos(c.deg_to_rad * dec)
 
     ra_out = ra + c.rad_to_deg * delta_ra
     dec_out = dec + c.rad_to_deg * delta_dec
@@ -320,7 +319,7 @@ def create_HMXBs(t_b, N_sys=1000, ra_in=-1, dec_in=-1):
     init_params["t_b"] = t_b
 
     # Evolve population
-    M_NS_out, M_2_out, L_x_out, v_sys_out, M2_dot_out, A_out, ecc_out, theta_out =  \
+    M_NS_out, M_2_out, L_x_out, v_sys_out, M2_dot_out, A_out, ecc_out, theta_out, k_out =  \
             full_forward(M1_i, M2_i, A_i, ecc_i, v_k, theta, phi, t_b)
 
 
@@ -405,6 +404,8 @@ def full_forward(M1, M2, A, ecc, v_k, theta, phi, t_obs):
         Orbital eccentricity (unitless)
     theta : float or ndarray
         Projected angular distance traveled from birth location (radians)
+    k_type : int
+        k-type of HMXB donor
     """
 
     if load_sse.func_sse_mass is None:
@@ -419,7 +420,8 @@ def full_forward(M1, M2, A, ecc, v_k, theta, phi, t_obs):
                 ('M2_dot','<f8'), \
                 ('A','<f8'), \
                 ('ecc','<f8'), \
-                ('theta','<f8')]
+                ('theta','<f8'), \
+                ('k_type','<i8')]
 
         HMXB = np.recarray(len(M1), dtype=dtypes)
 
@@ -467,6 +469,10 @@ def full_forward(M1, M2, A, ecc, v_k, theta, phi, t_obs):
                 M_2_tmp, L_x_tmp, M2_dot_out, A_out = binary_evolve.func_Lx_forward(M1[i], M2[i], M_2_b, A_tmp, e_tmp, t_obs)
                 theta_out = (t_obs - load_sse.func_sse_tmax(M1[i])) * v_sys_tmp / c.dist_SMC * c.yr_to_sec * 1.0e6 * np.sin(get_theta(1))
 
+            # To get k-type of HMXB donor
+            tobs_eff = binary_evolve.func_get_time(M1[i], M2[i], t_obs[i])
+            M_tmp, M_dot_tmp, R_tmp, k_type = load_sse.func_get_sse_star(M_2_b, tobs_eff)
+
 
             HMXB["M_NS"][i] = c.M_NS
             HMXB["M_2"][i] = M_2_tmp
@@ -476,9 +482,10 @@ def full_forward(M1, M2, A, ecc, v_k, theta, phi, t_obs):
             HMXB["A"][i] = A_out
             HMXB["ecc"][i] = e_tmp
             HMXB["theta"][i] = theta_out
+            HMXB["k_type"][i] = int(k_type)
 
 
-        return HMXB["M_NS"], HMXB["M_2"], HMXB["L_x"], HMXB["v_sys"], HMXB["M2_dot"], HMXB["A"], HMXB["ecc"], HMXB["theta"]
+        return HMXB["M_NS"], HMXB["M_2"], HMXB["L_x"], HMXB["v_sys"], HMXB["M2_dot"], HMXB["A"], HMXB["ecc"], HMXB["theta"], HMXB["k_type"]
 
     else:
 
@@ -499,7 +506,11 @@ def full_forward(M1, M2, A, ecc, v_k, theta, phi, t_obs):
 
         theta_out = (t_obs - load_sse.func_sse_tmax(M1)) * v_sys_tmp / c.dist_SMC * c.yr_to_sec * 1.0e6 * np.sin(get_theta(1))
 
-        return c.M_NS, M_2_tmp, L_x_tmp, v_sys_tmp, M2_dot_out, A_out, e_tmp, theta_out
+        # To get k-type of HMXB donor
+        tobs_eff = binary_evolve.func_get_time(M1, M2, t_obs)
+        M_tmp, M_dot_tmp, R_tmp, k_type = load_sse.func_get_sse_star(M_2_b, tobs_eff)
+
+        return c.M_NS, M_2_tmp, L_x_tmp, v_sys_tmp, M2_dot_out, A_out, e_tmp, theta_out, int(k_type)
 
 
 def run_pop_synth(input_sys, N_sys=10000, t_low=15.0, t_high=60.0, delta_t=1):

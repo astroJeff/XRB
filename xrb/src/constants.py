@@ -19,7 +19,8 @@ M_0 = 0.073 # in Msun
 xi = 0.704
 M_NS = 1.35
 #v_wind = 1000.0 # companion velocity in km/s
-R_NS = 12.0  # NS radius in km
+R_NS = 10.0  # NS radius in km
+eta_bol = 0.15  # Calibrated to Chandra X-ray sensitivity
 
 
 min_mass = 8.0

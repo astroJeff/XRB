@@ -1,5 +1,5 @@
 # Create plots from saved pickles of SMC HMXB simulations
-from src.core import *
+from xrb.src.core import *
 set_data_path("../data")
 
 import matplotlib.pyplot as plt
@@ -7,11 +7,9 @@ import matplotlib.gridspec as gridspec
 from matplotlib import font_manager
 import corner
 import pickle
-from astropy.coordinates import SkyCoord
-from astropy import units as u
 
 from xrb.SF_history import sf_history
-from xrb.core import stats
+from xrb.src import stats
 from xrb.pop_synth import pop_synth
 from xrb.binary import binary_evolve, load_sse
 
@@ -52,7 +50,7 @@ labels = [r"$M_{\rm 1, i}\ (M_{\odot})$", r"$M_{\rm 2, i}\ (M_{\odot})$", r"$a_{
           r"$e_{\rm i}$", r"$v_{\rm k, i}\ ({\rm km}\ {\rm s}^{-1})$", r"$\theta_{\rm k}\ ({\rm rad.})$", \
           r"$\phi_{\rm k}\ ({\rm rad.})$", r"$\alpha_{\rm i}\ ({\rm deg.})$", \
           r"$\delta_{\rm i}\ ({\rm deg.}) $", r"$t_{\rm i}\ ({\rm Myr})$"]
-plt_range = ([7,24], [2.5,15], [0,1500], [0,1], [0,450], [np.pi/4.,np.pi], [0,2.0*np.pi], [6,21], [-76,-70], [0,70])
+plt_range = ([7,24], [2.5,15], [0,1500], [0,1], [0,450], [np.pi/4.,np.pi], [0,np.pi], [6,21], [-75,-71], [0,70])
 hist2d_kwargs = {"plot_datapoints" : False}
 fig = corner.corner(sampler.flatchain, fig=fig, labels=labels, range=plt_range, bins=40, max_n_ticks=4, **hist2d_kwargs)
 
@@ -72,11 +70,24 @@ ax[5,0].set_yticklabels([r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$', r'$\pi$'])
 
 # Set phi ticks
 for i in np.arange(4)+6:
-    ax[i,6].set_xticks([np.pi/2., np.pi, 3.*np.pi/2.])
-ax[9,6].set_xticklabels([r'$\frac{\pi}{2}$', r'$\pi$', r'$\frac{3\pi}{2}$'])
+    # ax[i,6].set_xticks([np.pi/2., np.pi, 3.*np.pi/2.])
+    ax[i,6].set_xticks([np.pi/2., np.pi])
+# ax[9,6].set_xticklabels([r'$\frac{\pi}{2}$', r'$\pi$', r'$\frac{3\pi}{2}$'])
+ax[9,6].set_xticklabels([r'$\frac{\pi}{2}$', r'$\pi$'])
 for i in np.arange(6):
-    ax[6,i].set_yticks([np.pi/2., np.pi, 3.*np.pi/2.])
-ax[6,0].set_yticklabels([r'$\frac{\pi}{2}$', r'$\pi$', r'$\frac{3\pi}{2}$'])
+    # ax[6,i].set_yticks([np.pi/2., np.pi, 3.*np.pi/2.])
+    ax[6,i].set_yticks([np.pi/2., np.pi])
+# ax[6,0].set_yticklabels([r'$\frac{\pi}{2}$', r'$\pi$', r'$\frac{3\pi}{2}$'])
+ax[6,0].set_yticklabels([r'$\frac{\pi}{2}$', r'$\pi$'])
+
+
+# Set dec ticks
+for i in np.arange(2)+8:
+    ax[i,8].set_xticks([-74.0, -72.0])
+ax[9,8].set_xticklabels(['-74', '-72'])
+for i in np.arange(8):
+    ax[8,i].set_yticks([-74.0, -72.0])
+ax[8,0].set_yticklabels(['-74', '-72'])
 
 
 plt.subplots_adjust(bottom=0.07, left=0.07, top=0.97)
@@ -86,12 +97,13 @@ plt.savefig('../figures/smc_population_corner.pdf')
 
 
 
-# Now, we want to run all the sampler positions forward to
-# get the distribution today of HMXBs
+# # Now, we want to run all the sampler positions forward to
+# # get the distribution today of HMXBs
 # l = len(sampler.flatchain.T[0])
-#
+# 
 # print "length:", l
-#
+# print "Calculating forward evolution..."
+# 
 # HMXB_ra = np.zeros(l)
 # HMXB_dec = np.zeros(l)
 # HMXB_Porb = np.zeros(l)
@@ -100,23 +112,23 @@ plt.savefig('../figures/smc_population_corner.pdf')
 # HMXB_vsys = np.zeros(l)
 # HMXB_Lx = np.zeros(l)
 # HMXB_theta = np.zeros(l)
-#
+# 
 # for i in np.arange(l):
-#
+# 
 #     s = sampler.flatchain[i]
-#
+# 
 #     # Run forward model
 #     data_out = pop_synth.full_forward(s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[9])
-#
+# 
 #     # Get a random phi for position angle
 #     ran_phi = pop_synth.get_phi(1)
-#
+# 
 #     # Get the new ra and dec
-#    ra_out, dec_out = pop_synth.get_new_ra_dec(s[7], s[8], data_out[7], ran_phi)
-#
+#     ra_out, dec_out = pop_synth.get_new_ra_dec(s[7], s[8], data_out[7], ran_phi)
+# 
 #     # Get the output orbital period
 #     Porb = binary_evolve.A_to_P(data_out[0], data_out[1], data_out[5])
-#
+# 
 #     # Save outputs
 #     HMXB_ra[i] = ra_out
 #     HMXB_dec[i] = dec_out
@@ -126,12 +138,12 @@ plt.savefig('../figures/smc_population_corner.pdf')
 #     HMXB_vsys[i] = data_out[3]
 #     HMXB_Lx[i] = data_out[2]
 #     HMXB_theta[i] = data_out[7] * 180.0*60.0/np.pi
-#
+# 
 # # Save current HMXB parameters as an object
 # HMXB = np.array([HMXB_ra, HMXB_dec, HMXB_Porb, HMXB_ecc, HMXB_M2, HMXB_vsys, HMXB_Lx, HMXB_theta])
 # pickle.dump( HMXB, open( INDATA("SMC_MCMC_HMXB.obj"), "wb" ) )
-
-
+# 
+# print "Finished calculating forward evolution."
 
 
 
@@ -174,7 +186,7 @@ plt.savefig('../figures/smc_population_HMXB.pdf')
 
 
 
-#plt.rc('font', size=10)
+plt.rc('font', size=10)
 
 # Birth location
 # fig, host = plt.subplots(figsize=(5,5))

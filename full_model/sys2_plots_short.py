@@ -11,7 +11,7 @@ from astropy.coordinates import SkyCoord
 from astropy import units as u
 
 from xrb.SF_history import sf_history
-from xrb.core import stats
+from xrb.src import stats
 
 
 # System 1 test parameters
@@ -98,11 +98,11 @@ for i in np.arange(10):
     ax[9,i].xaxis.set_label_coords(0.5, -0.5)
 
 # Set declination ticks
-ax[9,8].set_xticks([-72.4, -72.2, -72.0])
-ax[9,8].set_xticklabels(["-72.4", "-72.2", "-72.0"])
+ax[9,8].set_xticks([-72.2, -72.1])
+ax[9,8].set_xticklabels(["-72.2", "-72.1"])
 for i in np.arange(8):
-    ax[8,i].set_yticks([-72.4, -72.2, -72.0])
-ax[8,0].set_yticklabels(["-72.4", "-72.2", "-72.0"])
+    ax[8,i].set_yticks([-72.2, -72.1])
+ax[8,0].set_yticklabels(["-72.2", "-72.1"])
 
 # Set theta ticks
 for i in np.arange(5)+5:

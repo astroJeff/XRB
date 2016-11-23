@@ -1,6 +1,5 @@
 import matplotlib
 matplotlib.use('Agg')
-from src.core import *
 
 import pickle
 import matplotlib.pyplot as plt
@@ -8,8 +7,9 @@ from matplotlib import font_manager
 import emcee
 import matplotlib.gridspec as gridspec
 
-from xrb.core import stats
-
+from xrb.src import stats
+from xrb import src
+import numpy as np
 
 print "Loading data..."
 sampler1 = pickle.load( open( "../data/sys2_MCMC_multiburn_burn1.obj", "rb" ) )

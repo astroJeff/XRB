@@ -26,7 +26,7 @@ t_b = 22.0
 
 
 # Now, run full evolution
-M1_obs, M2_obs, L_x_obs, v_sys_obs, M2_dot_obs, A_obs, ecc_obs, theta_obs \
+M1_obs, M2_obs, L_x_obs, v_sys_obs, M2_dot_obs, A_obs, ecc_obs, theta_obs, k_type \
     = pop_synth.full_forward(M1,M2,A,ecc,v_k,theta,phi,t_b)
 
 # Let's put some uncertainties on those observations

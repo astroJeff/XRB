@@ -13,7 +13,7 @@ from astropy.coordinates import SkyCoord
 from astropy import units as u
 
 from xrb.SF_history import sf_history
-from xrb.source import stats
+from xrb.src import stats
 
 
 # J0045-7319 coordinates

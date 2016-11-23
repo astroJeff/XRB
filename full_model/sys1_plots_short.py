@@ -12,7 +12,7 @@ from astropy.coordinates import SkyCoord
 from astropy import units as u
 
 from xrb.SF_history import sf_history
-from xrb.core import stats
+from xrb.src import stats
 
 
 # System 1 test parameters
@@ -119,11 +119,11 @@ ax[5,0].set_yticklabels([r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$', r'$\pi$'])
 
 # Set phi ticks
 for i in np.arange(4)+6:
-    ax[i,6].set_xticks([np.pi/2., np.pi, 3.*np.pi/2.])
-ax[9,6].set_xticklabels([r'$\frac{\pi}{2}$', r'$\pi$', r'$\frac{3\pi}{2}$'])
+    ax[i,6].set_xticks([np.pi/2., np.pi])
+ax[9,6].set_xticklabels([r'$\frac{\pi}{2}$', r'$\pi$'])
 for i in np.arange(6):
-    ax[6,i].set_yticks([np.pi/2., np.pi, 3.*np.pi/2.])
-ax[6,0].set_yticklabels([r'$\frac{\pi}{2}$', r'$\pi$', r'$\frac{3\pi}{2}$'])
+    ax[6,i].set_yticks([np.pi/2., np.pi])
+ax[6,0].set_yticklabels([r'$\frac{\pi}{2}$', r'$\pi$'])
 
 
 

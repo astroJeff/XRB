@@ -9,7 +9,7 @@ from matplotlib import font_manager
 import emcee
 import matplotlib.gridspec as gridspec
 
-from xrb.core import stats
+from xrb.src import stats
 
 
 print "Loading data..."

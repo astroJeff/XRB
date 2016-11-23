@@ -168,6 +168,9 @@ def ln_priors(y):
     t_eff_obs = binary_evolve.func_get_time(M1, M2, t_b)
     if t_eff_obs < 0.0: return -np.inf
 
+    if t_b * 1.0e6 * c.yr_to_sec < t_min: return -np.inf
+    if t_b * 1.0e6 * c.yr_to_sec > t_max: return -np.inf
+
     return lp
 
 
@@ -569,6 +572,8 @@ def ln_priors_population(y):
     # Add a prior so the effective time remains bounded
     t_eff_obs = binary_evolve.func_get_time(M1, M2, t_b)
     if t_eff_obs < 0.0: return -np.inf
+    t_max = (load_sse.func_sse_tmax(M2_b) - binary_evolve.func_get_time(M1, M2, 0.0))
+    if t_b > t_max: return -np.inf
 
     return lp
 

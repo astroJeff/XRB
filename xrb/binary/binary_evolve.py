@@ -403,6 +403,6 @@ def func_Lx_forward(M_1_a, M_2_a, M_2_in, A_in, ecc_in, t_obs):
     M_dot_out = f_capture * M_dot_wind
 
     L_bol = c.GGG * c.M_NS * M_dot_out / c.R_NS * c.km_to_cm * c.Msun_to_g * c.Rsun_to_cm / c.yr_to_sec
-    L_x = L_bol
+    L_x = c.eta_bol * L_bol
 
     return M_2_out, L_x, M_dot_out, A_out

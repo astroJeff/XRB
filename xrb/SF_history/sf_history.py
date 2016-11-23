@@ -866,6 +866,7 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dis
     smc_plot = plt.title(str(int(age)) + ' Myr')
     # smc_plot = plt.colorbar()
 
+
     # Plot the contours defining the distributions of ra_dist and dec_dist
     if ra_dist is not None and dec_dist is not None:
 
@@ -903,7 +904,7 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dis
     # Plot a star at the coordinate position, if supplied
     if ra is not None and dec is not None:
         coor_pol1, coor_pol2 = tr.transform(zip(np.array([ra, ra]), np.array([dec, dec])))
-        smc_plot = plt.scatter(coor_pol1[0], coor_pol1[1], color='r', s=100, marker="*")
+        smc_plot = plt.scatter(coor_pol1[0], coor_pol1[1], color='r', s=75, marker="*", zorder=10)
 
 
 
