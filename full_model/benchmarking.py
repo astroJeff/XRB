@@ -2,7 +2,7 @@ import numpy as np
 
 import xrb
 from xrb.src.core import *
-set_data_path("../../data")
+set_data_path("../data")
 from xrb.binary import load_sse
 import xrb.src.constants as c
 from xrb.pop_synth import pop_synth
