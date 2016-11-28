@@ -158,7 +158,7 @@ def generate_population(N):
 
 
 
-def get_random_positions(N, t_b, ra_in=-1.0, dec_in=-1.0):
+def get_random_positions(N, t_b, ra_in=None, dec_in=None):
     """ Use the star formation history to generate a population of new binaries
 
     Parameters
@@ -182,6 +182,9 @@ def get_random_positions(N, t_b, ra_in=-1.0, dec_in=-1.0):
         Normalization constant calculated from number of stars formed at time t_b
     """
 
+    if sf_history.smc_sfh is None or sf_history.smc_coor is None:
+        sf_history.load_sf_history()
+
     N_regions = len(sf_history.smc_sfh)
 
     # If provided with an ra and dec, only generate stars within 3 degrees of input position
@@ -189,7 +192,7 @@ def get_random_positions(N, t_b, ra_in=-1.0, dec_in=-1.0):
     for i in np.arange(N_regions):
         SF_regions[0,i] = i
 
-        if ra_in == -1:
+        if ra_in is None or dec_in is None:
             SF_regions[1,i] = sf_history.smc_sfh[i](np.log10(t_b*1.0e6))
         elif sf_history.get_theta_proj_degree(sf_history.smc_coor["ra"][i], sf_history.smc_coor["dec"][i], ra_in, dec_in) < c.deg_to_rad * 3.0:
             SF_regions[1,i] = sf_history.smc_sfh[i](np.log10(t_b*1.0e6))
@@ -277,7 +280,7 @@ def get_new_ra_dec(ra, dec, theta_proj, pos_ang):
     return ra_out, dec_out
 
 
-def create_HMXBs(t_b, N_sys=1000, ra_in=-1, dec_in=-1):
+def create_HMXBs(t_b, N_sys=1000, ra_in=None, dec_in=None):
     """ Randomly generate a sample of binaries and evolve them forward
 
     Parameters
@@ -465,13 +468,17 @@ def full_forward(M1, M2, A, ecc, v_k, theta, phi, t_obs):
             if isinstance(t_obs, np.ndarray):
                 M_2_tmp, L_x_tmp, M2_dot_out, A_out = binary_evolve.func_Lx_forward(M1[i], M2[i], M_2_b, A_tmp, e_tmp, t_obs[i])
                 theta_out = (t_obs[i] - load_sse.func_sse_tmax(M1[i])) * v_sys_tmp / c.dist_SMC * c.yr_to_sec * 1.0e6 * np.sin(get_theta(1))
+                tobs_eff = binary_evolve.func_get_time(M1[i], M2[i], t_obs[i])
             else:
                 M_2_tmp, L_x_tmp, M2_dot_out, A_out = binary_evolve.func_Lx_forward(M1[i], M2[i], M_2_b, A_tmp, e_tmp, t_obs)
                 theta_out = (t_obs - load_sse.func_sse_tmax(M1[i])) * v_sys_tmp / c.dist_SMC * c.yr_to_sec * 1.0e6 * np.sin(get_theta(1))
+                tobs_eff = binary_evolve.func_get_time(M1[i], M2[i], t_obs)
 
             # To get k-type of HMXB donor
-            tobs_eff = binary_evolve.func_get_time(M1[i], M2[i], t_obs[i])
-            M_tmp, M_dot_tmp, R_tmp, k_type = load_sse.func_get_sse_star(M_2_b, tobs_eff)
+            if M_2_b > c.max_mass:
+                k_type = -999
+            else:
+                M_tmp, M_dot_tmp, R_tmp, k_type = load_sse.func_get_sse_star(M_2_b, tobs_eff)
 
 
             HMXB["M_NS"][i] = c.M_NS
