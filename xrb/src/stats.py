@@ -137,6 +137,11 @@ def ln_priors(y):
     A_c, v_sys, ecc = binary_evolve.func_SN_forward(M1_b, M2_b, A_b, v_k, theta, phi)
     if ecc < 0.0 or ecc > 1.0 or np.isnan(ecc): return -np.inf
 
+    # Ensure that we only get non-compact object companions
+    tobs_eff = binary_evolve.func_get_time(M1, M2, t_b)
+    M_tmp, M_dot_tmp, R_tmp, k_type = load_sse.func_get_sse_star(M2_b, tobs_eff)
+    if int(k_type) > 9: return -np.inf
+
 #    t_sn = (t_b - func_sse_tmax(M1)) * 1.0e6 * yr_to_sec  # The time since the primary's core collapse
 #    theta_max = (v_sys * t_sn) / dist_LMC  # Unitless
 #    area = np.pi * rad_to_dec(theta_max)**2
@@ -564,6 +569,11 @@ def ln_priors_population(y):
     M1_b, M2_b, A_b = binary_evolve.func_MT_forward(M1, M2, A, ecc)
     A_c, v_sys, ecc = binary_evolve.func_SN_forward(M1_b, M2_b, A_b, v_k, theta, phi)
     if ecc < 0.0 or ecc > 1.0 or np.isnan(ecc): return -np.inf
+
+    # Ensure that we only get non-compact object companions
+    tobs_eff = binary_evolve.func_get_time(M1, M2, t_b)
+    M_tmp, M_dot_tmp, R_tmp, k_type = load_sse.func_get_sse_star(M2_b, tobs_eff)
+    if int(k_type) > 9: return -np.inf
 
     # Add a prior so that the post-MT secondary is within the correct bounds
     M2_c = M1 + M2 - load_sse.func_sse_he_mass(M1)
