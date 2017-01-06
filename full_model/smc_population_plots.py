@@ -19,7 +19,7 @@ print "Loading data"
 
 # Load sampler using pickle
 sampler = pickle.load( open( INDATA("SMC_MCMC_sampler.obj"), "rb" ) )
-HMXB = pickle.load( open(INDATA("SMC_MCMC_HMXB.obj"), "rb" ) )
+#HMXB = pickle.load( open(INDATA("SMC_MCMC_HMXB_full.obj"), "rb" ) )
 
 
 print "Finished loading data"
@@ -97,54 +97,61 @@ plt.savefig('../figures/smc_population_corner.pdf')
 
 
 
-# # Now, we want to run all the sampler positions forward to
-# # get the distribution today of HMXBs
-# l = len(sampler.flatchain.T[0])
-# 
-# print "length:", l
-# print "Calculating forward evolution..."
-# 
-# HMXB_ra = np.zeros(l)
-# HMXB_dec = np.zeros(l)
-# HMXB_Porb = np.zeros(l)
-# HMXB_ecc = np.zeros(l)
-# HMXB_M2 = np.zeros(l)
-# HMXB_vsys = np.zeros(l)
-# HMXB_Lx = np.zeros(l)
-# HMXB_theta = np.zeros(l)
-# 
-# for i in np.arange(l):
-# 
-#     s = sampler.flatchain[i]
-# 
+# Now, we want to run all the sampler positions forward to
+# get the distribution today of HMXBs
+l = len(sampler.flatchain.T[0])
+#
+print "length:", l
+print "Calculating forward evolution..."
+#
+HMXB_ra = np.zeros(l)
+HMXB_dec = np.zeros(l)
+HMXB_Porb = np.zeros(l)
+HMXB_ecc = np.zeros(l)
+HMXB_M2 = np.zeros(l)
+HMXB_vsys = np.zeros(l)
+HMXB_Lx = np.zeros(l)
+HMXB_theta = np.zeros(l)
+#
+
+
+# s = sampler.flatchain.T
+# ran_phi = pop_synth.get_phi(l)
+# ra_out, dec_out = pop_synth.get_new_ra_dec(s[7], s[8], HMXB['theta'], ran_phi)
+# Porb = binary_evolve.A_to_P(HMXB['M_NS'], HMXB['M_2'], HMXB['A'])
+
+for i in np.arange(l):
+#
+    s = sampler.flatchain[i]
+#
 #     # Run forward model
-#     data_out = pop_synth.full_forward(s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[9])
+    data_out = pop_synth.full_forward(s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[9])
 # 
 #     # Get a random phi for position angle
-#     ran_phi = pop_synth.get_phi(1)
-# 
+    ran_phi = pop_synth.get_phi(1)
+#
 #     # Get the new ra and dec
-#     ra_out, dec_out = pop_synth.get_new_ra_dec(s[7], s[8], data_out[7], ran_phi)
-# 
+    ra_out, dec_out = pop_synth.get_new_ra_dec(s[7], s[8], data_out[7], ran_phi)
+#
 #     # Get the output orbital period
-#     Porb = binary_evolve.A_to_P(data_out[0], data_out[1], data_out[5])
-# 
+    Porb = binary_evolve.A_to_P(data_out[0], data_out[1], data_out[5])
+#
 #     # Save outputs
-#     HMXB_ra[i] = ra_out
-#     HMXB_dec[i] = dec_out
-#     HMXB_Porb[i] = Porb
-#     HMXB_ecc[i] = data_out[6]
-#     HMXB_M2[i] = data_out[1]
-#     HMXB_vsys[i] = data_out[3]
-#     HMXB_Lx[i] = data_out[2]
-#     HMXB_theta[i] = data_out[7] * 180.0*60.0/np.pi
-# 
-# # Save current HMXB parameters as an object
-# HMXB = np.array([HMXB_ra, HMXB_dec, HMXB_Porb, HMXB_ecc, HMXB_M2, HMXB_vsys, HMXB_Lx, HMXB_theta])
-# pickle.dump( HMXB, open( INDATA("SMC_MCMC_HMXB.obj"), "wb" ) )
-# 
-# print "Finished calculating forward evolution."
+    HMXB_ra[i] = ra_out
+    HMXB_dec[i] = dec_out
+    HMXB_Porb[i] = Porb
+    HMXB_ecc[i] = data_out[6]
+    HMXB_M2[i] = data_out[1]
+    HMXB_vsys[i] = data_out[3]
+    HMXB_Lx[i] = data_out[2]
+    HMXB_theta[i] = data_out[7] * 180.0*60.0/np.pi
 
+# # Save current HMXB parameters as an object
+HMXB = np.array([HMXB_ra, HMXB_dec, HMXB_Porb, HMXB_ecc, HMXB_M2, HMXB_vsys, HMXB_Lx, HMXB_theta])
+pickle.dump( HMXB, open( INDATA("SMC_MCMC_HMXB.obj"), "wb" ) )
+#
+print "Finished calculating forward evolution."
+#
 
 
 
@@ -154,6 +161,7 @@ fig, ax = plt.subplots(3, 1, figsize=(6,8))
 plt.rc('font', size=14)
 plt_range = ([0, 4], [0,1])
 corner.hist2d(np.log10(HMXB[2]), HMXB[3], ax=ax[0], bins=40, range=plt_range, plot_datapoints=False)
+# corner.hist2d(np.log10(Porb), HMXB['ecc'], ax=ax[0], bins=40, range=plt_range, plot_datapoints=False)
 ax[0].set_xlabel(r"${\rm log}\ P_{\rm orb}\ {\rm (days)}$", size=16)
 ax[0].set_ylabel(r"$e$", size=16)
 ax[0].set_xticks([0,1,2,3,4])

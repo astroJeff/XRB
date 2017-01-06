@@ -5,6 +5,7 @@ from scipy.interpolate import interp1d
 from scipy.stats import maxwell, norm, uniform, powerlaw, truncnorm
 import emcee
 from emcee.utils import MPIPool
+import binary_c
 
 from xrb.binary import load_sse, binary_evolve
 from xrb.binary.binary_evolve import A_to_P, P_to_A
@@ -623,20 +624,136 @@ def ln_posterior_population(x):
 
     return ll + lp
 
-def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80):
+
+
+
+# Priors
+def ln_priors_population_binary_c(y):
+    """ Priors on the model parameters
+
+    Parameters
+    ----------
+    y : M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b
+        10 model parameters
+
+    Returns
+    -------
+    lp : float
+        Natural log of the prior
+    """
+
+    M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = y
+
+    lp = 0.0
+
+    # P(M1)
+    if M1 < 0.1: return -np.inf
+    norm_const = (c.alpha+1.0) / (np.power(c.max_mass, c.alpha+1.0) - np.power(c.min_mass, c.alpha+1.0))
+    lp += np.log( norm_const * np.power(M1, c.alpha) )
+
+    # P(M2)
+    if M2 < 0.1: return -np.inf
+    # Normalization is over full q in (0,1.0)
+    lp += np.log( (1.0 / M1 ) )
+
+    # P(ecc)
+    if ecc < 0.0 or ecc > 1.0: return -np.inf
+    lp += np.log(2.0 * ecc)
+
+    # P(A)
+    if A*(1.0-ecc) < c.min_A or A*(1.0+ecc) > c.max_A: return -np.inf
+    norm_const = np.log(c.max_A) - np.log(c.min_A)
+    lp += np.log( norm_const / A )
+
+    # P(v_k)
+    if v_k < 0.0: return -np.inf
+    lp += np.log( maxwell.pdf(v_k, scale=c.v_k_sigma) )
+
+    # P(theta)
+    if theta <= 0.0 or theta >= np.pi: return -np.inf
+    lp += np.log(np.sin(theta) / 2.0)
+
+    # P(phi)
+    if phi < 0.0 or phi > np.pi: return -np.inf
+    lp += -np.log( np.pi )
+
+    # Get star formation history
+    sfh = sf_history.get_SFH(ra_b, dec_b, t_b, sf_history.smc_coor, sf_history.smc_sfh)
+    if sfh <= 0.0: return -np.inf
+    lp += np.log(sfh)
+
+    # P(alpha, delta)
+    # From spherical geometric effect, scale by cos(declination)
+    lp += np.log(np.cos(c.deg_to_rad*dec_b) / 2.0)
+
+    return lp
+
+
+def ln_posterior_population_binary_c(x):
+    """ Calculate the natural log of the posterior probability
+
+    Parameters
+    ----------
+    x : M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b
+        10 model parameters
+
+    Returns
+    -------
+    lp : float
+        Natural log of the posterior probability
+    """
+
+    M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
+
+
+    # Call priors
+    lp = ln_priors_population_binary_c(x)
+    if np.isinf(lp): return -np.inf
+
+
+    # Run binary_c evolution
+    orbital_period = A_to_P(M1, M2, A)
+    metallicity = 0.008
+
+    output = binary_c.run_binary(M1, M2, orbital_period, ecc, metallicity, t_b, v_k, theta, phi, v_k, theta, phi)
+    m1_out, m2_out, A_out, ecc_out, v_sys, L_x, t_SN1, t_SN2, k1, k2 = output
+
+    # Check if object is an X-ray binary
+    if L_x == 0.0: return -np.inf
+    if k1 < 13: return -np.inf
+    if k2 > 9: return -np.inf
+    if A_out < 0.0: return -np.inf
+    if ecc > 1.0: return -np.inf
+
+    if np.isnan(lp): print "Found a NaN!"
+
+
+    return lp
+
+
+def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme='toy'):
     """ Run emcee on the entire X-ray binary population
 
     Parameters
     ----------
-    nburn : float (optional)
+    nburn : int (optional)
         number of steps for the Burn-in (default=10000)
-    nsteps : float (optional)
+    nsteps : int (optional)
         number of steps for the simulation (default=100000)
+    nwalkers : int (optional)
+        number of walkers for the sampler (default=80)
+    binary_scheme : string (optional)
+        Binary evolution scheme to use (options: 'toy' or 'binary_c')
 
     Returns
     -------
     sampler : emcee object
     """
+
+    if binary_scheme != 'toy' and binary_scheme != 'binary_c':
+        print "You must use an appropriate binary evolution scheme"
+        print "Options are: 'toy' or 'binary_c'"
+        exit(-1)
 
     # First thing is to load the sse data and SF_history data
     load_sse.load_sse()
@@ -645,13 +762,19 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80):
     # Get initial values - choose 12 Msun as a seed for initial position
     initial_vals = get_initial_values(12.0, nwalkers=nwalkers)
 
+    # Choose the posterior probability function based on the binary_scheme provided
+    if binary_scheme == 'toy':
+        posterior_function = ln_posterior_population
+    else:
+        posterior_function = ln_posterior_population_binary_c
+
     # Define sampler
-    sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=ln_posterior_population)
+    sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function)
 
     # Assign initial values based on a random binary
     args = [12.0, 2.0, 500.0, 20.0, 0.50, 0.2, 13.5, -72.7] # SMC
     p0 = np.zeros((nwalkers,10))
-    p0 = set_walkers(initial_vals, args, nwalkers=nwalkers)
+    p0 = set_walkers(initial_vals, args, nwalkers=nwalkers, binary_scheme=binary_scheme)
 
     # Burn-in
     pos,prob,state = sampler.run_mcmc(p0, N=nburn)
@@ -665,7 +788,7 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80):
 
 
 
-def set_walkers(initial_masses, args, nwalkers=32):
+def set_walkers(initial_masses, args, nwalkers=80, binary_scheme='toy'):
     """ Get the initial positions for the walkers
 
     Parameters
@@ -674,6 +797,16 @@ def set_walkers(initial_masses, args, nwalkers=32):
         array of initial masses of length nwalkers
     args : M2_d, P_orb_obs, ecc_obs, ra, dec
         observed system parameters
+    nwalkers : int (optional)
+        Number of walkers for the sampler (default=80)
+    binary_scheme : string (optional)
+        Binary evolution scheme to use (options: 'toy' or 'binary_c')
+
+    Returns
+    -------
+    p0 : ndarray
+        The initial walker positions
+
     """
 
     M2_d, M2_d_err, P_orb_obs, P_orb_obs_err, ecc_obs, ecc_obs_err, ra, dec = args
