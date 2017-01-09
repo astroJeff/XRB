@@ -671,7 +671,7 @@ def ln_priors_population_binary_c(y):
 
     # P(theta)
     if theta <= 0.0 or theta >= np.pi: return -np.inf
-    lp += np.log(np.sin(theta) / 2.0)
+    lp += np.log( np.sin(theta) / 2.0 )
 
     # P(phi)
     if phi < 0.0 or phi > np.pi: return -np.inf
@@ -680,11 +680,11 @@ def ln_priors_population_binary_c(y):
     # Get star formation history
     sfh = sf_history.get_SFH(ra_b, dec_b, t_b, sf_history.smc_coor, sf_history.smc_sfh)
     if sfh <= 0.0: return -np.inf
-    lp += np.log(sfh)
+    lp += np.log( sfh )
 
     # P(alpha, delta)
     # From spherical geometric effect, scale by cos(declination)
-    lp += np.log(np.cos(c.deg_to_rad*dec_b) / 2.0)
+    lp += np.log( np.cos(c.deg_to_rad*dec_b) / 2.0 )
 
     return lp
 
@@ -756,25 +756,39 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme=
         exit(-1)
 
     # First thing is to load the sse data and SF_history data
-    load_sse.load_sse()
     sf_history.load_sf_history()
 
-    # Get initial values - choose 12 Msun as a seed for initial position
-    initial_vals = get_initial_values(12.0, nwalkers=nwalkers)
 
     # Choose the posterior probability function based on the binary_scheme provided
     if binary_scheme == 'toy':
+
+        # Load sse data
+        load_sse.load_sse()
+
+        # Get initial values - choose 12 Msun as a seed for initial position
+        initial_vals = get_initial_values(12.0, nwalkers=nwalkers)
+
         posterior_function = ln_posterior_population
-    else:
+
+        # Assign initial values based on a random binary
+        args = [12.0, 2.0, 500.0, 20.0, 0.50, 0.2, 13.5, -72.7] # SMC
+        p0 = np.zeros((nwalkers,10))
+        p0 = set_walkers(initial_vals, args, nwalkers=nwalkers)
+
+    elif binary_scheme == 'binary_c':
+
         posterior_function = ln_posterior_population_binary_c
+
+        p0 = np.zeros((nwalkers,10))
+        p0 = set_walkers_binary_c(nwalkers=nwalkers)
+
+    else:
+
+        exit(-1)
+
 
     # Define sampler
     sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function)
-
-    # Assign initial values based on a random binary
-    args = [12.0, 2.0, 500.0, 20.0, 0.50, 0.2, 13.5, -72.7] # SMC
-    p0 = np.zeros((nwalkers,10))
-    p0 = set_walkers(initial_vals, args, nwalkers=nwalkers, binary_scheme=binary_scheme)
 
     # Burn-in
     pos,prob,state = sampler.run_mcmc(p0, N=nburn)
@@ -787,8 +801,137 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme=
 
 
 
+def set_walkers_binary_c(nwalkers=80):
+    """ Set the positions for the walkers
 
-def set_walkers(initial_masses, args, nwalkers=80, binary_scheme='toy'):
+    Parameters
+    ----------
+    nwalkers : int (optional)
+        Number of walkers for the sampler (default=80)
+
+    Returns
+    -------
+    p0 : ndarray
+        The initial walker positions
+
+    """
+
+    # Initial values
+    m1 = 12.0
+    m2 = 9.0
+    eccentricity = 0.41
+    orbital_period = 1500.0
+    metallicity = 0.02
+
+    # SN kicks
+    sn_kick_magnitude_1 = 0.0
+    sn_kick_theta_1 = 0.0
+    sn_kick_phi_1 = 0.0
+    sn_kick_magnitude_2 = 0.0
+    sn_kick_theta_2 = 0.0
+    sn_kick_phi_2 = 0.0
+
+
+    n_sys = 1000
+    L_x_out = np.zeros(n_sys)
+    k1_out = np.zeros(n_sys)
+    k2_out = np.zeros(n_sys)
+    times = np.linspace(8.0, 40.0, n_sys)
+
+
+    for i, time in zip(np.arange(n_sys), times):
+
+        m1_out, m2_out, A_out, e_out, v_sys, L_x_out[i], tsn1, tsn2, k1_out[i], k2_out[i] = \
+                binary_c.run_binary(m1, m2, orbital_period, eccentricity, metallicity, time,
+                                    sn_kick_magnitude_1, sn_kick_theta_1, sn_kick_phi_1,
+                                    sn_kick_magnitude_2, sn_kick_theta_2, sn_kick_phi_2)
+
+        if i != 0:
+            if L_x_out[i-1] == 0.0 and L_x_out[i] != 0.0:
+                time_min = times[i-1]
+            if L_x_out[i-1] != 0.0 and L_x_out[i] == 0.0:
+                time_max = times[i]
+
+    time_good = (time_max + time_min) / 2.0
+
+
+    # Now to generate a ball around this spot
+
+    # Binary parameters
+    m1_set = m1 + np.random.normal(0.0, 1.0, nwalkers)
+    m2_set = m2 + np.random.normal(0.0, 1.0, nwalkers)
+    e_set = eccentricity + np.random.normal(0.0, 0.1, nwalkers)
+    P_orb_set = orbital_period + np.random.normal(0.0, 20.0, nwalkers)
+    a_set = binary_evolve.P_to_A(m1_set, m2_set, P_orb_set)
+    time_set = time_good + np.random.normal(0.0, 1.0, nwalkers)
+
+
+    # Get coordinates from the birth time
+    smc_out = np.zeros(len(sf_history.smc_coor))
+    for i in np.arange(len(sf_history.smc_coor)):
+        smc_out[i] = sf_history.get_SFH(sf_history.smc_coor['ra'][i], sf_history.smc_coor['dec'][i], \
+                                        time_good, sf_history.smc_coor, sf_history.smc_sfh)
+    idx = np.argmax(smc_out)
+
+    ra_set = sf_history.smc_coor['ra'][idx] + np.random.normal(0.0, 0.1, nwalkers)
+    dec_set = sf_history.smc_coor['dec'][idx] + np.random.normal(0.0, 0.1, nwalkers)
+
+
+    # SN kick
+    v_kick_set = 100.0 + np.random.normal(0.0, 15.0, nwalkers)
+    theta_set = 0.9*np.pi + np.random.normal(0.0, 0.1, nwalkers)
+    phi_set = 0.8 + np.random.normal(0.0, 0.1, nwalkers)
+
+
+    # Check if any of these have priors with -infinity
+    for i in np.arange(nwalkers):
+
+        p = m1_set[i], m2_set[i], a_set[i], e_set[i], v_kick_set[i], theta_set[i], phi_set[i], ra_set[i], dec_set[i], time_set[i]
+        ln_prior = ln_priors_population_binary_c(p)
+
+
+        while ln_prior < -10000.0:
+
+            # Binary parameters
+            m1_set[i] = m1 + np.random.normal(0.0, 1.0, 1)
+            m2_set[i] = m2 + np.random.normal(0.0, 1.0, 1)
+            e_set[i] = eccentricity + np.random.normal(0.0, 0.1, 1)
+            P_orb_set[i] = orbital_period + np.random.normal(0.0, 20.0, 1)
+            a_set[i] = binary_evolve.P_to_A(m1_set[i], m2_set[i], P_orb_set[i])
+            time_set[i] = time_good + np.random.normal(0.0, 1.0, 1)
+
+            # Position
+            ra_set[i] = sf_history.smc_coor['ra'][idx] + np.random.normal(0.0, 0.1, 1)
+            dec_set[i] = sf_history.smc_coor['dec'][idx] + np.random.normal(0.0, 0.1, 1)
+
+            # SN kick
+            v_kick_set[i] = 100.0 + np.random.normal(0.0, 15.0, 1)
+            theta_set[i] = 0.9*np.pi + np.random.normal(0.0, 0.1, 1)
+            phi_set[i] = 0.8 + np.random.normal(0.0, 0.1, 1)
+
+            p = m1_set[i], m2_set[i], a_set[i], e_set[i], v_kick_set[i], theta_set[i], phi_set[i], ra_set[i], dec_set[i], time_set[i]
+            ln_prior = ln_priors_population_binary_c(p)
+
+
+
+    # Save and return the walker positions
+    p0 = np.zeros((nwalkers,10))
+
+    p0[:,0] = m1_set
+    p0[:,1] = m2_set
+    p0[:,2] = a_set
+    p0[:,3] = e_set
+    p0[:,4] = v_kick_set
+    p0[:,5] = theta_set
+    p0[:,6] = phi_set
+    p0[:,7] = ra_set
+    p0[:,8] = dec_set
+    p0[:,9] = time_set
+
+    return p0
+
+
+def set_walkers(initial_masses, args, nwalkers=80):
     """ Get the initial positions for the walkers
 
     Parameters
@@ -799,8 +942,6 @@ def set_walkers(initial_masses, args, nwalkers=80, binary_scheme='toy'):
         observed system parameters
     nwalkers : int (optional)
         Number of walkers for the sampler (default=80)
-    binary_scheme : string (optional)
-        Binary evolution scheme to use (options: 'toy' or 'binary_c')
 
     Returns
     -------
