@@ -715,8 +715,8 @@ def ln_posterior_population_binary_c(x):
     orbital_period = A_to_P(M1, M2, A)
     metallicity = 0.008
 
-    output = binary_c.run_binary(M1, M2, orbital_period, ecc, metallicity, t_b, v_k, theta, phi, v_k, theta, phi)
-    m1_out, m2_out, A_out, ecc_out, v_sys, L_x, t_SN1, t_SN2, k1, k2 = output
+    output = binary_c.run_binary(M1, M2, orbital_period, ecc, metallicity, t_b, v_k, theta, phi, v_k, theta, phi, 0)
+    m1_out, m2_out, A_out, ecc_out, v_sys, L_x, t_SN1, t_SN2, k1, k2, comenv_count, evol_hist = output
 
     # Check if object is an X-ray binary
     if L_x == 0.0: return -np.inf
@@ -836,15 +836,19 @@ def set_walkers_binary_c(nwalkers=80):
     L_x_out = np.zeros(n_sys)
     k1_out = np.zeros(n_sys)
     k2_out = np.zeros(n_sys)
+    comenv_count = np.zeros(n_sys)
+    evol_hist = np.zeros(n_sys, dtype=object)
     times = np.linspace(8.0, 40.0, n_sys)
 
 
     for i, time in zip(np.arange(n_sys), times):
 
-        m1_out, m2_out, A_out, e_out, v_sys, L_x_out[i], tsn1, tsn2, k1_out[i], k2_out[i] = \
-                binary_c.run_binary(m1, m2, orbital_period, eccentricity, metallicity, time,
+        m1_out, m2_out, A_out, e_out, v_sys, L_x_out[i], tsn1, tsn2, k1_out[i], k2_out[i], \
+                comenv_count[i], evol_hist[i] = \
+                binary_c.run_binary(m1, m2, orbital_period,
+                                    eccentricity, metallicity, time,
                                     sn_kick_magnitude_1, sn_kick_theta_1, sn_kick_phi_1,
-                                    sn_kick_magnitude_2, sn_kick_theta_2, sn_kick_phi_2)
+                                    sn_kick_magnitude_2, sn_kick_theta_2, sn_kick_phi_2, 0)
 
         if i != 0:
             if L_x_out[i-1] == 0.0 and L_x_out[i] != 0.0:

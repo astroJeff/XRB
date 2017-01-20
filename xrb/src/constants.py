@@ -34,5 +34,10 @@ ECS_Fe_mass = 10.0  # Mass differentiating ECS from Fe-core collapse
 
 alpha = -2.35
 
+
+# Large Magellanic Cloud
 dist_LMC = 5.0e4 * pc_to_km # Distance in km
+
+
+# Small Magellanic Cloud
 dist_SMC = 6.1e4 * pc_to_km # Distance in km
