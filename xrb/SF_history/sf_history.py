@@ -6,14 +6,15 @@ from astropy import units as u
 from scipy.interpolate import interp1d
 import scipy.optimize as so
 
-lmc_sfh = None
-lmc_coor = None
-smc_sfh = None
-smc_coor = None
+
 ra_max = None
 ra_min = None
 dec_max = None
 dec_min = None
+
+sf_sfh = None
+sf_coor = None
+sf_dist = None
 
 
 def get_theta_proj_degree(ra, dec, ra_b, dec_b):
@@ -81,20 +82,37 @@ def load_sf_history(z=0.008):
         Default = 0.008
     """
 
-    if lmc_coor is None: load_lmc_coor()
-    if lmc_sfh is None: load_lmc_sfh(z)
-    if smc_coor is None: load_smc_coor()
-    if smc_sfh is None: load_smc_sfh(z)
 
+    global sf_coor
+    global sf_sfh
+    global sf_dist
 
     global ra_min
     global ra_max
     global dec_min
     global dec_max
-    if ra_min is None: ra_min = min(smc_coor['ra'])-0.2
-    if ra_max is None: ra_max = max(smc_coor['ra'])+0.2
-    if dec_min is None: dec_min = min(smc_coor['dec'])-0.2
-    if dec_max is None: dec_max = max(smc_coor['dec'])+0.2
+
+    if c.sf_scheme is None:
+        print "You must provide a scheme for the star formation history"
+        exit(-1)
+
+    if (sf_coor is None) or (sf_sfh is None) or (sf_dist is None):
+        if c.sf_scheme is "SMC":
+            sf_coor = load_smc_coor()
+            sf_sfh = load_smc_sfh(z)
+            sf_dist = dist_SMC
+
+        if c.sf_scheme is "LMC""
+            sf_coor = load_lmc_coor()
+            sf_sfh = load_lmc_sfh(z)
+            sf_dist = dist_LMC
+
+    if ra_min is None: ra_min = min(sf_coor['ra'])-0.2
+    if ra_max is None: ra_max = max(sf_coor['ra'])+0.2
+    if dec_min is None: dec_min = min(sf_coor['dec'])-0.2
+    if dec_max is None: dec_max = max(sf_coor['dec'])+0.2
+
+
 
 def get_SFH(ra, dec, t_b, coor, sfh):
     """ Returns the star formation rate in Msun/Myr for a sky position and age
@@ -118,6 +136,7 @@ def get_SFH(ra, dec, t_b, coor, sfh):
     SFH : float64 or ndarray
         Star formation history (Msun/Myr)
     """
+
 
     if (coor is None) or (sfh is None): load_sf_history()
 
@@ -243,10 +262,6 @@ def load_lmc_coor():
                 ('dec','float64')]
     """
 
-    global lmc_coor
-
-    # If already loaded, no need to reload
-    if lmc_coor is not None: return lmc_coor
 
     # Load data
     this_dir, this_filename = os.path.split(__file__)
@@ -293,10 +308,6 @@ def load_lmc_sfh(z=0.008):
         Array of star formation histories for each region
     """
 
-    global lmc_sfh
-
-    # If already loaded, no need to reload
-    if lmc_sfh is not None: return lmc_sfh
 
     # Load the LMC coordinates and SFH data
     lmc_data = load_lmc_data()
@@ -336,18 +347,25 @@ def test_LMC_SFH_plots():
 
     plt.figure(figsize=(12,15))
 
-    # Load LMC data
-    lmc_coor = load_lmc_coor()
-    lmc_sfh = load_lmc_sfh()
+
+    global sf_coor
+    global sf_sfh
+    global sf_dist
+
+
+    if (sf_coor is None) or (sf_sfh is None):
+        c.sf_scheme = "LMC"
+        load_sf_history(z=0.008)
+
 
 
     def get_LMC_plot(age):
         sfr = np.array([])
-        for i in np.arange(len(lmc_coor)):
-            sfr = np.append(sfr, get_SFH(lmc_coor["ra"][i], \
-                            lmc_coor["dec"][i], age, lmc_coor, lmc_sfh))
+        for i in np.arange(len(sf_coor)):
+            sfr = np.append(sfr, get_SFH(sf_coor["ra"][i], \
+                            sf_coor["dec"][i], age, sf_coor, sf_sfh))
 
-        plt.tricontourf(lmc_coor["ra"], lmc_coor["dec"], sfr)
+        plt.tricontourf(sf_coor["ra"], sf_coor["dec"], sfr)
         plt.title(str(int(age)) + ' Myr')
         plt.ylim(-73, -64)
 
@@ -409,19 +427,27 @@ def get_LMC_plot(age, ax=None):
         Contour plot of the star formation history
     """
 
-    if lmc_coor is None: load_lmc_coor()
-    if lmc_sfh is None: load_lmc_sfh()
+
+    global sf_coor
+    global sf_sfh
+    global sf_dist
+
+
+    if (sf_coor is None) or (sf_sfh is None):
+        c.sf_scheme = "LMC"
+        load_sf_history()
+
 
     sfr = np.array([])
-    for i in np.arange(len(lmc_coor)):
-        sfr = np.append(sfr, get_SFH(lmc_coor["ra"][i], \
-                        lmc_coor["dec"][i], age, lmc_coor, lmc_sfh))
+    for i in np.arange(len(sf_coor)):
+        sfr = np.append(sfr, get_SFH(sf_coor["ra"][i], \
+                        sf_coor["dec"][i], age, sf_coor, sf_sfh))
 
     if ax:
-        lmc_plot = ax.tricontourf(lmc_coor["ra"], lmc_coor["dec"], sfr)
+        lmc_plot = ax.tricontourf(sf_coor["ra"], sf_coor["dec"], sfr)
         lmc_plot = ax.set_title(str(int(age)) + ' Myr')
     else:
-        lmc_plot = plt.tricontourf(lmc_coor["ra"], lmc_coor["dec"], sfr)
+        lmc_plot = plt.tricontourf(sf_coor["ra"], sf_coor["dec"], sfr)
         lmc_plot = plt.title(str(int(age)) + ' Myr')
         lmc_plot = plt.gca().invert_xaxis()
 
@@ -445,10 +471,6 @@ def load_smc_coor():
                 ('dec','float64')]
     """
 
-    global smc_coor
-
-    # If already loaded, no need to reload
-    if smc_coor is not None: return smc_coor
 
     # Load data
     this_dir, this_filename = os.path.split(__file__)
@@ -553,10 +575,6 @@ def load_smc_sfh(z=0.008):
         Array of star formation histories for each region
     """
 
-    global smc_sfh
-
-    # If already loaded, no need to reload
-    if smc_sfh is not None: return smc_sfh
 
     # Load the LMC coordinates and SFH data
     smc_data = load_smc_data()
@@ -594,19 +612,24 @@ def test_SMC_SFH_plots():
     at 12 different times.
     """
 
+    global sf_coor
+    global sf_sfh
+    global sf_dist
+
+    if (sf_coor is None) or (sf_sfh is None):
+        c.sf_scheme = "SMC"
+        load_sf_history(z=0.008)
+
     plt.figure(figsize=(12,15))
 
-    # Load SMC data
-    smc_coor = load_smc_coor()
-    smc_sfh = load_smc_sfh(z=0.008)
 
     def get_SMC_plot(age):
         sfr = np.array([])
-        for i in np.arange(len(smc_coor)):
-            sfr = np.append(sfr, get_SFH(smc_coor["ra"][i], \
-                            smc_coor["dec"][i], age, smc_coor, smc_sfh))
+        for i in np.arange(len(sf_coor)):
+            sfr = np.append(sfr, get_SFH(sf_coor["ra"][i], \
+                            sf_coor["dec"][i], age, sf_coor, sf_sfh))
 
-        plt.tricontourf(smc_coor["ra"], smc_coor["dec"], sfr)
+        plt.tricontourf(sf_coor["ra"], sf_coor["dec"], sfr)
         plt.title(str(int(age)) + ' Myr')
 
         return plt
@@ -667,19 +690,25 @@ def get_SMC_plot(age, ax=None):
         Contour plot of the star formation history
     """
 
-    if smc_coor is None: load_smc_coor()
-    if smc_sfh is None: load_smc_sfh()
+    global sf_coor
+    global sf_sfh
+    global sf_dist
+
+    if (sf_coor is None) or (sf_sfh is None):
+        c.sf_scheme = "SMC"
+        load_sf_history(z=0.008)
+
 
     sfr = np.array([])
-    for i in np.arange(len(smc_coor)):
-        sfr = np.append(sfr, get_SFH(smc_coor["ra"][i], \
-                        smc_coor["dec"][i], age, smc_coor, smc_sfh))
+    for i in np.arange(len(sf_coor)):
+        sfr = np.append(sfr, get_SFH(sf_coor["ra"][i], \
+                        sf_coor["dec"][i], age, sf_coor, sf_sfh))
 
     if ax:
-        smc_plot = ax.tricontourf(smc_coor["ra"], smc_coor["dec"], sfr)
+        smc_plot = ax.tricontourf(sf_coor["ra"], sf_coor["dec"], sfr)
         smc_plot = ax.set_title(str(int(age)) + ' Myr')
     else:
-        smc_plot = plt.tricontourf(smc_coor["ra"], smc_coor["dec"], sfr)
+        smc_plot = plt.tricontourf(sf_coor["ra"], sf_coor["dec"], sfr)
         smc_plot = plt.title(str(int(age)) + ' Myr')
         smc_plot = plt.gca().invert_xaxis()
 
@@ -735,6 +764,15 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dis
     from mpl_toolkits.axisartist import SubplotHost
     from mpl_toolkits.axisartist import GridHelperCurveLinear
     import matplotlib.gridspec as gridspec
+
+    global sf_coor
+    global sf_sfh
+    global sf_dist
+
+    if (sf_coor is None) or (sf_sfh is None):
+        c.sf_scheme = "SMC"
+        load_sf_history(z=0.008)
+
 
     def curvelinear_test2(fig, gs=None, xcenter=0.0, ycenter=17.3, xwidth=1.5, ywidth=1.5,
             xlabel=xlabel, ylabel=ylabel, xgrid_density=8, ygrid_density=5):
@@ -823,24 +861,19 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dis
                     xwidth=xwidth, ywidth=ywidth, xlabel=xlabel, ylabel=ylabel,
                     xgrid_density=xgrid_density, ygrid_density=ygrid_density)
 
-    # Load star formation histories
-    load_sf_history()
-    # if smc_coor is None: load_smc_coor()
-    # if smc_sfh is None: load_smc_sfh()
 
     sfr = np.array([])
 
 
-
     # CREATING OUR OWN, LARGER GRID FOR STAR FORMATION CONTOURS
-    x_tmp = np.linspace(min(smc_coor['ra'])-1.0, max(smc_coor['ra'])+1.0, 30)
-    y_tmp = np.linspace(min(smc_coor['dec'])-1.0, max(smc_coor['dec'])+1.0, 30)
+    x_tmp = np.linspace(min(sf_coor['ra'])-1.0, max(sf_coor['ra'])+1.0, 30)
+    y_tmp = np.linspace(min(sf_coor['dec'])-1.0, max(sf_coor['dec'])+1.0, 30)
 
     XX, YY = np.meshgrid(x_tmp, y_tmp)
 
     for i in np.arange(len(XX.flatten())):
         sfr = np.append(sfr, get_SFH(XX.flatten()[i], \
-                        YY.flatten()[i], age, smc_coor, smc_sfh))
+                        YY.flatten()[i], age, sf_coor, sf_sfh))
     out_test = tr.transform(zip(XX.flatten(), YY.flatten()))
 
     # USING smc_coor AS THE POINTS FOR STAR FORMATION CONTOURS

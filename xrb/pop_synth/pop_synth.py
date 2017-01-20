@@ -182,10 +182,10 @@ def get_random_positions(N, t_b, ra_in=None, dec_in=None):
         Normalization constant calculated from number of stars formed at time t_b
     """
 
-    if sf_history.smc_sfh is None or sf_history.smc_coor is None:
+    if sf_history.sf_sfh is None or sf_history.sf_coor is None:
         sf_history.load_sf_history()
 
-    N_regions = len(sf_history.smc_sfh)
+    N_regions = len(sf_history.sf_sfh)
 
     # If provided with an ra and dec, only generate stars within 3 degrees of input position
     SF_regions = np.zeros((2,N_regions))
@@ -193,9 +193,9 @@ def get_random_positions(N, t_b, ra_in=None, dec_in=None):
         SF_regions[0,i] = i
 
         if ra_in is None or dec_in is None:
-            SF_regions[1,i] = sf_history.smc_sfh[i](np.log10(t_b*1.0e6))
-        elif sf_history.get_theta_proj_degree(sf_history.smc_coor["ra"][i], sf_history.smc_coor["dec"][i], ra_in, dec_in) < c.deg_to_rad * 3.0:
-            SF_regions[1,i] = sf_history.smc_sfh[i](np.log10(t_b*1.0e6))
+            SF_regions[1,i] = sf_history.sf_sfh[i](np.log10(t_b*1.0e6))
+        elif sf_history.get_theta_proj_degree(sf_history.sf_coor["ra"][i], sf_history.sf_coor["dec"][i], ra_in, dec_in) < c.deg_to_rad * 3.0:
+            SF_regions[1,i] = sf_history.sf_sfh[i](np.log10(t_b*1.0e6))
         else:
             SF_regions[1,i] = 0.0
 
@@ -229,8 +229,8 @@ def get_random_positions(N, t_b, ra_in=None, dec_in=None):
     indices = SF_sort[0][indices].astype(int)
 
     # Get random ra's and dec's of each region
-    ra_out = sf_history.smc_coor["ra"][indices]
-    dec_out = sf_history.smc_coor["dec"][indices]
+    ra_out = sf_history.sf_coor["ra"][indices]
+    dec_out = sf_history.sf_coor["dec"][indices]
 
     # Width is 12 arcmin or 12/60 degrees for outermost regions
     # Width is 6 arcmin or 6/60 degrees for inner regions

@@ -55,7 +55,7 @@ def get_stars_formed(ra, dec, t_min, t_max, v_sys, dist, N_size=512):
     ran_dec = c.rad_to_deg * ran_theta * np.sin(ran_phi) + dec
 
     # Specific star formation rate (Msun/Myr/steradian)
-    SFR = sf_history.get_SFH(ran_ra, ran_dec, ran_t_b/(c.yr_to_sec*1.0e6), sf_history.smc_coor, sf_history.smc_sfh)
+    SFR = sf_history.get_SFH(ran_ra, ran_dec, ran_t_b/(c.yr_to_sec*1.0e6), sf_history.sf_coor, sf_history.sf_sfh)
 
     return np.mean(SFR)
 
@@ -120,7 +120,7 @@ def ln_priors(y):
 
     # Get star formation history
     sf_history.load_sf_history()
-    sfh = sf_history.get_SFH(ra_b, dec_b, t_b, sf_history.smc_coor, sf_history.smc_sfh)
+    sfh = sf_history.get_SFH(ra_b, dec_b, t_b, sf_history.sf_coor, sf_history.sf_sfh)
     if sfh <= 0.0: return -np.inf
 
     # P(alpha, delta)
@@ -155,8 +155,8 @@ def ln_priors(y):
     t_min = load_sse.func_sse_tmax(M1) * 1.0e6 * c.yr_to_sec
     t_max = (load_sse.func_sse_tmax(M2_b) - binary_evolve.func_get_time(M1, M2, 0.0)) * 1.0e6 * c.yr_to_sec
     if t_max-t_min < 0.0: return -np.inf
-    theta_C = (v_sys * (t_max - t_min)) / c.dist_SMC
-    stars_formed = get_stars_formed(ra, dec, t_min, t_max, v_sys, c.dist_SMC)
+    theta_C = (v_sys * (t_max - t_min)) / sf_history.sf_dist
+    stars_formed = get_stars_formed(ra, dec, t_min, t_max, v_sys, sf_history.sf_dist)
     if stars_formed == 0.0: return -np.inf
     volume_cone = (np.pi/3.0 * theta_C**2 * (t_max - t_min) / c.yr_to_sec / 1.0e6)
     lp += np.log(sfh / stars_formed / volume_cone)
@@ -304,7 +304,7 @@ def ln_posterior(x, args):
     ######## Under Construction #######
     theta_proj = get_theta_proj(c.deg_to_rad*ra, c.deg_to_rad*dec, c.deg_to_rad*ra_b, c.deg_to_rad*dec_b)  # Projected travel distance
     t_sn = (t_b - load_sse.func_sse_tmax(M1)) * 1.0e6 * c.yr_to_sec  # The time since the primary's core collapse
-    tmp = (v_sys * t_sn) / c.dist_SMC  # Unitless
+    tmp = (v_sys * t_sn) / sf_history.sf_dist  # Unitless
     conds = [theta_proj>tmp, theta_proj<=tmp]  # Define conditional
     funcs = [lambda theta_proj: -np.inf, lambda theta_proj: np.log(np.tan(np.arcsin(theta_proj/tmp))/tmp)]
     J_coor = np.abs(get_J_coor(c.deg_to_rad*ra, c.deg_to_rad*dec, c.deg_to_rad*ra_b, c.deg_to_rad*dec_b)) # Jacobian for coordinate change
@@ -559,7 +559,7 @@ def ln_priors_population(y):
     lp += -np.log( np.pi )
 
     # Get star formation history
-    sfh = sf_history.get_SFH(ra_b, dec_b, t_b, sf_history.smc_coor, sf_history.smc_sfh)
+    sfh = sf_history.get_SFH(ra_b, dec_b, t_b, sf_history.sf_coor, sf_history.sf_sfh)
     if sfh <= 0.0: return -np.inf
     lp += np.log(sfh)
 
@@ -678,7 +678,7 @@ def ln_priors_population_binary_c(y):
     lp += -np.log( np.pi )
 
     # Get star formation history
-    sfh = sf_history.get_SFH(ra_b, dec_b, t_b, sf_history.smc_coor, sf_history.smc_sfh)
+    sfh = sf_history.get_SFH(ra_b, dec_b, t_b, sf_history.sf_coor, sf_history.sf_sfh)
     if sfh <= 0.0: return -np.inf
     lp += np.log( sfh )
 
@@ -871,14 +871,14 @@ def set_walkers_binary_c(nwalkers=80):
 
 
     # Get coordinates from the birth time
-    smc_out = np.zeros(len(sf_history.smc_coor))
-    for i in np.arange(len(sf_history.smc_coor)):
-        smc_out[i] = sf_history.get_SFH(sf_history.smc_coor['ra'][i], sf_history.smc_coor['dec'][i], \
-                                        time_good, sf_history.smc_coor, sf_history.smc_sfh)
-    idx = np.argmax(smc_out)
+    sf_out = np.zeros(len(sf_history.sf_coor))
+    for i in np.arange(len(sf_history.sf_coor)):
+        sf_out[i] = sf_history.get_SFH(sf_history.sf_coor['ra'][i], sf_history.sf_coor['dec'][i], \
+                                        time_good, sf_history.sf_coor, sf_history.sf_sfh)
+    idx = np.argmax(sf_out)
 
-    ra_set = sf_history.smc_coor['ra'][idx] + np.random.normal(0.0, 0.1, nwalkers)
-    dec_set = sf_history.smc_coor['dec'][idx] + np.random.normal(0.0, 0.1, nwalkers)
+    ra_set = sf_history.sf_coor['ra'][idx] + np.random.normal(0.0, 0.1, nwalkers)
+    dec_set = sf_history.sf_coor['dec'][idx] + np.random.normal(0.0, 0.1, nwalkers)
 
 
     # SN kick
@@ -905,8 +905,8 @@ def set_walkers_binary_c(nwalkers=80):
             time_set[i] = time_good + np.random.normal(0.0, 1.0, 1)
 
             # Position
-            ra_set[i] = sf_history.smc_coor['ra'][idx] + np.random.normal(0.0, 0.1, 1)
-            dec_set[i] = sf_history.smc_coor['dec'][idx] + np.random.normal(0.0, 0.1, 1)
+            ra_set[i] = sf_history.sf_coor['ra'][idx] + np.random.normal(0.0, 0.1, 1)
+            dec_set[i] = sf_history.sf_coor['dec'][idx] + np.random.normal(0.0, 0.1, 1)
 
             # SN kick
             v_kick_set[i] = 100.0 + np.random.normal(0.0, 15.0, 1)
