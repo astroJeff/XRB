@@ -715,8 +715,8 @@ def ln_posterior_population_binary_c(x):
     orbital_period = A_to_P(M1, M2, A)
     metallicity = 0.008
 
-    output = binary_c.run_binary(M1, M2, orbital_period, ecc, metallicity, t_b, v_k, theta, phi, v_k, theta, phi, 0)
-    m1_out, m2_out, A_out, ecc_out, v_sys, L_x, t_SN1, t_SN2, k1, k2, comenv_count, evol_hist = output
+    output = binary_c.run_binary(M1, M2, orbital_period, ecc, metallicity, t_b, v_k, theta, phi, v_k, theta, phi, 0, 0)
+    m1_out, m2_out, A_out, ecc_out, v_sys, L_x, t_SN1, t_SN2, t_cur, k1, k2, comenv_count, evol_hist = output
 
     # Check if object is an X-ray binary
     if L_x == 0.0: return -np.inf
@@ -731,7 +731,8 @@ def ln_posterior_population_binary_c(x):
     return lp
 
 
-def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme='toy'):
+def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme='toy',
+                         threads=1, mpi=False):
     """ Run emcee on the entire X-ray binary population
 
     Parameters
@@ -744,6 +745,10 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme=
         number of walkers for the sampler (default=80)
     binary_scheme : string (optional)
         Binary evolution scheme to use (options: 'toy' or 'binary_c')
+    threads : int
+        Number of threads to use for parallelization
+    mpi : bool
+        If true, use MPIPool for parallelization
 
     Returns
     -------
@@ -788,7 +793,19 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme=
 
 
     # Define sampler
-    sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function)
+    if mpi == True:
+        pool = MPIPool()
+        if not pool.is_master():
+            pool.wait()
+            sys.exit(0)
+        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function, pool=pool)
+
+    elif threads != 1:
+        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function, threads=threads)
+    else:
+        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function)
+
+    # sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function)
 
     # Burn-in
     pos,prob,state = sampler.run_mcmc(p0, N=nburn)
@@ -843,12 +860,12 @@ def set_walkers_binary_c(nwalkers=80):
 
     for i, time in zip(np.arange(n_sys), times):
 
-        m1_out, m2_out, A_out, e_out, v_sys, L_x_out[i], tsn1, tsn2, k1_out[i], k2_out[i], \
-                comenv_count[i], evol_hist[i] = \
+        m1_out, m2_out, A_out, e_out, v_sys, L_x_out[i], tsn1, tsn2, t_cur, \
+                k1_out[i], k2_out[i], comenv_count[i], evol_hist[i] = \
                 binary_c.run_binary(m1, m2, orbital_period,
                                     eccentricity, metallicity, time,
                                     sn_kick_magnitude_1, sn_kick_theta_1, sn_kick_phi_1,
-                                    sn_kick_magnitude_2, sn_kick_theta_2, sn_kick_phi_2, 0)
+                                    sn_kick_magnitude_2, sn_kick_theta_2, sn_kick_phi_2, 0, 0)
 
         if i != 0:
             if L_x_out[i-1] == 0.0 and L_x_out[i] != 0.0:
@@ -887,14 +904,14 @@ def set_walkers_binary_c(nwalkers=80):
     phi_set = 0.8 + np.random.normal(0.0, 0.1, nwalkers)
 
 
-    # Check if any of these have priors with -infinity
+    # Check if any of these have posteriors with -infinity
     for i in np.arange(nwalkers):
 
         p = m1_set[i], m2_set[i], a_set[i], e_set[i], v_kick_set[i], theta_set[i], phi_set[i], ra_set[i], dec_set[i], time_set[i]
-        ln_prior = ln_priors_population_binary_c(p)
+        # ln_prior = ln_priors_population_binary_c(p)
+        ln_posterior = ln_posterior_population_binary_c(p)
 
-
-        while ln_prior < -10000.0:
+        while ln_posterior < -10000.0:
 
             # Binary parameters
             m1_set[i] = m1 + np.random.normal(0.0, 1.0, 1)
@@ -914,8 +931,8 @@ def set_walkers_binary_c(nwalkers=80):
             phi_set[i] = 0.8 + np.random.normal(0.0, 0.1, 1)
 
             p = m1_set[i], m2_set[i], a_set[i], e_set[i], v_kick_set[i], theta_set[i], phi_set[i], ra_set[i], dec_set[i], time_set[i]
-            ln_prior = ln_priors_population_binary_c(p)
-
+            # ln_prior = ln_priors_population_binary_c(p)
+            ln_posterior = ln_posterior_population_binary_c(p)
 
 
     # Save and return the walker positions

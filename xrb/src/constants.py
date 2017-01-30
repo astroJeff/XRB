@@ -1,6 +1,7 @@
 # Constants to be used throughout module
 G = 6.674e-8 # Gravitational constant in cgs
 GGG = 1.909e5 # Gravitational constant in Rsun * (km/s)^2 / Msun
+c_light = 2.9979e10 # speed of light in cgs
 km_to_cm = 1.0e5 # km to cm
 Msun_to_g = 1.989e33 # Msun to g
 Rsun_to_cm = 6.995e10 # Rsun to cm
@@ -31,6 +32,8 @@ min_mass = 8.0
 max_mass = 39.0
 min_A = 1.0e1
 max_A = 1.0e4
+min_z = 0.001
+max_z = 0.03
 
 
 

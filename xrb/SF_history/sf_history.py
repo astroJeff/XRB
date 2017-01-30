@@ -72,6 +72,28 @@ def get_dist_closest(ra, dec, coor):
     return c.rad_to_deg * dist[index]
 
 
+def reset_sf_history():
+    """ Clear the SF_history module variables """
+
+    global sf_coor
+    global sf_sfh
+    global sf_dist
+
+    global ra_min
+    global ra_max
+    global dec_min
+    global dec_max
+
+    ra_max = None
+    ra_min = None
+    dec_max = None
+    dec_min = None
+
+    sf_sfh = None
+    sf_coor = None
+    sf_dist = None
+
+
 def load_sf_history(z=0.008):
     """ Load star formation history data for both SMC and LMC
 
@@ -239,9 +261,9 @@ def load_lmc_data():
                 line_data = np.array(line_data).astype(np.float64)
 
                 if "_" in str(region):
-                    area = 1.218e-5
+                    area = 1.218e-5  # radian^2
                 else:
-                    area = 4.874e-5
+                    area = 4.874e-5  # radian^2
 
                 out_line[0][0] = region
                 out_line[0][1] = line_data[0]
