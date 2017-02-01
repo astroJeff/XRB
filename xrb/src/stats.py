@@ -77,7 +77,11 @@ def ln_priors(y):
     """
 
 #    M1, M2, A, v_k, theta, phi, ra_b, dec_b, t_b = y
-    ra, dec, M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = y
+    ra, dec, log_M1, log_M2, log_A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = y
+
+    M1 = 10**log_M1
+    M2 = 10**log_M2
+    A = 10**log_A
 
     lp = 0.0
 
@@ -258,9 +262,13 @@ def ln_posterior(x, args):
         Natural log of the posterior probability
     """
 
-    M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
+    log_M1, log_M2, log_A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
     M2_d, M2_d_err, P_orb_obs, P_orb_obs_err, ecc_obs, ecc_obs_err, ra, dec = args
-    y = ra, dec, M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b
+    y = ra, dec, log_M1, log_M2, log_A, ecc, v_k, theta, phi, ra_b, dec_b, t_b
+
+    M1 = 10**log_M1
+    M2 = 10**log_M2
+    A = 10**log_A
 
 
     # Call priors
@@ -517,7 +525,11 @@ def ln_priors_population(y):
         Natural log of the prior
     """
 
-    M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = y
+    log_M1, log_M2, log_A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = y
+
+    M1 = 10**log_M1
+    M2 = 10**log_M2
+    A = 10**log_A
 
     lp = 0.0
 
@@ -604,7 +616,11 @@ def ln_posterior_population(x):
         Natural log of the posterior probability
     """
 
-    M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
+    log_M1, log_M2, log_A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
+
+    M1 = 10**log_M1
+    M2 = 10**log_M2
+    A = 10**log_A
 
     # Call priors
     lp = ln_priors_population(x)
@@ -642,17 +658,21 @@ def ln_priors_population_binary_c(y):
         Natural log of the prior
     """
 
-    M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = y
+    log_M1, log_M2, log_A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = y
+
+    M1 = 10**log_M1
+    M2 = 10**log_M2
+    A = 10**log_A
 
     lp = 0.0
 
     # P(M1)
-    if M1 < 0.1: return -np.inf
+    if M1 < c.min_mass or M1 > c.max_mass: return -np.inf
     norm_const = (c.alpha+1.0) / (np.power(c.max_mass, c.alpha+1.0) - np.power(c.min_mass, c.alpha+1.0))
     lp += np.log( norm_const * np.power(M1, c.alpha) )
 
     # P(M2)
-    if M2 < 0.1: return -np.inf
+    if M2 < 0.1 or M2 > M1: return -np.inf
     # Normalization is over full q in (0,1.0)
     lp += np.log( (1.0 / M1 ) )
 
@@ -703,7 +723,11 @@ def ln_posterior_population_binary_c(x):
         Natural log of the posterior probability
     """
 
-    M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
+    log_M1, log_M2, log_A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
+
+    M1 = 10**log_M1
+    M2 = 10**log_M2
+    A = 10**log_A
 
 
     # Call priors
@@ -836,6 +860,9 @@ def set_walkers_binary_c(nwalkers=80):
     # Initial values
     m1 = 12.0
     m2 = 9.0
+    log_m1 = np.log10(m1)
+    log_m2 = np.log10(m2)
+
     eccentricity = 0.41
     orbital_period = 1500.0
     metallicity = 0.02
@@ -879,11 +906,11 @@ def set_walkers_binary_c(nwalkers=80):
     # Now to generate a ball around this spot
 
     # Binary parameters
-    m1_set = m1 + np.random.normal(0.0, 1.0, nwalkers)
-    m2_set = m2 + np.random.normal(0.0, 1.0, nwalkers)
+    log_m1_set = log_m1 + np.random.normal(0.0, 0.1, nwalkers)
+    log_m2_set = log_m2 + np.random.normal(0.0, 0.1, nwalkers)
     e_set = eccentricity + np.random.normal(0.0, 0.1, nwalkers)
     P_orb_set = orbital_period + np.random.normal(0.0, 20.0, nwalkers)
-    a_set = binary_evolve.P_to_A(m1_set, m2_set, P_orb_set)
+    log_a_set = np.log10(binary_evolve.P_to_A(np.power(10., log_m1_set), np.power(10., log_m2_set), P_orb_set))
     time_set = time_good + np.random.normal(0.0, 1.0, nwalkers)
 
 
@@ -907,18 +934,18 @@ def set_walkers_binary_c(nwalkers=80):
     # Check if any of these have posteriors with -infinity
     for i in np.arange(nwalkers):
 
-        p = m1_set[i], m2_set[i], a_set[i], e_set[i], v_kick_set[i], theta_set[i], phi_set[i], ra_set[i], dec_set[i], time_set[i]
+        p = log_m1_set[i], log_m2_set[i], log_a_set[i], e_set[i], v_kick_set[i], theta_set[i], phi_set[i], ra_set[i], dec_set[i], time_set[i]
         # ln_prior = ln_priors_population_binary_c(p)
         ln_posterior = ln_posterior_population_binary_c(p)
 
         while ln_posterior < -10000.0:
 
             # Binary parameters
-            m1_set[i] = m1 + np.random.normal(0.0, 1.0, 1)
-            m2_set[i] = m2 + np.random.normal(0.0, 1.0, 1)
+            log_m1_set[i] = log_m1 + np.random.normal(0.0, 0.1, 1)
+            log_m2_set[i] = log_m2 + np.random.normal(0.0, 0.1, 1)
             e_set[i] = eccentricity + np.random.normal(0.0, 0.1, 1)
             P_orb_set[i] = orbital_period + np.random.normal(0.0, 20.0, 1)
-            a_set[i] = binary_evolve.P_to_A(m1_set[i], m2_set[i], P_orb_set[i])
+            log_a_set[i] = np.log10(binary_evolve.P_to_A(np.power(10., log_m1_set[i]), np.power(10., log_m2_set[i]), P_orb_set[i]))
             time_set[i] = time_good + np.random.normal(0.0, 1.0, 1)
 
             # Position
@@ -930,7 +957,7 @@ def set_walkers_binary_c(nwalkers=80):
             theta_set[i] = 0.9*np.pi + np.random.normal(0.0, 0.1, 1)
             phi_set[i] = 0.8 + np.random.normal(0.0, 0.1, 1)
 
-            p = m1_set[i], m2_set[i], a_set[i], e_set[i], v_kick_set[i], theta_set[i], phi_set[i], ra_set[i], dec_set[i], time_set[i]
+            p = log_m1_set[i], log_m2_set[i], log_a_set[i], e_set[i], v_kick_set[i], theta_set[i], phi_set[i], ra_set[i], dec_set[i], time_set[i]
             # ln_prior = ln_priors_population_binary_c(p)
             ln_posterior = ln_posterior_population_binary_c(p)
 
@@ -938,9 +965,9 @@ def set_walkers_binary_c(nwalkers=80):
     # Save and return the walker positions
     p0 = np.zeros((nwalkers,10))
 
-    p0[:,0] = m1_set
-    p0[:,1] = m2_set
-    p0[:,2] = a_set
+    p0[:,0] = log_m1_set
+    p0[:,1] = log_m2_set
+    p0[:,2] = log_a_set
     p0[:,3] = e_set
     p0[:,4] = v_kick_set
     p0[:,5] = theta_set
@@ -974,10 +1001,10 @@ def set_walkers(initial_masses, args, nwalkers=80):
     M2_d, M2_d_err, P_orb_obs, P_orb_obs_err, ecc_obs, ecc_obs_err, ra, dec = args
 
     p0 = np.zeros((nwalkers,10))
-    p0[:,0] = initial_masses.T[0] # M1
-    p0[:,1] = initial_masses.T[1] # M2
+    p0[:,0] = np.log10(initial_masses.T[0]) # log M1
+    p0[:,1] = np.log10(initial_masses.T[1]) # log M2
 
-    p0[:,2] = np.power(10.0, np.random.uniform(1.0, 3.0, size=nwalkers)) # A
+    p0[:,2] = np.random.uniform(1.0, 3.0, size=nwalkers) # log A
     p0[:,3] = np.random.uniform(0.0, 0.99, size=nwalkers) # ecc
     p0[:,4] = 300.0 * np.random.uniform(size=nwalkers) # v_k
     p0[:,5] = np.random.normal(0.8*np.pi, 0.2, size=nwalkers) # theta
@@ -991,7 +1018,7 @@ def set_walkers(initial_masses, args, nwalkers=80):
 
         prob = ln_posterior(p0[i], args)
         while(np.isinf(prob)):
-            p0[i,2] = np.power(10.0, np.random.uniform(1.0, 3.0)) # A
+            p0[i,2] = np.random.uniform(1.0, 3.0) # log A
             p0[i,3] = np.random.uniform(0.0, 0.99) # ecc
             p0[i,4] = 300.0* np.random.normal() # v_k
             p0[i,5] = np.random.normal(0.8*np.pi, 0.2) # theta
