@@ -744,10 +744,12 @@ def ln_posterior_population_binary_c(x):
 
     # Check if object is an X-ray binary
     if L_x == 0.0: return -np.inf
-    if k1 < 13: return -np.inf
+    if k1 < 13 or k1 > 14: return -np.inf
     if k2 > 9: return -np.inf
     if A_out < 0.0: return -np.inf
-    if ecc > 1.0: return -np.inf
+    if ecc > 1.0 or ecc < 0.0: return -np.inf
+    if m2_out < 4.0: return -np.inf
+
 
     if np.isnan(lp): print "Found a NaN!"
 
