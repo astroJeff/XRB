@@ -758,7 +758,7 @@ def ln_posterior_population_binary_c(x):
 
 
 def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme='toy',
-                         threads=1, mpi=False):
+                         threads=1, mpi=False, return_sampler=True, print_progress=False):
     """ Run emcee on the entire X-ray binary population
 
     Parameters
@@ -836,11 +836,39 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme=
     # Burn-in
     pos,prob,state = sampler.run_mcmc(p0, N=nburn)
 
-    # Full run
-    sampler.reset()
-    pos,prob,state = sampler.run_mcmc(pos, N=nsteps)
 
-    return sampler
+
+    # Run everything and return sampler
+    if return_sampler:
+        sampler.reset()
+        pos,prob,state = sampler.run_mcmc(pos, N=nsteps)
+
+        return sampler
+
+    else:
+        # Run in batches, only return combined chains
+        chains = np.empty((80, 0, 10))  # create empty array
+
+        # nleft are the number of steps remaining
+        nleft = nsteps
+
+        while nleft > 0:
+
+            # Run at most 10,000 steps at a time
+            nrun = min(nleft, 10000)
+            nleft = nleft - nrun
+
+            # Print progress
+            if print_progress:  print nleft, "steps remaining,", nrun, "steps currently running"
+
+            # Empties sampler
+            sampler.reset()
+            pos,prob,state = sampler.run_mcmc(pos, N=nrun)
+
+            # add every 100th step to array of chains
+            chains = np.concatenate((chains, sampler.chain[:, 0::100, :]), axis=1)
+
+        return chains
 
 
 

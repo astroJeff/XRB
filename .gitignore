@@ -57,3 +57,4 @@ full_model/test*
 scripts
 stats
 documents/*.key
+xrb/code/sse_code/*.o
