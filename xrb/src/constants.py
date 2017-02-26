@@ -41,9 +41,6 @@ max_z = 0.03
 sf_scheme = None
 
 
-# Large Magellanic Cloud
-dist_LMC = 5.0e4 * pc_to_km # Distance in km
-
-
-# Small Magellanic Cloud
-dist_SMC = 6.1e4 * pc_to_km # Distance in km
+dist_LMC = 5.0e4 * pc_to_km # Distance to Large Magellanic Cloud (in km)
+dist_SMC = 6.1e4 * pc_to_km # Distance to Small Magellanic Cloud (in km)
+dist_NGC4244 = 4.3e6 * pc_to_km # Distance to NGC4244 (in km)

@@ -56,10 +56,13 @@ def get_M1(x1, x2, alpha, N):
 
     return np.power(x*(alpha+1.0)/A + np.power(x1, alpha+1.0), 1.0/(alpha+1.0))
 
-# Mass ratio - uniform [0.3,1.0]
 def get_q(N):
-    """ Generate N random mass ratios """
+    """ Generate random mass ratios """
     return 0.7 * uniform.rvs(size = N) + 0.3
+
+def get_M2(N, M1):
+    """ Generate secondary masses """
+    return (M1-0.1) * uniform.rvs(size=N) + 0.1
 
 def get_A(a1, a2, N):
     """ Generate random orbital separations
@@ -79,10 +82,15 @@ def get_A(a1, a2, N):
         Array of random orbital separations (Rsun)
     """
 
-    x1 = np.log10(a1)
-    x2 = np.log10(a2)
+    # x1 = np.log10(a1)
+    # x2 = np.log10(a2)
+    # return np.power(10.0, (x2-x1)*uniform.rvs(size=N) + x1)
 
-    return np.power(10.0, (x2-x1)*uniform.rvs(size=N) + x1)
+    C = 1.0 / (np.log(a2) - np.log(a1))
+    x = uniform.rvs(size=N)
+
+    return a1 * np.exp(x / C)
+
 
 def get_ecc(N):
     """ Generate N random eccentricities """
@@ -118,10 +126,11 @@ def generate_population(N):
     theta = get_theta(N)
     phi = get_phi(N)
     M_1_a = get_M1(c.min_mass, c.max_mass, c.alpha, N)
-    M_2_a = get_q(N) * M_1_a
+    M_2_a = get_M2(N, M_1_a)
 
     # Kick velocities depend on the core mass
-    sigma = map(lambda m: c.v_k_sigma_ECS if m<c.ECS_Fe_mass else c.v_k_sigma, M_1_a)
+    # sigma = map(lambda m: c.v_k_sigma_ECS if m<c.ECS_Fe_mass else c.v_k_sigma, M_1_a)
+    sigma = c.v_k_sigma
     v_k = get_v_k(sigma, N)
 
     # To get Orbital Separation limits, need to take into account star radii

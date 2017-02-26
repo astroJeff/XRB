@@ -8,18 +8,21 @@ import pickle
 
 from xrb.src import stats
 
+c.sf_scheme = "SMC" 
+
 # Record time
 start_time = time.time()
 
-sampler = stats.run_emcee_population(nburn=10000, nsteps=50000, nwalkers=320)
+sampler = stats.run_emcee_population(nburn=10000, nsteps=500000, nwalkers=40)
 
 
 print "Simulation took", time.time()-start_time, "seconds"
 
 
+pickle.dump( sampler, open( INDATA("SMC_MCMC_sampler_test.obj"), "wb" ) )
+
+
 print "Production run:"
-print "Autocorrelation lengths", sampler.acor
 print "Acceptance fraction", sampler.acceptance_fraction
+print "Autocorrelation lengths", sampler.acor
 
-
-pickle.dump( sampler, open( INDATA("SMC_MCMC_sampler.obj"), "wb" ) )

@@ -77,11 +77,8 @@ def ln_priors(y):
     """
 
 #    M1, M2, A, v_k, theta, phi, ra_b, dec_b, t_b = y
-    ra, dec, log_M1, log_M2, log_A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = y
+    ra, dec, M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = y
 
-    M1 = 10**log_M1
-    M2 = 10**log_M2
-    A = 10**log_A
 
     lp = 0.0
 
@@ -262,13 +259,10 @@ def ln_posterior(x, args):
         Natural log of the posterior probability
     """
 
-    log_M1, log_M2, log_A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
+    M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
     M2_d, M2_d_err, P_orb_obs, P_orb_obs_err, ecc_obs, ecc_obs_err, ra, dec = args
-    y = ra, dec, log_M1, log_M2, log_A, ecc, v_k, theta, phi, ra_b, dec_b, t_b
+    y = ra, dec, M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b
 
-    M1 = 10**log_M1
-    M2 = 10**log_M2
-    A = 10**log_A
 
 
     # Call priors
@@ -525,11 +519,7 @@ def ln_priors_population(y):
         Natural log of the prior
     """
 
-    log_M1, log_M2, log_A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = y
-
-    M1 = 10**log_M1
-    M2 = 10**log_M2
-    A = 10**log_A
+    M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = y
 
     lp = 0.0
 
@@ -616,11 +606,7 @@ def ln_posterior_population(x):
         Natural log of the posterior probability
     """
 
-    log_M1, log_M2, log_A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
-
-    M1 = 10**log_M1
-    M2 = 10**log_M2
-    A = 10**log_A
+    M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
 
     # Call priors
     lp = ln_priors_population(x)
@@ -658,11 +644,7 @@ def ln_priors_population_binary_c(y):
         Natural log of the prior
     """
 
-    log_M1, log_M2, log_A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = y
-
-    M1 = 10**log_M1
-    M2 = 10**log_M2
-    A = 10**log_A
+    M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = y
 
     lp = 0.0
 
@@ -723,16 +705,14 @@ def ln_posterior_population_binary_c(x):
         Natural log of the posterior probability
     """
 
-    log_M1, log_M2, log_A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
+    M1, M2, A, ecc, v_k, theta, phi, ra_b, dec_b, t_b = x
 
-    M1 = 10**log_M1
-    M2 = 10**log_M2
-    A = 10**log_A
 
+    empty_arr = np.zeros(9)
 
     # Call priors
     lp = ln_priors_population_binary_c(x)
-    if np.isinf(lp): return -np.inf
+    if np.isinf(lp): return -np.inf, empty_arr
 
 
     # Run binary_c evolution
@@ -742,23 +722,26 @@ def ln_posterior_population_binary_c(x):
     output = binary_c.run_binary(M1, M2, orbital_period, ecc, metallicity, t_b, v_k, theta, phi, v_k, theta, phi, 0, 0)
     m1_out, m2_out, A_out, ecc_out, v_sys, L_x, t_SN1, t_SN2, t_cur, k1, k2, comenv_count, evol_hist = output
 
+    binary_evolved = [m1_out, m2_out, A_out, ecc_out, v_sys, L_x, t_SN1, k1, k2]
+
     # Check if object is an X-ray binary
-    if L_x == 0.0: return -np.inf
-    if k1 < 13 or k1 > 14: return -np.inf
-    if k2 > 9: return -np.inf
-    if A_out < 0.0: return -np.inf
-    if ecc > 1.0 or ecc < 0.0: return -np.inf
-    if m2_out < 4.0: return -np.inf
+    if L_x <= 0.0: return -np.inf, empty_arr
+    if k1 < 13 or k1 > 14: return -np.inf, empty_arr
+    if k2 > 9: return -np.inf, empty_arr
+    if A_out <= 0.0: return -np.inf, empty_arr
+    if ecc > 1.0 or ecc < 0.0: return -np.inf, empty_arr
+    if m2_out < 4.0: return -np.inf, empty_arr
 
 
     if np.isnan(lp): print "Found a NaN!"
 
 
-    return lp
+    return lp, np.array(binary_evolved)
 
 
 def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme='toy',
-                         threads=1, mpi=False, return_sampler=True, print_progress=False):
+                         threads=1, mpi=False, return_sampler=True, print_progress=False,
+                         save_binaries=True):
     """ Run emcee on the entire X-ray binary population
 
     Parameters
@@ -775,6 +758,8 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme=
         Number of threads to use for parallelization
     mpi : bool
         If true, use MPIPool for parallelization
+    save_binaries: bool
+        If true, use emcee's "blobs" to save data about the binary
 
     Returns
     -------
@@ -824,30 +809,40 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme=
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
-        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function, pool=pool)
+        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function, a=10.0, pool=pool)
 
     elif threads != 1:
-        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function, threads=threads)
+        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function, a=10.0, threads=threads)
     else:
-        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function)
+        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function, a=10.0)
 
     # sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function)
 
+
     # Burn-in
-    pos,prob,state = sampler.run_mcmc(p0, N=nburn)
+    if save_binaries:
+        pos,prob,state,binary_data = sampler.run_mcmc(p0, N=nburn)
+    else:
+        pos,prob,state = sampler.run_mcmc(p0, N=nburn)
 
 
 
     # Run everything and return sampler
     if return_sampler:
         sampler.reset()
-        pos,prob,state = sampler.run_mcmc(pos, N=nsteps)
 
-        return sampler
+        if save_binaries:
+            pos,prob,state,binary_data = sampler.run_mcmc(pos, N=nsteps)
+            return sampler, np.swapaxes(np.array(sampler.blobs), 0, 1)
+        else:
+            pos,prob,state = sampler.run_mcmc(pos, N=nsteps)
+            return sampler
 
     else:
         # Run in batches, only return combined chains
         chains = np.empty((80, 0, 10))  # create empty array
+        if save_binaries:
+            HMXB_evolved = np.empty((80, 0, 9))
 
         # nleft are the number of steps remaining
         nleft = nsteps
@@ -863,12 +858,20 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme=
 
             # Empties sampler
             sampler.reset()
-            pos,prob,state = sampler.run_mcmc(pos, N=nrun)
+
+            if save_binaries:
+                pos,prob,state,binary_data = sampler.run_mcmc(pos, N=nrun)
+                HMXB_evolved = np.concatenate((HMXB_evolved, np.swapaxes(np.array(sampler.blobs), 0, 1)[:, 0::100, :]), axis=1)
+            else:
+                pos,prob,state = sampler.run_mcmc(pos, N=nrun)
 
             # add every 100th step to array of chains
             chains = np.concatenate((chains, sampler.chain[:, 0::100, :]), axis=1)
 
-        return chains
+        if save_binaries:
+            return chains, HMXB_evolved
+        else:
+            return chains
 
 
 
@@ -890,8 +893,6 @@ def set_walkers_binary_c(nwalkers=80):
     # Initial values
     m1 = 12.0
     m2 = 9.0
-    log_m1 = np.log10(m1)
-    log_m2 = np.log10(m2)
 
     eccentricity = 0.41
     orbital_period = 1500.0
@@ -936,11 +937,11 @@ def set_walkers_binary_c(nwalkers=80):
     # Now to generate a ball around this spot
 
     # Binary parameters
-    log_m1_set = log_m1 + np.random.normal(0.0, 0.1, nwalkers)
-    log_m2_set = log_m2 + np.random.normal(0.0, 0.1, nwalkers)
+    m1_set = m1 + np.random.normal(0.0, 0.5, nwalkers)
+    m2_set = m2 + np.random.normal(0.0, 0.5, nwalkers)
     e_set = eccentricity + np.random.normal(0.0, 0.1, nwalkers)
     P_orb_set = orbital_period + np.random.normal(0.0, 20.0, nwalkers)
-    log_a_set = np.log10(binary_evolve.P_to_A(np.power(10., log_m1_set), np.power(10., log_m2_set), P_orb_set))
+    a_set = binary_evolve.P_to_A(m1_set, m2_set, P_orb_set)
     time_set = time_good + np.random.normal(0.0, 1.0, nwalkers)
 
 
@@ -964,18 +965,18 @@ def set_walkers_binary_c(nwalkers=80):
     # Check if any of these have posteriors with -infinity
     for i in np.arange(nwalkers):
 
-        p = log_m1_set[i], log_m2_set[i], log_a_set[i], e_set[i], v_kick_set[i], theta_set[i], phi_set[i], ra_set[i], dec_set[i], time_set[i]
+        p = m1_set[i], m2_set[i], a_set[i], e_set[i], v_kick_set[i], theta_set[i], phi_set[i], ra_set[i], dec_set[i], time_set[i]
         # ln_prior = ln_priors_population_binary_c(p)
         ln_posterior = ln_posterior_population_binary_c(p)
 
         while ln_posterior < -10000.0:
 
             # Binary parameters
-            log_m1_set[i] = log_m1 + np.random.normal(0.0, 0.1, 1)
-            log_m2_set[i] = log_m2 + np.random.normal(0.0, 0.1, 1)
+            m1_set[i] = m1 + np.random.normal(0.0, 0.5, 1)
+            m2_set[i] = m2 + np.random.normal(0.0, 0.5, 1)
             e_set[i] = eccentricity + np.random.normal(0.0, 0.1, 1)
             P_orb_set[i] = orbital_period + np.random.normal(0.0, 20.0, 1)
-            log_a_set[i] = np.log10(binary_evolve.P_to_A(np.power(10., log_m1_set[i]), np.power(10., log_m2_set[i]), P_orb_set[i]))
+            a_set[i] = binary_evolve.P_to_A(m1_set[i], m2_set[i], P_orb_set[i])
             time_set[i] = time_good + np.random.normal(0.0, 1.0, 1)
 
             # Position
@@ -987,7 +988,7 @@ def set_walkers_binary_c(nwalkers=80):
             theta_set[i] = 0.9*np.pi + np.random.normal(0.0, 0.1, 1)
             phi_set[i] = 0.8 + np.random.normal(0.0, 0.1, 1)
 
-            p = log_m1_set[i], log_m2_set[i], log_a_set[i], e_set[i], v_kick_set[i], theta_set[i], phi_set[i], ra_set[i], dec_set[i], time_set[i]
+            p = m1_set[i], m2_set[i], a_set[i], e_set[i], v_kick_set[i], theta_set[i], phi_set[i], ra_set[i], dec_set[i], time_set[i]
             # ln_prior = ln_priors_population_binary_c(p)
             ln_posterior = ln_posterior_population_binary_c(p)
 
@@ -995,9 +996,9 @@ def set_walkers_binary_c(nwalkers=80):
     # Save and return the walker positions
     p0 = np.zeros((nwalkers,10))
 
-    p0[:,0] = log_m1_set
-    p0[:,1] = log_m2_set
-    p0[:,2] = log_a_set
+    p0[:,0] = m1_set
+    p0[:,1] = m2_set
+    p0[:,2] = a_set
     p0[:,3] = e_set
     p0[:,4] = v_kick_set
     p0[:,5] = theta_set
@@ -1031,10 +1032,10 @@ def set_walkers(initial_masses, args, nwalkers=80):
     M2_d, M2_d_err, P_orb_obs, P_orb_obs_err, ecc_obs, ecc_obs_err, ra, dec = args
 
     p0 = np.zeros((nwalkers,10))
-    p0[:,0] = np.log10(initial_masses.T[0]) # log M1
-    p0[:,1] = np.log10(initial_masses.T[1]) # log M2
+    p0[:,0] = initial_masses.T[0] # M1
+    p0[:,1] = initial_masses.T[1] # M2
 
-    p0[:,2] = np.random.uniform(1.0, 3.0, size=nwalkers) # log A
+    p0[:,2] = np.random.uniform(100.0, 20.0, size=nwalkers) # A
     p0[:,3] = np.random.uniform(0.0, 0.99, size=nwalkers) # ecc
     p0[:,4] = 300.0 * np.random.uniform(size=nwalkers) # v_k
     p0[:,5] = np.random.normal(0.8*np.pi, 0.2, size=nwalkers) # theta
@@ -1048,7 +1049,7 @@ def set_walkers(initial_masses, args, nwalkers=80):
 
         prob = ln_posterior(p0[i], args)
         while(np.isinf(prob)):
-            p0[i,2] = np.random.uniform(1.0, 3.0) # log A
+            p0[i,2] = np.random.uniform(100.0, 20.0) # log A
             p0[i,3] = np.random.uniform(0.0, 0.99) # ecc
             p0[i,4] = 300.0* np.random.normal() # v_k
             p0[i,5] = np.random.normal(0.8*np.pi, 0.2) # theta

@@ -1,10 +1,13 @@
 from xrb.src.core import *
+from xrb.SF_history import *
 
 import matplotlib.pyplot as plt
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 from scipy.interpolate import interp1d
 import scipy.optimize as so
+
+
 
 
 ra_max = None
@@ -118,26 +121,33 @@ def load_sf_history(z=0.008):
         print "You must provide a scheme for the star formation history"
         exit(-1)
 
-    if (sf_coor is None) or (sf_sfh is None) or (sf_dist is None):
+    if (sf_coor is None) or (sf_sfh is None) or (sf_dist is None) or (ra_min is None):
         if c.sf_scheme is "SMC":
-            sf_coor = load_smc_coor()
-            sf_sfh = load_smc_sfh(z)
+            sf_coor = load_smc_data.load_smc_coor()
+            sf_sfh = load_smc_data.load_smc_sfh(z)
             sf_dist = c.dist_SMC
+            pad = 0.2
 
         if c.sf_scheme is "LMC":
-            sf_coor = load_lmc_coor()
-            sf_sfh = load_lmc_sfh(z)
+            sf_coor = load_lmc_data.load_lmc_coor()
+            sf_sfh = load_lmc_data.load_lmc_sfh(z)
             sf_dist = c.dist_LMC
+            pad = 0.2
+
+        if c.sf_scheme is "NGC4244":
+            sf_coor, sf_sfh = load_NGC4244_data.load_NGC4244_sfh()
+            sf_dist = c.dist_NGC4244
+            pad = 0.005
 
     # if ra_min is None: ra_min = min(sf_coor['ra'])-0.2
     # if ra_max is None: ra_max = max(sf_coor['ra'])+0.2
     # if dec_min is None: dec_min = min(sf_coor['dec'])-0.2
     # if dec_max is None: dec_max = max(sf_coor['dec'])+0.2
 
-    ra_min = min(sf_coor['ra'])-0.2
-    ra_max = max(sf_coor['ra'])+0.2
-    dec_min = min(sf_coor['dec'])-0.2
-    dec_max = max(sf_coor['dec'])+0.2
+        ra_min = min(sf_coor['ra'])-pad
+        ra_max = max(sf_coor['ra'])+pad
+        dec_min = min(sf_coor['dec'])-pad
+        dec_max = max(sf_coor['dec'])+pad
 
 
 
@@ -215,155 +225,8 @@ def get_SFH(ra, dec, t_b, coor, sfh):
 
 
 
-def load_lmc_data():
-    """ Return LMC star formation history per unit steradian
-
-    Returns
-    -------
-    lmc_sfh : np structured array
-        LMC star formation history
-        dtype: [('region','<S10'),
-                ('log_age','<f8'),
-                ('sfh_z008','<f8'),
-                ('sfh_z004','<f8'),
-                ('sfh_z0025','<f8'),
-                ('sfh_z001','<f8')]
-    """
-
-    # Create an empty array to start with
-    dtypes = [('region','<S10'), \
-            ('log_age','<f8'), \
-            ('sfh_z008','<f8'), \
-            ('sfh_z004','<f8'), \
-            ('sfh_z0025','<f8'), \
-            ('sfh_z001','<f8')]
-    lmc_data = np.recarray(0, dtype=dtypes)
-    out_line = np.recarray(1, dtype=dtypes)
-
-    # Test to load data
-    this_dir, this_filename = os.path.split(__file__)
-    file_path = os.path.join(this_dir, "lmc_sfh_reduced.dat")
-
-    with open(file_path) as f:
-#    with open("./lmc_sfh_reduced.dat") as f:
-        line_num = 0
-
-        for line in f:
-            line_num += 1
-
-            if line_num < 17: continue
-            if "Region" in line:
-                region = np.array(line.split()[2]).astype(np.str)
-            elif "(" in line:
-                1 == 1
-            else:
-                line_data = line.split()
-                line_data = np.array(line_data).astype(np.float64)
-
-                if "_" in str(region):
-                    area = 1.218e-5  # radian^2
-                else:
-                    area = 4.874e-5  # radian^2
-
-                out_line[0][0] = region
-                out_line[0][1] = line_data[0]
-                out_line[0][2] = line_data[1] / area
-                out_line[0][3] = line_data[4] / area
-                out_line[0][4] = line_data[7] / area
-                out_line[0][5] = line_data[10] / area
-
-                lmc_data = np.append(lmc_data, out_line[0])
-
-    return lmc_data
 
 
-def load_lmc_coor():
-    """ Load coordinates to LMC regions
-
-    Returns
-    -------
-    lmc_coor: np structured array
-        Coordinates of LMC regions in degrees
-        dtype: [('region','<S10'),
-                ('ra','float64'),
-                ('dec','float64')]
-    """
-
-
-    # Load data
-    this_dir, this_filename = os.path.split(__file__)
-    data_file = os.path.join(this_dir, "lmc_coordinates.dat")
-
-    lmc_coor_2 = np.genfromtxt(data_file, dtype="S10,S2,S2,S3,S2")
-
-    lmc_coor = np.recarray(0, dtype=[('region','<S10'),('ra','float64'),('dec','float64')])
-    tmp = np.recarray(1, dtype=[('region','<S10'),('ra','float64'),('dec','float64')])
-
-
-    for coor in lmc_coor_2:
-        ra = str(coor[1])+"h"+str(coor[2])+"m"
-        dec = str(coor[3])+"d"+str(coor[4])+"m"
-
-        region = coor[0]
-
-        coor = SkyCoord(ra, dec)
-
-        tmp["region"] = region
-        tmp["ra"] = coor.ra.degree
-        tmp["dec"] = coor.dec.degree
-
-        lmc_coor = np.append(lmc_coor, tmp)
-
-    return lmc_coor
-
-
-
-
-def load_lmc_sfh(z=0.008):
-    """ Create array of 1D interpolations in time of the
-    star formation histories for each region in the LMC.
-
-    Parameters
-    ----------
-    z : float (0.001, 0.0025, 0.004, 0.008)
-        Metallicity for which to return star formation history
-        Default = 0.008
-
-    Returns
-    -------
-    SF_history : ndarray
-        Array of star formation histories for each region
-    """
-
-
-    # Load the LMC coordinates and SFH data
-    lmc_data = load_lmc_data()
-
-    regions = np.unique(lmc_data["region"])
-
-    lmc_sfh = np.array([])
-    age = np.array([])
-    sfr = np.array([])
-    for r in regions:
-
-        age = lmc_data["log_age"][np.where(lmc_data["region"] == r)]
-
-        if z == 0.008:
-            sfr = lmc_data["sfh_z008"][np.where(lmc_data["region"] == r)]
-        elif z == 0.004:
-            sfr = lmc_data["sfh_z004"][np.where(lmc_data["region"] == r)]
-        elif z == 0.0025:
-            sfr = lmc_data["sfh_z0025"][np.where(lmc_data["region"] == r)]
-        elif z == 0.001:
-            sfr = lmc_data["sfh_z001"][np.where(lmc_data["region"] == r)]
-        else:
-            print "ERROR: You must choose an appropriate metallicity input"
-            print "Possible options are 0.001, 0.0025, 0.004, 0.008"
-            return -1
-
-        lmc_sfh = np.append(lmc_sfh, interp1d(age[::-1], sfr[::-1], bounds_error=False, fill_value=0.0))
-
-    return lmc_sfh
 
 
 
@@ -486,152 +349,6 @@ def get_LMC_plot(age, ax=None):
 
 
 
-def load_smc_coor():
-    """ Load coordinates to SMC regions
-
-    Returns
-    -------
-    smc_coor: np structured array
-        Coordinates of SMC regions in degrees
-        dtype: [('region','<S10'),
-                ('ra','float64'),
-                ('dec','float64')]
-    """
-
-
-    # Load data
-    this_dir, this_filename = os.path.split(__file__)
-    data_file = os.path.join(this_dir, "smc_coordinates.dat")
-
-    smc_coor_2 = np.genfromtxt(data_file, dtype="S10,S2,S2,S3,S2")
-
-    smc_coor = np.recarray(0, dtype=[('region','<S10'),('ra','float64'),('dec','float64')])
-    tmp = np.recarray(1, dtype=[('region','<S10'),('ra','float64'),('dec','float64')])
-
-
-    for coor in smc_coor_2:
-        ra = str(coor[1])+"h"+str(coor[2])+"m"
-        dec = str(coor[3])+"d"+str(coor[4])+"m"
-
-        region = coor[0]
-
-        coor = SkyCoord(ra, dec)
-
-        tmp["region"] = region
-        tmp["ra"] = coor.ra.degree
-        tmp["dec"] = coor.dec.degree
-
-        smc_coor = np.append(smc_coor, tmp)
-
-    return smc_coor
-
-
-def load_smc_data():
-    """ Return SMC star formation history per unit steradian
-
-    Returns
-    -------
-    smc_sfh : np structured array
-        SMC star formation history
-        dtype: [('region','<S10'),
-                ('log_age','<f8'),
-                ('sfh_z008','<f8'),
-                ('sfh_z004','<f8'),
-                ('sfh_z001','<f8')]
-    """
-
-    # Create an empty array to start with
-    dtypes = [('region','<S10'), \
-            ('log_age','<f8'), \
-            ('sfh_z008','<f8'), \
-            ('sfh_z004','<f8'), \
-            ('sfh_z001','<f8')]
-
-    smc_data = np.recarray(0, dtype=dtypes)
-    out_data = np.recarray(1, dtype=dtypes)
-
-    smc_coor = load_smc_coor()
-
-    # Each region has an area of 12' x 12', or 1.218e-5 steradians
-    area = 1.218e-5
-
-    # Star formation history file
-    # Test to load data
-    this_dir, this_filename = os.path.split(__file__)
-    file_path = os.path.join(this_dir, "smc_sfh.dat")
-
-    with open(file_path) as f:
-        line_num = 0
-
-        for line in f:
-
-            line_num += 1
-
-            if line_num < 27: continue
-
-            line_data = np.array(line.split()).astype(str)
-
-            out_data[0][0] = line_data[0]
-            out_data[0][1] = (line_data[5].astype(np.float64)+line_data[6].astype(np.float64))/2.0
-            out_data[0][2] = line_data[7].astype(np.float64) / area
-            out_data[0][3] = line_data[10].astype(np.float64) / area
-
-            if len(line_data) < 15:
-                out_data[0][4] = 0.0
-            else:
-                out_data[0][4] = line_data[13].astype(np.float64) / area
-
-            smc_data = np.append(smc_data, out_data[0])
-
-    return smc_data
-
-
-def load_smc_sfh(z=0.008):
-    """ Create array of 1D interpolations in time of the
-    star formation histories for each region in the SMC.
-
-    Parameters
-    ----------
-    z : float (0.001, 0.004, 0.008)
-        Metallicity for which to return star formation history
-        Default = 0.008
-
-    Returns
-    -------
-    SF_history : ndarray
-        Array of star formation histories for each region
-    """
-
-
-    # Load the LMC coordinates and SFH data
-    smc_data = load_smc_data()
-
-    smc_sfh = np.array([])
-    age = np.array([])
-    sfr = np.array([])
-
-    _, idx = np.unique(smc_data["region"], return_index=True)
-    regions = smc_data["region"][np.sort(idx)]
-
-    for i in np.arange(len(regions)):
-#    for r in regions:
-        r = regions[i]
-
-        age = smc_data["log_age"][np.where(smc_data["region"] == r)]
-        if z == 0.008:
-            sfr = smc_data["sfh_z008"][np.where(smc_data["region"] == r)]
-        elif z == 0.004:
-            sfr = smc_data["sfh_z004"][np.where(smc_data["region"] == r)]
-        elif z == 0.001:
-            sfr = smc_data["sfh_z001"][np.where(smc_data["region"] == r)]
-        else:
-            print "ERROR: You must choose an appropriate metallicity input"
-            print "Possible options are 0.001, 0.004, 0.008"
-            return -1
-
-        smc_sfh = np.append(smc_sfh, interp1d(age[::-1], sfr[::-1], bounds_error=False, fill_value=0.0))
-
-    return smc_sfh
 
 
 def test_SMC_SFH_plots():
@@ -975,7 +692,7 @@ def get_SMC_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dis
 def get_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dist=None,
         dist_bins=25, ra=None, dec=None, xcenter=None, ycenter=None, xwidth=None, ywidth=None,
         xlabel="Right Ascension", ylabel="Declination", xgrid_density=8, ygrid_density=5,
-        color_map='Blues'):
+        color_map='Blues', title=None):
     """ return a plot of the star formation history of the SMC at a particular age.
     In this case, the plot should be curvelinear, instead of flattened.
 
@@ -1005,6 +722,8 @@ def get_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dist=No
         Density of RA, Dec grid axes
     color_map : string (optional)
         One of the color map options from plt.cmap
+    title : string
+        Add a title to the plot. Default is the age.
 
     Returns
     -------
@@ -1022,6 +741,11 @@ def get_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dist=No
     global sf_coor
     global sf_sfh
     global sf_dist
+
+    global ra_min
+    global ra_max
+    global dec_min
+    global dec_max
 
     if c.sf_scheme is None:
         c.sf_scheme = "SMC"
@@ -1041,6 +765,12 @@ def get_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dist=No
         if xwidth is None: xwidth=5.0
         if ywidth is None: ywidth=5.0
 
+    if c.sf_scheme == 'NGC4244':
+        if xcenter is None: xcenter = 0.0
+        if ycenter is None: ycenter = 127.8
+        if xwidth is None: xwidth = 0.3
+        if ywidth is None: ywidth = 0.1
+
 
     def curvelinear_test2(fig, gs=None, xcenter=0.0, ycenter=17.3, xwidth=1.5, ywidth=1.5,
             xlabel=xlabel, ylabel=ylabel, xgrid_density=8, ygrid_density=5):
@@ -1052,9 +782,13 @@ def get_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dist=No
         tr += Affine2D().scale(np.pi/180., 1.)
         tr += PolarAxes.PolarTransform()
         if c.sf_scheme == "SMC":
-            tr += Affine2D().rotate(1.34)  # This rotates the grid
+            rot_angle = 1.34
         if c.sf_scheme == "LMC":
-            tr += Affine2D().rotate(0.2)  # This rotates the grid
+            rot_angle = 0.2
+        if c.sf_scheme == "NGC4244":
+            rot_angle = 4.636
+
+        tr += Affine2D().rotate(rot_angle)  # This rotates the grid
 
         extreme_finder = angle_helper.ExtremeFinderCycle(10, 60,
                                                         lon_cycle = 360,
@@ -1136,9 +870,23 @@ def get_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dist=No
     sfr = np.array([])
 
 
+    if c.sf_scheme == "SMC":
+        levels = np.linspace(1.0e7, 1.0e9, 10)
+        bins = 30
+    if c.sf_scheme == "LMC":
+        levels = np.linspace(1.0e7, 2.0e8, 10)
+        bins = 30
+    if c.sf_scheme == "NGC4244":
+        levels = np.linspace(0.1, 25, 25)
+        bins = 80
+
+
     # CREATING OUR OWN, LARGER GRID FOR STAR FORMATION CONTOURS
-    x_tmp = np.linspace(min(sf_coor['ra'])-1.0, max(sf_coor['ra'])+1.0, 30)
-    y_tmp = np.linspace(min(sf_coor['dec'])-1.0, max(sf_coor['dec'])+1.0, 30)
+    # x_tmp = np.linspace(min(sf_coor['ra'])-1.0, max(sf_coor['ra'])+1.0, 30)
+    # y_tmp = np.linspace(min(sf_coor['dec'])-1.0, max(sf_coor['dec'])+1.0, 30)
+    x_tmp = np.linspace(ra_min, ra_max, bins)
+    y_tmp = np.linspace(dec_min, dec_max, bins)
+
 
     XX, YY = np.meshgrid(x_tmp, y_tmp)
 
@@ -1146,6 +894,7 @@ def get_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dist=No
         sfr = np.append(sfr, get_SFH(XX.flatten()[i], \
                         YY.flatten()[i], age, sf_coor, sf_sfh))
     out_test = tr.transform(zip(XX.flatten(), YY.flatten()))
+
 
     # USING smc_coor AS THE POINTS FOR STAR FORMATION CONTOURS
     # for i in np.arange(len(smc_coor)):
@@ -1162,10 +911,6 @@ def get_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dist=No
     # Plot star formation histories on adjusted coordinates
     # Plot color contours with linear spacing
     #levels = np.arange(1.0e8, 1.0e9, 1.0e8)
-    if c.sf_scheme == "SMC":
-        levels = np.linspace(1.0e7, 1.0e9, 10)
-    if c.sf_scheme == "LMC":
-        levels = np.linspace(1.0e7, 2.0e8, 10)
 
     sf_plot = plt.tricontourf(out_test[:,0], out_test[:,1], sfr, cmap=color_map, levels=levels, extend='max')
     # sf_plot = plt.tricontourf(out_test[:,0], out_test[:,1], sfr, cmap=color_map, extend='max')
@@ -1173,7 +918,10 @@ def get_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dist=No
     # Plot color contours with logarithmic spacing
     # levels = np.linspace(7.0, 10.0, 10)
     # smc_plot = plt.tricontourf(out_test[:,0], out_test[:,1], np.log10(sfr), cmap=color_map, levels=levels, extend='max')
-    sf_plot = plt.title(str(int(age)) + ' Myr')
+    if title is None:
+        sf_plot = plt.title(str(int(age)) + ' Myr')
+    else:
+        sf_plot = plt.title(title)
     # smc_plot = plt.colorbar()
 
 
