@@ -108,7 +108,7 @@ def ln_posterior_population(x):
     # Run binary_c evolution
     orbital_period = A_to_P(M1, M2, A)
     output = binary_c.run_binary(M1, M2, orbital_period, ecc, metallicity, t_b, v_k_1, theta_1, phi_1, v_k_1, theta_1, phi_1, 0, 0)
-    # m1_out, m2_out, A_out, ecc_out, v_sys, L_x, t_SN1, t_SN2, t_cur, k1, k2, comenv_count, evol_hist = output
+    m1_out, m2_out, A_out, ecc_out, v_sys, L_x, t_SN1, t_SN2, t_cur, k1, k2, comenv_count, evol_hist = output
 
 
     # Check to see if we've formed an HMXB
