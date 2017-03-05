@@ -5,7 +5,11 @@ from scipy.interpolate import interp1d
 from scipy.stats import maxwell, norm, uniform, powerlaw, truncnorm
 import emcee
 from emcee.utils import MPIPool
-import binary_c
+
+try:
+    import binary_c
+except:
+    print "Binary_c could not be loaded"
 
 from xrb.binary import load_sse, binary_evolve
 from xrb.binary.binary_evolve import A_to_P, P_to_A
@@ -854,7 +858,7 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme=
             nleft = nleft - nrun
 
             # Print progress
-            if print_progress:  
+            if print_progress:
                 print nleft, "steps remaining,", nrun, "steps currently running"
 
             # Empties sampler

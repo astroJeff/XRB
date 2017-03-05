@@ -959,10 +959,23 @@ def get_plot_polar(age, fig_in=None, ax=None, gs=None, ra_dist=None, dec_dist=No
         zc = contour.collections
         plt.setp(zc, linewidth=1.5)
 
+
+
     # Plot a star at the coordinate position, if supplied
     if ra is not None and dec is not None:
-        coor_pol1, coor_pol2 = tr.transform(zip(np.array([ra, ra]), np.array([dec, dec])))
-        sf_plot = plt.scatter(coor_pol1[0], coor_pol1[1], color='r', s=75, marker="*", zorder=10)
+
+        # If only a single ra and dec, or a list of points
+        if isinstance(ra, np.ndarray):
+            coor_pol = tr.transform(zip(ra, dec))
+            sf_plot = plt.scatter(coor_pol[:,0], coor_pol[:,1], color='r', s=25, marker=".", zorder=10)
+        else:
+            coor_pol1, coor_pol2 = tr.transform(zip(np.array([ra, ra]), np.array([dec, dec])))
+            sf_plot = plt.scatter(coor_pol1[0], coor_pol1[1], color='r', s=75, marker="*", zorder=10)
+
+#    # Plot a star at the coordinate position, if supplied
+#    if ra is not None and dec is not None:
+#        coor_pol1, coor_pol2 = tr.transform(zip(np.array([ra, ra]), np.array([dec, dec])))
+#        sf_plot = plt.scatter(coor_pol1[0], coor_pol1[1], color='r', s=75, marker="*", zorder=10)
 
 
 
