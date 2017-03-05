@@ -315,6 +315,49 @@ def set_walkers(nwalkers=80):
     return p0
 
 
+def merger_time(M1, M2, A, ecc, formula="peters"):
+    """ Calculate the merger time of a compact binary
+
+    Parameters
+    ----------
+    M1, M2 : float
+        Masses of the two compact objects (Msun)
+    A, ecc : float
+        Orbital separation (Rsun) and eccentricity of the orbit
+    formula : str (optional)
+        Formula used to calculate the merger time
+        Options: 'peters'
+
+    Returns
+    -------
+    t_merge : float
+        Time before the two stars to merge (Myr)
+    """
+
+    if formula is "peters":
+        # Eqn 5.14 from Peters (1964), PhRv, 136, 1224
+
+        def peters_integrand(e):
+            return np.power(e, 29./19.) * np.power(1. + 121./304. * e*e, 1181./2299.) / np.power(1.-e*e, 1.5)
+
+        # beta has units cm^4/s
+        beta = 64./5. * (c.G**3) * M1 * M2 * (M1 + M2) / (c.c_light**5) * (c.Msun_to_g**3)
+
+        # c0 has units cm
+        c0 = A * (1.-ecc*ecc) * np.power(ecc, -12./19.) * np.power(1.0 + 121./304.*ecc*ecc, -870./2299.) * c.Rsun_to_cm
+
+        # Calculate the merger time, convert from s to Myr
+        t_merge = 12.0/19.0 * np.power(c0, 4.) / beta * quad(peters_integrand, 0.0, ecc)[0] / c.yr_to_sec / 1.0e6
+
+        return t_merge
+
+
+    else:
+        print "You must provide an appropriate formula"
+        print "Available options: 'peters'"
+        sys.exit(-1)
+
+
 
 def check_output(output, binary_type='HMXB'):
     """ Determine if the resulting binary from binary_c is of the type desired
