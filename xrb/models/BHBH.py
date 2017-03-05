@@ -15,6 +15,8 @@ from xrb.binary.binary_evolve import A_to_P, P_to_A
 
 nwalkers = 80
 
+binary_type = 'BHBH'
+
 
 # Priors
 def ln_priors_population(y):
@@ -102,11 +104,14 @@ def ln_posterior_population(x):
         Natural log of the posterior probability
     """
 
+    # Default is BHBH
+    global binary_type
+
     M1, M2, A, ecc, v_k_1, theta_1, phi_1, v_k_2, theta_2, phi_2, metallicity = x
     time_max = 100.0 # Max time to evolve is 100 Myr
 
     # Empty array
-    empty_arr = np.zeros(11) 
+    empty_arr = np.zeros(11)
 
     # Call priors
     lp = ln_priors_population(x)
@@ -120,7 +125,7 @@ def ln_posterior_population(x):
 
 
     # Check to see if we've formed an HMXB
-    if check_output(output, binary_type='BHBH'):
+    if check_output(output, binary_type=binary_type):
 
         # Calculate the merger time
         t_merge = merger_time(m1_out, m2_out, A_out, ecc_out, formula="peters")
@@ -209,6 +214,7 @@ def set_walkers(nwalkers=80):
 
     """
 
+    global binary_type
 
     # Initial values
     m1 = 50.0
@@ -253,7 +259,7 @@ def set_walkers(nwalkers=80):
         output = binary_c.run_binary(m1, m2, orbital_period, eccentricity, metallicity, time,
                                      v_k_1, theta_1, phi_1,v_k_2, theta_2, phi_2, evol_flag, dco_flag)
 
-        if check_output(output, "BHBH"):
+        if check_output(output, binary_type):
 
 
             m1_out, m2_out, orbital_separation_out, eccentricity_out, system_velocity, L_x, \
@@ -439,7 +445,7 @@ def check_output(output, binary_type='BHBH'):
     m1_out, m2_out, A_out, ecc_out, v_sys, L_x, t_SN1, t_SN2, t_cur, k1, k2, comenv_count, evol_hist = output
 
 
-    type_options = ["HMXB", "BHBH", "NSNS", "BHNS"]
+    type_options = np.array(["HMXB", "BHBH", "NSNS", "BHNS"]) 
 
     if not np.any(binary_type == type_options):
         print "The code is not set up to detect the type of binary you are interested in"
