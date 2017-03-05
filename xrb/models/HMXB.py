@@ -22,7 +22,7 @@ def ln_priors_population(y):
 
     Parameters
     ----------
-    y : M1, M2, A, ecc, v_k_1, theta_1, phi_1, t_b
+    y : log_M1, log_M2, log_A, ecc, v_k_1, theta_1, phi_1, t_b
         8 model parameters
 
     Returns
@@ -31,20 +31,22 @@ def ln_priors_population(y):
         Natural log of the prior
     """
 
-    M1, M2, A, ecc, v_k_1, theta_1, phi_1, t_b = y
-
+    log_M1, log_M2, log_A, ecc, v_k_1, theta_1, phi_1, t_b = y
+    M1 = np.power(10.0, log_M1)
+    M2 = np.power(10.0, log_M2)
+    A = np.power(10.0, log_A)
 
     lp = 0.0
 
     # P(M1)
     if M1 < c.min_mass: return -np.inf
     norm_const = (c.alpha+1.0) / (np.power(c.max_mass, c.alpha+1.0) - np.power(c.min_mass, c.alpha+1.0))
-    lp += np.log( norm_const * np.power(M1, c.alpha) )
+    lp += np.log( norm_const * np.power(M1, c.alpha+1.0) )
 
     # P(M2)
     if M2 < 0.1 or M2 > M1: return -np.inf
     # Normalization is over full q in (0,1.0)
-    lp += np.log( (1.0 / M1 ) )
+    lp += np.log( (M2 / M1) )
 
     # P(ecc)
     if ecc < 0.0 or ecc > 1.0: return -np.inf
@@ -53,7 +55,7 @@ def ln_priors_population(y):
     # P(A)
     if A*(1.0-ecc) < c.min_A or A*(1.0+ecc) > c.max_A: return -np.inf
     norm_const = 1.0 / (np.log(c.max_A) - np.log(c.min_A))
-    lp += np.log( norm_const / A )
+    lp += np.log(norm_const)
 
     # P(v_k_1)
     if v_k_1 < 0.0: return -np.inf
@@ -80,7 +82,7 @@ def ln_posterior_population(x):
 
     Parameters
     ----------
-    x : M1, M2, A, ecc, v_k_1, theta_1, phi_1, t_b
+    x : log_M1, log_M2, log_A, ecc, v_k_1, theta_1, phi_1, t_b
         8 model parameters
 
     Returns
@@ -89,15 +91,19 @@ def ln_posterior_population(x):
         Natural log of the posterior probability
     """
 
-    M1, M2, A, ecc, v_k_1, theta_1, phi_1, t_b = x
-
+    log_M1, log_M2, log_A, ecc, v_k_1, theta_1, phi_1, t_b = x
+    M1 = np.power(10.0, log_M1)
+    M2 = np.power(10.0, log_M2)
+    A = np.power(10.0, log_A)
 
     metallicity = 0.008
 
+    # Empty array
+    empty_arr = np.zeros(11)
+
     # Call priors
     lp = ln_priors_population(x)
-    if np.isinf(lp): return -np.inf
-
+    if np.isinf(lp): return -np.inf, empty_arr
 
     # Run binary_c evolution
     orbital_period = A_to_P(M1, M2, A)
@@ -107,9 +113,17 @@ def ln_posterior_population(x):
 
     # Check to see if we've formed an HMXB
     if check_output(output, binary_type='HMXB'):
-        return lp
 
-    return -np.inf
+        # Calculate the merger time
+        t_merge = merger_time(m1_out, m2_out, A_out, ecc_out, formula="peters")
+
+        # Data saved to blobs
+        binary_evolved = [m1_out, m2_out, A_out, ecc_out, v_sys, t_SN1, t_SN2, t_cur, t_merge, k1, k2]
+
+        return lp, binary_evolved
+
+
+    return -np.inf, empty_arr
 
 
 
@@ -159,13 +173,13 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, threads=1, mpi
 
     # Burn-in
     print "Starting burn-in..."
-    pos,prob,state = sampler.run_mcmc(p0, N=nburn)
+    pos,prob,state,binary_data = sampler.run_mcmc(p0, N=nburn)
     print "...finished running burn-in"
 
     # Full run
     print "Starting full run..."
     sampler.reset()
-    pos,prob,state = sampler.run_mcmc(pos, N=nsteps)
+    pos,prob,state,binary_data = sampler.run_mcmc(pos, N=nsteps)
     print "...full run finished"
 
     return sampler
@@ -218,12 +232,12 @@ def set_walkers(nwalkers=80):
         phi_1 = np.pi * np.random.uniform(size=1)
         time = 40.0 * np.random.uniform(size=1) + 10.0
 
-        x = m1, m2, A, eccentricity, v_k_1, theta_1, phi_1, time
+        x = np.log10(m1), np.log10(m2), np.log10(A), eccentricity, v_k_1, theta_1, phi_1, time
 
         # print "trial:", x, ln_posterior_population(x)
 
         # If the system has a viable posterior probability
-        if ln_posterior_population(x) > -10000.0:
+        if ln_posterior_population(x)[0] > -10000.0:
 
             # ...then use it as our starting system
             break
@@ -256,9 +270,9 @@ def set_walkers(nwalkers=80):
     for i in np.arange(nwalkers):
 
 
-        p = m1_set[i], m2_set[i], A_set[i], e_set[i], \
+        p = np.log10(m1_set[i]), np.log10(m2_set[i]), np.log10(A_set[i]), e_set[i], \
                 v_k_1_set[i], theta_1_set[i], phi_1_set[i], time_set[i]
-        ln_posterior = ln_posterior_population(p)
+        ln_posterior = ln_posterior_population(p)[0]
 
 
         while ln_posterior < -10000.0:
@@ -279,19 +293,19 @@ def set_walkers(nwalkers=80):
             time_set[i] = time + np.random.normal(0.0, 0.2, 1)
 
 
-            p = m1_set[i], m2_set[i], A_set[i], e_set[i], \
+            p = np.log10(m1_set[i]), np.log10(m2_set[i]), np.log10(A_set[i]), e_set[i], \
                     v_k_1_set[i], theta_1_set[i], phi_1_set[i], time_set[i]
 
-            ln_posterior = ln_posterior_population(p)
+            ln_posterior = ln_posterior_population(p)[0]
 
 
 
     # Save and return the walker positions
     p0 = np.zeros((nwalkers,8))
 
-    p0[:,0] = m1_set
-    p0[:,1] = m2_set
-    p0[:,2] = A_set
+    p0[:,0] = np.log10(m1_set)
+    p0[:,1] = np.log10(m2_set)
+    p0[:,2] = np.log10(A_set)
     p0[:,3] = e_set
     p0[:,4] = v_k_1_set
     p0[:,5] = theta_1_set

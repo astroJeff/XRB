@@ -106,11 +106,11 @@ def ln_posterior_population(x):
     time_max = 100.0 # Max time to evolve is 100 Myr
 
     # Empty array
-    empty_arry = np.zeros(11) 
+    empty_arr = np.zeros(11) 
 
     # Call priors
     lp = ln_priors_population(x)
-    if np.isinf(lp): return -np.inf, empty_arr 
+    if np.isinf(lp): return -np.inf, empty_arr
 
 
     # Run binary_c evolution
@@ -128,7 +128,7 @@ def ln_posterior_population(x):
         # Data saved to blobs
         binary_evolved = [m1_out, m2_out, A_out, ecc_out, v_sys, t_SN1, t_SN2, t_cur, t_merge, k1, k2]
 
-        return lp, np.array(binary_evolved) 
+        return lp, np.array(binary_evolved)
 
     else:
 
@@ -254,7 +254,7 @@ def set_walkers(nwalkers=80):
                                      v_k_1, theta_1, phi_1,v_k_2, theta_2, phi_2, evol_flag, dco_flag)
 
         if check_output(output, "BHBH"):
-       
+
 
             m1_out, m2_out, orbital_separation_out, eccentricity_out, system_velocity, L_x, \
                     time_SN_1, time_SN_2, time_current, ktype_1, ktype_2, comenv_count, evol_hist = output
@@ -284,8 +284,8 @@ def set_walkers(nwalkers=80):
     x = m1, m2, A, eccentricity, v_k_1, theta_1, phi_1, v_k_2, theta_2, phi_2, metallicity
 
 
-    ln_posterior = ln_posterior_population(x)[0]  
-    if not np.isinf(ln_posterior): print "Found Initial Walker Solution: ", v_k_1, theta_1, v_k_2, theta_2, ln_posterior_population(x)[0] 
+    ln_posterior = ln_posterior_population(x)[0]
+    if not np.isinf(ln_posterior): print "Found Initial Walker Solution: ", v_k_1, theta_1, v_k_2, theta_2, ln_posterior_population(x)[0]
 
 
 
@@ -314,7 +314,7 @@ def set_walkers(nwalkers=80):
 
         p = m1_set[i], m2_set[i], a_set[i], e_set[i], v_k_1_set[i], theta_1_set[i], \
                 phi_1_set[i], v_k_2_set[i], theta_2_set[i], phi_2_set[i], metallicity_set[i]
-        ln_posterior = ln_posterior_population(p)[0] 
+        ln_posterior = ln_posterior_population(p)[0]
 
 
         while ln_posterior < -10000.0:
@@ -337,7 +337,7 @@ def set_walkers(nwalkers=80):
 
             p = m1_set[i], m2_set[i], a_set[i], e_set[i], v_k_1_set[i], theta_1_set[i], \
                     phi_1_set[i], v_k_2_set[i], theta_2_set[i], phi_2_set[i], metallicity_set[i]
-            ln_posterior = ln_posterior_population(p)[0] 
+            ln_posterior = ln_posterior_population(p)[0]
 
 
 
@@ -441,7 +441,7 @@ def check_output(output, binary_type='BHBH'):
 
     type_options = ["HMXB", "BHBH", "NSNS", "BHNS"]
 
-    if not np.any(binary_type == type_options):   
+    if not np.any(binary_type == type_options):
         print "The code is not set up to detect the type of binary you are interested in"
         sys.exit(-1)
 
@@ -459,8 +459,8 @@ def check_output(output, binary_type='BHBH'):
         if k1 != 14 or k2 != 14: return False
         if A_out <= 0.0: return False
         if ecc_out < 0.0 or ecc_out > 1.0: return False
-        return True 
- 
+        return True
+
     elif binary_type == "NSNS":
         if k1 != 13 or k2 != 13: return False
         if A_out <= 0.0: return False
