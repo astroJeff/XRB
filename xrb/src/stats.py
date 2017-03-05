@@ -730,7 +730,7 @@ def ln_posterior_population_binary_c(x):
     if k2 > 9: return -np.inf, empty_arr
     if A_out <= 0.0: return -np.inf, empty_arr
     if ecc > 1.0 or ecc < 0.0: return -np.inf, empty_arr
-    if m2_out < 4.0: return -np.inf, empty_arr
+    if m2_out < 1.0: return -np.inf, empty_arr
 
 
     if np.isnan(lp): print "Found a NaN!"
@@ -809,12 +809,12 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme=
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
-        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function, a=10.0, pool=pool)
+        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function, pool=pool)
 
     elif threads != 1:
-        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function, a=10.0, threads=threads)
+        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function, threads=threads)
     else:
-        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function, a=10.0)
+        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function)
 
     # sampler = emcee.EnsembleSampler(nwalkers=nwalkers, dim=10, lnpostfn=posterior_function)
 
@@ -840,9 +840,9 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme=
 
     else:
         # Run in batches, only return combined chains
-        chains = np.empty((80, 0, 10))  # create empty array
+        chains = np.empty((nwalkers, 0, 10))  # create empty array
         if save_binaries:
-            HMXB_evolved = np.empty((80, 0, 9))
+            HMXB_evolved = np.empty((nwalkers, 0, 9))
 
         # nleft are the number of steps remaining
         nleft = nsteps
@@ -854,7 +854,8 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, binary_scheme=
             nleft = nleft - nrun
 
             # Print progress
-            if print_progress:  print nleft, "steps remaining,", nrun, "steps currently running"
+            if print_progress:  
+                print nleft, "steps remaining,", nrun, "steps currently running"
 
             # Empties sampler
             sampler.reset()

@@ -105,9 +105,12 @@ def ln_posterior_population(x):
     M1, M2, A, ecc, v_k_1, theta_1, phi_1, v_k_2, theta_2, phi_2, metallicity = x
     time_max = 100.0 # Max time to evolve is 100 Myr
 
+    # Empty array
+    empty_arry = np.zeros(11) 
+
     # Call priors
     lp = ln_priors_population(x)
-    if np.isinf(lp): return -np.inf
+    if np.isinf(lp): return -np.inf, empty_arr 
 
 
     # Run binary_c evolution
@@ -116,26 +119,20 @@ def ln_posterior_population(x):
     m1_out, m2_out, A_out, ecc_out, v_sys, L_x, t_SN1, t_SN2, t_cur, k1, k2, comenv_count, evol_hist = output
 
 
-    # Check if object is an merging binary black hole
-    if k1 != 14: return -np.inf
-    if k2 != 14: return -np.inf
-    if A_out <= 0.0: return -np.inf
-    if ecc < 0.0 or ecc > 1.0: return -np.inf
+    # Check to see if we've formed an HMXB
+    if check_output(output, binary_type='BHBH'):
 
+        # Calculate the merger time
+        t_merge = merger_time(m1_out, m2_out, A_out, ecc_out, formula="peters")
 
-    # Calculate the merger time
-    t_merge = t_cur + merger_time(m1_out, m2_out, A_out, ecc_out, formula="peters")
+        # Data saved to blobs
+        binary_evolved = [m1_out, m2_out, A_out, ecc_out, v_sys, t_SN1, t_SN2, t_cur, t_merge, k1, k2]
 
-    # Only allow the system if it formed within the last Hubble time
-    if t_merge > 1.4e4: return -np.inf
+        return lp, np.array(binary_evolved) 
 
+    else:
 
-    # Simple error check
-    if np.isnan(lp): print "Found a NaN!"
-
-
-    return lp
-
+        return -np.inf, empty_arr
 
 
 def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, threads=1, mpi=False):
@@ -184,13 +181,13 @@ def run_emcee_population(nburn=10000, nsteps=100000, nwalkers=80, threads=1, mpi
 
     # Burn-in
     print "Starting burn-in..."
-    pos,prob,state = sampler.run_mcmc(p0, N=nburn)
+    pos,prob,state,binary_data = sampler.run_mcmc(p0, N=nburn)
     print "...finished running burn-in"
 
     # Full run
     print "Starting full run..."
     sampler.reset()
-    pos,prob,state = sampler.run_mcmc(pos, N=nsteps)
+    pos,prob,state,binary_data = sampler.run_mcmc(pos, N=nsteps)
     print "...full run finished"
 
     return sampler
@@ -256,17 +253,17 @@ def set_walkers(nwalkers=80):
         output = binary_c.run_binary(m1, m2, orbital_period, eccentricity, metallicity, time,
                                      v_k_1, theta_1, phi_1,v_k_2, theta_2, phi_2, evol_flag, dco_flag)
 
-        m1_out, m2_out, orbital_separation_out, eccentricity_out, system_velocity, L_x, \
-                time_SN_1, time_SN_2, time_current, ktype_1, ktype_2, comenv_count, evol_hist = output
+        if check_output(output, "BHBH"):
+       
 
-        # If system survives the both SN...
-        if orbital_separation_out != 0.0 and ktype_1==14 and ktype_2==14:
+            m1_out, m2_out, orbital_separation_out, eccentricity_out, system_velocity, L_x, \
+                    time_SN_1, time_SN_2, time_current, ktype_1, ktype_2, comenv_count, evol_hist = output
 
             A = P_to_A(m1, m2, orbital_period)
             x = m1, m2, A, eccentricity, v_k_1, theta_1, phi_1, v_k_2, theta_2, phi_2, metallicity
 
             # ...and merges within a Hubble time...
-            if not np.isinf(ln_posterior_population(x)):
+            if not np.isinf(ln_posterior_population(x)[0]):
 
                 # ...then use it as our starting system
                 break
@@ -287,8 +284,8 @@ def set_walkers(nwalkers=80):
     x = m1, m2, A, eccentricity, v_k_1, theta_1, phi_1, v_k_2, theta_2, phi_2, metallicity
 
 
-    ln_posterior = ln_posterior_population(x)
-    if not np.isinf(ln_posterior): print "Found Initial Walker Solution: ", v_k_1, theta_1, v_k_2, theta_2, ln_posterior_population(x)
+    ln_posterior = ln_posterior_population(x)[0]  
+    if not np.isinf(ln_posterior): print "Found Initial Walker Solution: ", v_k_1, theta_1, v_k_2, theta_2, ln_posterior_population(x)[0] 
 
 
 
@@ -317,7 +314,7 @@ def set_walkers(nwalkers=80):
 
         p = m1_set[i], m2_set[i], a_set[i], e_set[i], v_k_1_set[i], theta_1_set[i], \
                 phi_1_set[i], v_k_2_set[i], theta_2_set[i], phi_2_set[i], metallicity_set[i]
-        ln_posterior = ln_posterior_population(p)
+        ln_posterior = ln_posterior_population(p)[0] 
 
 
         while ln_posterior < -10000.0:
@@ -340,7 +337,7 @@ def set_walkers(nwalkers=80):
 
             p = m1_set[i], m2_set[i], a_set[i], e_set[i], v_k_1_set[i], theta_1_set[i], \
                     phi_1_set[i], v_k_2_set[i], theta_2_set[i], phi_2_set[i], metallicity_set[i]
-            ln_posterior = ln_posterior_population(p)
+            ln_posterior = ln_posterior_population(p)[0] 
 
 
 
@@ -405,3 +402,76 @@ def merger_time(M1, M2, A, ecc, formula="peters"):
         print "You must provide an appropriate formula"
         print "Available options: 'peters'"
         sys.exit(-1)
+
+
+
+def check_output(output, binary_type='BHBH'):
+    """ Determine if the resulting binary from binary_c is of the type desired
+
+    Parameters
+    ----------
+    M1_out, M2_out : float
+        Masses of each object returned by binary_c
+    A_out, ecc_out : float
+        Orbital separation and eccentricity
+    v_sys : float
+        Systemic velocity of the system
+    L_x : float
+        X-ray luminosity of the system
+    t_SN1, t_SN2 : float
+        Time of the first and second SN, respectively
+    t_cur : float
+        Time at the end of the simulation
+    k1, k2 : int
+        K-types for each star
+    comenv_count : int
+        Number of common envelopes the star went through
+    evol_hist : string
+        String corresponding to the evolutionary history of the binary
+
+    Returns
+    -------
+    binary_type : bool
+        Is the binary of the requested type?
+
+    """
+
+    m1_out, m2_out, A_out, ecc_out, v_sys, L_x, t_SN1, t_SN2, t_cur, k1, k2, comenv_count, evol_hist = output
+
+
+    type_options = ["HMXB", "BHBH", "NSNS", "BHNS"]
+
+    if not np.any(binary_type == type_options):   
+        print "The code is not set up to detect the type of binary you are interested in"
+        sys.exit(-1)
+
+    # Check if object is an HMXB
+    if binary_type == "HMXB":
+        if k1 < 13 or k1 > 14: return False
+        if k2 > 9: return False
+        if A_out <= 0.0: return False
+        if ecc_out < 0.0 or ecc_out > 1.0: return False
+        if L_x <= 0.0: return False
+        if m2_out < 4.0: return False
+        return True
+
+    elif binary_type == "BHBH":
+        if k1 != 14 or k2 != 14: return False
+        if A_out <= 0.0: return False
+        if ecc_out < 0.0 or ecc_out > 1.0: return False
+        return True 
+ 
+    elif binary_type == "NSNS":
+        if k1 != 13 or k2 != 13: return False
+        if A_out <= 0.0: return False
+        if ecc_out < 0.0 or ecc_out > 1.0: return False
+        return True
+
+    elif binary_type == "BHNS":
+        if (k1 != 14 or k2 != 13) and (k1 != 13 or k2 != 14): return False
+        if A_out <= 0.0: return False
+        if ecc_out < 0.0 or ecc_out > 1.0: return False
+        return True
+
+
+    return True
